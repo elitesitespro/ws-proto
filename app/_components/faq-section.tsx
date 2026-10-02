@@ -1,6 +1,11 @@
+"use client";
+
+import Image from "next/image";
 import { ArrowRightIcon } from "lucide-react";
+import { motion, MotionConfig } from "motion/react";
 import { cn } from "cn";
 import { FaqAccordion, type FaqItem } from "@/components/faq/faq-accordion";
+import { revealHeading, revealItem, revealMutedItem, revealTitle } from "@/components/faq/faq-reveal-motion";
 import { buttonVariants } from "@/components/ui/button";
 
 const faqItems: FaqItem[] = [
@@ -44,39 +49,70 @@ const faqItems: FaqItem[] = [
 
 export function FaqSection() {
   return (
-    <section
-      aria-labelledby="faq-heading"
-      className="mx-auto w-full max-w-6xl px-3 py-6 md:px-6 md:py-8"
-    >
-      <div className="mx-auto flex max-w-4xl flex-col items-center gap-2 text-center">
-        <h1
-          id="faq-heading"
-          className="text-xl leading-[44px] font-semibold tracking-tight md:text-2xl md:leading-[52px] md:tracking-tighter"
+    <MotionConfig reducedMotion="user">
+      <section
+        aria-labelledby="faq-heading"
+        className="mx-auto w-full max-w-6xl px-3 py-6 md:px-6 md:py-8"
+      >
+        <motion.div
+          className="mx-auto flex max-w-4xl flex-col items-center gap-2 text-center"
+          variants={revealHeading}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, amount: 0.6 }}
         >
-          Frequently asked questions
-        </h1>
-        <p className="max-w-md text-sm leading-[24px] opacity-70">
-          Everything you need to know about WorldStreet. Find answers to the most
-          common questions below.
-        </p>
-      </div>
+          <Image
+            src="/assets/images/luminous-molten-gold-question-mark.png"
+            alt=""
+            width={96}
+            height={144}
+            sizes="(min-width: 768px) 96px, 80px"
+            className="h-15 w-10 object-contain md:h-18 md:w-12"
+            loading="eager"
+          />
+          <div className="w-full overflow-hidden">
+            <motion.h1
+              id="faq-heading"
+              variants={revealTitle}
+              className="text-xl leading-[44px] font-semibold tracking-tight md:text-2xl md:leading-[52px] md:tracking-tighter"
+            >
+              Frequently asked questions
+            </motion.h1>
+          </div>
+          <div className="w-full max-w-md overflow-hidden">
+            <motion.p
+              variants={revealMutedItem}
+              className="text-sm leading-[24px]"
+            >
+              Everything you need to know about WorldStreet. Find answers to the most
+              common questions below.
+            </motion.p>
+          </div>
+        </motion.div>
 
-      <div className="mx-auto mt-5 w-full max-w-xl">
-        <FaqAccordion items={faqItems} defaultOpenItem="separate-accounts" />
-      </div>
+        <div className="mx-auto mt-5 w-full max-w-xl">
+          <FaqAccordion items={faqItems} defaultOpenItem="separate-accounts" />
+        </div>
 
-      <div className="mt-4 flex justify-center">
-        <a
-          href="https://worldstreet.app/en/support"
-          className={cn(
-            buttonVariants({ variant: "link" }),
-            "h-6 px-2 underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
-          )}
+        <motion.div
+          className="mt-4 flex justify-center"
+          variants={revealItem}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, amount: 0.5 }}
         >
-          Visit the Help Center
-          <ArrowRightIcon aria-hidden="true" className="size-(--icon-size-min)" />
-        </a>
-      </div>
-    </section>
+          <a
+            href="https://worldstreet.app/en/support"
+            className={cn(
+              buttonVariants({ variant: "link" }),
+              "h-6 px-2 underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
+            )}
+          >
+            Visit the Help Center
+            <ArrowRightIcon aria-hidden="true" className="size-(--icon-size-min)" />
+          </a>
+        </motion.div>
+      </section>
+    </MotionConfig>
   );
 }
