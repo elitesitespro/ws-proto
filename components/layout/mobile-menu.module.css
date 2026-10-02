@@ -1,0 +1,5 @@
+@media (min-width: 64rem) {
+  .root {
+    display: none;
+  }
+}
