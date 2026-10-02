@@ -71,13 +71,13 @@ export function FaqSection() {
             loading="eager"
           />
           <div className="w-full overflow-hidden">
-            <motion.h1
+            <motion.h2
               id="faq-heading"
               variants={revealTitle}
               className="text-xl leading-[44px] font-semibold tracking-tight md:text-2xl md:leading-[52px] md:tracking-tighter"
             >
               Frequently asked questions
-            </motion.h1>
+            </motion.h2>
           </div>
           <div className="w-full max-w-md overflow-hidden">
             <motion.p
