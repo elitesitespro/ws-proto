@@ -139,9 +139,8 @@ export function SiteHeader() {
         aria-hidden={hidden}
         inert={hidden}
         onFocusCapture={() => setHidden(false)}
-        className={`sticky top-0 z-50 border-b border-border/50 bg-background/70 backdrop-blur-xl transition-[translate] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] motion-reduce:transition-none ${
-          hidden ? "-translate-y-full" : "translate-y-0"
-        }`}
+        className={`sticky top-0 z-50 border-b border-border/50 bg-background/70 backdrop-blur-xl transition-[translate] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] motion-reduce:transition-none ${hidden ? "-translate-y-full" : "translate-y-0"
+          }`}
       >
         <div className="relative mx-auto flex h-10 w-full max-w-7xl items-center justify-between gap-1 px-3 xl:px-4">
           <Link
@@ -190,7 +189,6 @@ export function SiteHeader() {
                 className="flex min-h-6 items-center gap-1 whitespace-nowrap text-[14px] font-medium opacity-75 transition-opacity hover:opacity-100 focus-visible:rounded-sm focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
               >
                 {item.label}
-                <ChevronDownIcon aria-hidden="true" className="size-2 shrink-0" />
               </Link>
             ))}
           </nav>
