@@ -9,7 +9,7 @@ export function MarketsSection() {
         heading="Explore specialized WorldStreet market experiences available to eligible users."
         actions={[
           "Monitor market prices",
-          "Track supported portfolio information",
+          "Manage orders",
           "Explore crypto markets",
           "View market information",
           "Explore active events",
