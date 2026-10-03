@@ -1,4 +1,5 @@
 import { ConnectSection } from "./_components/connect-section";
+import { CurrencySection } from "./_components/currency-section";
 import { EcosystemIntroSection } from "./_components/ecosystem-intro-section";
 import { EntertainmentSection } from "./_components/entertainment-section";
 import { ExploreCtaSection } from "./_components/explore-cta-section";
@@ -20,6 +21,7 @@ export default function Home() {
       <LifestyleSection />
       <MarketsSection />
       <WalletSection />
+      <CurrencySection />
       <ExploreCtaSection />
       <FaqSection />
     </main>
