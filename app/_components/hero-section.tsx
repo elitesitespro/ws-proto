@@ -9,7 +9,7 @@ export function HeroSection() {
             aria-labelledby="hero-heading"
             className="mx-auto flex w-full max-w-6xl flex-col items-center justify-center px-3 py-12 text-center md:px-6 md:py-20"
         >
-            <div className="flex max-w-3xl flex-col items-center gap-5">
+            <div className="flex max-w-3xl flex-col items-center gap-2">
 
                 {/* Main Headline */}
                 <h1
@@ -18,7 +18,7 @@ export function HeroSection() {
                 >
                     <span>One Wallet for Everything</span>
 
-                    <span className="mt-1 flex items-center justify-center gap-3">
+                    <span className="mt-0 flex items-center justify-center gap-2">
                         {/* Cap-height matched badge placeholder */}
                         <span
                             aria-hidden="true"
@@ -35,7 +35,7 @@ export function HeroSection() {
                 </p>
 
                 {/* CTAs */}
-                <div className="flex w-full flex-col items-center gap-2 pt-2 sm:w-auto sm:flex-row">
+                <div className="flex w-full flex-col items-center gap-0 pt-2 sm:w-auto sm:flex-row">
                     <Link
                         href="/create-account"
                         className={cn(
