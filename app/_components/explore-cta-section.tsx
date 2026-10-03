@@ -16,12 +16,12 @@ export function ExploreCtaSection() {
       >
         <div className="pointer-events-none absolute inset-0 z-0 bg-black/55" aria-hidden="true" />
         <div className="relative z-10 mx-auto flex max-w-4xl flex-col items-center gap-2 px-4 pb-1 pt-10 text-center md:px-8 md:pt-12">
-          <h1
+          <h2
             id="explore-heading"
             className="max-w-xl text-lg leading-[32px] font-semibold tracking-tight md:text-2xl md:leading-[48px] md:tracking-tighter"
           >
             There&apos;s more than one street to explore.
-          </h1>
+          </h2>
           <p className="max-w-md text-sm leading-[24px] text-white/80">
             Connect, create, watch, shop, work, learn and discover what WorldStreet
             has to offer.
