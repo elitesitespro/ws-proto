@@ -26,37 +26,37 @@ const CATEGORIES: Category[] = [
     id: "trade-markets",
     label: "Trade & Markets",
     platforms: [
-      { name: "Forex Trading", href: "/platforms/forex", image: "/assets/cards/forex.jpg" },
-      { name: "Crypto", href: "/platforms/crypto", image: "/assets/cards/crypto.jpg" },
-      { name: "Prediction", href: "/platforms/prediction", image: "/assets/cards/prediction.jpg" },
+      { name: "Forex Trading", href: "/platforms/forex" },
+      { name: "Crypto", href: "/platforms/crypto" },
+      { name: "Prediction", href: "/platforms/prediction" },
     ],
   },
   {
     id: "media-play",
     label: "Media & Play",
     platforms: [
-      { name: "Vsion", href: "/platforms/vsion", image: "/assets/cards/vsion.jpg" },
-      { name: "AI Movie", href: "/platforms/ai-movie", image: "/assets/cards/ai-movie.jpg" },
-      { name: "Arcade", href: "/platforms/arcade", image: "/assets/cards/arcade.jpg" },
+      { name: "Vsion", href: "/platforms/vsion" },
+      { name: "AI Movie", href: "/platforms/ai-movie" },
+      { name: "Arcade", href: "/platforms/arcade" },
     ],
   },
   {
     id: "connect-social",
     label: "Connect & Social",
     platforms: [
-      { name: "WorldSpace", href: "/platforms/worldspace", image: "/assets/cards/worldspace.jpg" },
-      { name: "XStream", href: "/platforms/xstream", image: "/assets/cards/xstream.jpg" },
-      { name: "WorldMeet", href: "/platforms/worldmeet", image: "/assets/cards/worldmeet.jpg" },
+      { name: "WorldSpace", href: "/platforms/worldspace" },
+      { name: "XStream", href: "/platforms/xstream" },
+      { name: "WorldMeet", href: "/platforms/worldmeet" },
     ],
   },
   {
     id: "ecosystem-life",
     label: "Ecosystem & Life",
     platforms: [
-      { name: "WorkWorld", href: "/platforms/workworld", image: "/assets/cards/workworld.jpg" },
-      { name: "WorldStore", href: "/platforms/worldstore", image: "/assets/cards/worldstore.jpg" },
-      { name: "WorldHealth", href: "/platforms/worldhealth", image: "/assets/cards/worldhealth.jpg" },
-      { name: "Academy", href: "/platforms/academy", image: "/assets/cards/academy.jpg" },
+      { name: "WorkWorld", href: "/platforms/workworld" },
+      { name: "WorldStore", href: "/platforms/worldstore" },
+      { name: "WorldHealth", href: "/platforms/worldhealth" },
+      { name: "Academy", href: "/platforms/academy" },
     ],
   },
 ];
@@ -193,8 +193,8 @@ export function SiteHeader() {
             >
               <div className="mx-auto flex max-w-7xl items-stretch gap-4 px-3 md:gap-6 xl:px-4">
 
-                {/* Left Card: Categories */}
-                <div className="flex w-full max-w-[240px] shrink-0 flex-col rounded-2xl border border-white/10 bg-[#1a1918] p-6">
+                {/* Left Dark Card: Categories */}
+                <div className="flex w-full max-w-[240px] shrink-0 flex-col rounded-2xl border border-white/10 bg-[#1a1918] p-5 md:p-6">
                   <span className="mb-6 text-sm font-normal text-[#a8a29e]">Categories</span>
                   <div className="flex flex-col space-y-4">
                     {CATEGORIES.map((cat) => {
@@ -216,8 +216,8 @@ export function SiteHeader() {
                   </div>
                 </div>
 
-                {/* Right Card: Poster Platform Grid */}
-                <div className="flex-1 rounded-2xl border border-white/10 bg-[#1a1918] p-6">
+                {/* Right Dark Card: Platform Grid */}
+                <div className="flex flex-1 rounded-2xl border border-white/10 bg-[#1a1918] p-5 md:p-6">
                   <AnimatePresence mode="wait">
                     <motion.div
                       key={activeCategory.id}
@@ -226,7 +226,7 @@ export function SiteHeader() {
                       exit={{ opacity: 0, scale: 0.98 }}
                       transition={{ duration: 0.15 }}
                       className={cn(
-                        "grid h-full items-center gap-4",
+                        "grid w-full items-stretch gap-4",
                         activeCategory.platforms.length === 4
                           ? "grid-cols-2 sm:grid-cols-4"
                           : "grid-cols-2 sm:grid-cols-3"
@@ -237,12 +237,12 @@ export function SiteHeader() {
                           key={platform.name}
                           href={platform.href}
                           onClick={() => setIsDiscoverOpen(false)}
-                          className="group block h-full"
+                          className="group flex h-full flex-col"
                         >
                           <motion.div
                             whileHover={{ scale: 1.03 }}
                             transition={{ duration: 0.2 }}
-                            className="relative aspect-[3/4] w-full overflow-hidden rounded-xl border border-white/10 bg-[#252321] transition-all group-hover:border-[#FACC15]/40"
+                            className="relative flex h-full min-h-[220px] w-full flex-col justify-end overflow-hidden rounded-xl border border-white/10 bg-[#252321] transition-all group-hover:border-[#FACC15]/40 sm:min-h-[250px]"
                           >
                             {/* Background Canvas / Poster Image */}
                             {platform.image ? (
@@ -256,11 +256,11 @@ export function SiteHeader() {
                               <div className="absolute inset-0 bg-gradient-to-br from-white/15 to-white/5 transition-colors group-hover:from-white/20 group-hover:to-white/10" />
                             )}
 
-                            {/* Dark Bottom Gradient Overlay for Legibility */}
-                            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+                            {/* Dark Bottom Gradient Overlay */}
+                            <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent" />
 
                             {/* Title Overlaid Directly at Bottom */}
-                            <div className="absolute bottom-3 left-3 right-3 z-10 text-xs font-semibold text-white transition-colors group-hover:text-[#FACC15] sm:text-sm">
+                            <div className="relative z-10 p-3 text-xs font-semibold text-white transition-colors group-hover:text-[#FACC15] sm:p-4 sm:text-sm">
                               {platform.name}
                             </div>
                           </motion.div>

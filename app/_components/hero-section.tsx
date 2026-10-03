@@ -1,9 +1,39 @@
+"use client";
+
+import { useState, useEffect } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { ArrowRightIcon } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "cn";
 import { buttonVariants } from "@/components/ui/button";
 
+interface HeroFeature {
+    word: string;
+    image?: string;
+}
+
+const HERO_FEATURES: HeroFeature[] = [
+    { word: "Streaming", image: "/assets/hero/streaming.png" },
+    { word: "Trading", image: "/assets/hero/trading.png" },
+    { word: "Shopping", image: "/assets/hero/shopping.png" },
+    { word: "Gaming", image: "/assets/hero/gaming.png" },
+    { word: "Learning", image: "/assets/hero/learning.png" },
+];
+
 export function HeroSection() {
+    const [currentIndex, setCurrentIndex] = useState(0);
+
+    useEffect(() => {
+        const timer = setInterval(() => {
+            setCurrentIndex((prev) => (prev + 1) % HERO_FEATURES.length);
+        }, 2500);
+
+        return () => clearInterval(timer);
+    }, []);
+
+    const currentFeature = HERO_FEATURES[currentIndex];
+
     return (
         <section
             aria-labelledby="hero-heading"
@@ -18,13 +48,34 @@ export function HeroSection() {
                 >
                     <span>One Wallet for Everything</span>
 
-                    <span className="mt-0 flex items-center justify-center gap-2">
-                        {/* Cap-height matched badge placeholder */}
-                        <span
-                            aria-hidden="true"
-                            className="inline-block h-[0.82em] w-[0.82em] shrink-0 rounded-xl bg-[#d9d9d9] sm:rounded-2xl"
-                        />
-                        <span>Streaming</span>
+                    {/* Masked line container for vertical slide animation */}
+                    <span className="relative flex h-[1.2em] w-full items-center justify-center overflow-hidden">
+                        <AnimatePresence mode="wait">
+                            <motion.span
+                                key={currentFeature.word}
+                                initial={{ y: "100%", opacity: 0 }}
+                                animate={{ y: "0%", opacity: 1 }}
+                                exit={{ y: "-100%", opacity: 0 }}
+                                transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+                                className="flex items-center justify-center gap-2"
+                            >
+                                {/* Cap-height matched badge placeholder with optional image */}
+                                <span
+                                    aria-hidden="true"
+                                    className="relative inline-block h-[0.82em] w-[0.82em] shrink-0 overflow-hidden rounded-xl bg-[#d9d9d9] sm:rounded-2xl"
+                                >
+                                    {currentFeature.image && (
+                                        <Image
+                                            src={currentFeature.image}
+                                            alt=""
+                                            fill
+                                            className="object-cover"
+                                        />
+                                    )}
+                                </span>
+                                <span>{currentFeature.word}</span>
+                            </motion.span>
+                        </AnimatePresence>
                     </span>
                 </h1>
 
@@ -35,7 +86,7 @@ export function HeroSection() {
                 </p>
 
                 {/* CTAs */}
-                <div className="flex w-full flex-col items-center gap-0 pt-2 sm:w-auto sm:flex-row">
+                <div className="flex w-full flex-col items-center gap-2 pt-2 sm:w-auto sm:flex-row">
                     <Link
                         href="/create-account"
                         className={cn(
