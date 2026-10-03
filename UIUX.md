@@ -12,6 +12,7 @@ Apply these rules to every new or changed screen and component. Add new rules he
 - The down chevrons in the desktop primary navigation are the only exception: render them at 16px by 16px.
 - Calculate the Major Third type scale from 14px, multiplying each step by 1.25. Round each calculated size to the nearest multiple of 4px, rounding up when exactly halfway. The final font size divided by 4px must always be a whole number, never a decimal. For example, 27.430px becomes 28px because 28 ÷ 4 = 7. Use the shared type sizes in `app/globals.css` rather than one-off font sizes.
 - The desktop primary navigation labels are 14px as an exception to the rounded type scale.
+- Footer text is 14px as an exception to the rounded type scale, except the introductory sentence below the logo, which is 16px.
 - As font size increases, use tighter letter spacing and tighter line spacing relative to the font size.
 - Use sentence case for all UI text. Do not use Title Case or ALL CAPS.
 - Use opacity on the main text color for muted text. Do not use a solid gray color for muted text.
