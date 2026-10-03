@@ -1,10 +1,10 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { ChevronDownIcon } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
+import { AnimatePresence, motion, useMotionValueEvent, useScroll } from "motion/react";
 import { cn } from "@/lib/utils";
 import { buttonVariants } from "@/components/ui/button";
 import { MobileMenu } from "./mobile-menu";
@@ -70,6 +70,11 @@ const primaryNav = [
 ] as const;
 
 export function SiteHeader() {
+  const headerRef = useRef<HTMLElement>(null);
+  const lastDirection = useRef(0);
+  const distanceInDirection = useRef(0);
+  const [hidden, setHidden] = useState(false);
+  const { scrollY } = useScroll();
   const [isDiscoverOpen, setIsDiscoverOpen] = useState(false);
   const [activeCategoryId, setActiveCategoryId] = useState<string>(CATEGORIES[0].id);
 
@@ -84,6 +89,33 @@ export function SiteHeader() {
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, []);
+
+  useMotionValueEvent(scrollY, "change", (current) => {
+    const previous = scrollY.getPrevious() ?? current;
+    const change = current - previous;
+    const menuOpen = headerRef.current?.querySelector('[aria-expanded="true"]');
+    const focusInHeader = headerRef.current?.contains(document.activeElement);
+
+    if (current <= 80 || menuOpen || focusInHeader) {
+      setHidden(false);
+      distanceInDirection.current = 0;
+      return;
+    }
+
+    if (change === 0) return;
+
+    const direction = Math.sign(change);
+    if (direction !== lastDirection.current) {
+      lastDirection.current = direction;
+      distanceInDirection.current = 0;
+    }
+
+    distanceInDirection.current += Math.abs(change);
+    if (distanceInDirection.current >= 12) {
+      setHidden(direction > 0);
+      distanceInDirection.current = 0;
+    }
+  });
 
   return (
     <>
@@ -102,7 +134,15 @@ export function SiteHeader() {
         )}
       </AnimatePresence>
 
-      <header className="sticky top-0 z-50 border-b border-border/50 bg-background/70 backdrop-blur-xl">
+      <header
+        ref={headerRef}
+        aria-hidden={hidden}
+        inert={hidden}
+        onFocusCapture={() => setHidden(false)}
+        className={`sticky top-0 z-50 border-b border-border/50 bg-background/70 backdrop-blur-xl transition-[translate] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] motion-reduce:transition-none ${
+          hidden ? "-translate-y-full" : "translate-y-0"
+        }`}
+      >
         <div className="relative mx-auto flex h-10 w-full max-w-7xl items-center justify-between gap-1 px-3 xl:px-4">
           <Link
             href="/"

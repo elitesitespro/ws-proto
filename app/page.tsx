@@ -7,6 +7,7 @@ import { HeroSection } from "./_components/hero-section";
 import { LifestyleSection } from "./_components/lifestyle-section";
 import { MarketsSection } from "./_components/markets-section";
 import { PlatformTimelineSection } from "./_components/platform-timeline-section";
+import { WalletSection } from "./_components/wallet-section";
 
 export default function Home() {
   return (
@@ -18,6 +19,7 @@ export default function Home() {
       <EntertainmentSection />
       <LifestyleSection />
       <MarketsSection />
+      <WalletSection />
       <ExploreCtaSection />
       <FaqSection />
     </main>

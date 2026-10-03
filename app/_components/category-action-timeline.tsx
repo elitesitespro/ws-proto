@@ -28,7 +28,7 @@ export function CategoryActionTimeline({
   const onLeft = side === "left";
 
   return (
-    <div className={`relative min-h-25 lg:min-h-0 ${onLeft ? "lg:order-1" : ""}`}>
+    <div className={`relative min-h-25 lg:mt-8 lg:min-h-0 ${onLeft ? "lg:order-1" : ""}`}>
       <div
         aria-hidden="true"
         className={`absolute inset-y-0 hidden w-[4px] bg-white/25 lg:block ${
@@ -64,12 +64,13 @@ export function CategoryActionTimeline({
             className="ms-0! min-h-5 justify-center pb-0!"
           >
             <TimelineIndicator
-              className={`top-1/2! size-2! -translate-y-1/2! border-0! bg-white! transition-opacity duration-300 ${
+              className={`top-1/2! size-2! -translate-y-1/2! border-0! transition-colors duration-300 ${
+                index <= activeIndex ? "bg-[#f4c542]!" : "bg-[#635e60]!"
+              } ${
                 onLeft
                   ? "left-0! lg:left-auto! lg:right-0! lg:translate-x-1/2!"
                   : "left-0!"
               }`}
-              style={{ opacity: index <= activeIndex ? 0.8 : 0.2 }}
             />
             <motion.div
               aria-hidden={index > activeIndex}
