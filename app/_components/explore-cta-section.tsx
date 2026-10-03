@@ -14,8 +14,8 @@ export function ExploreCtaSection() {
         seed="worldstreet-explore"
         className="w-full"
       >
-        <div className="pointer-events-none absolute inset-0 bg-black/55" aria-hidden="true" />
-        <div className="relative mx-auto flex max-w-4xl flex-col items-center gap-2 px-4 py-8 text-center md:px-8 md:py-12">
+        <div className="pointer-events-none absolute inset-0 z-0 bg-black/55" aria-hidden="true" />
+        <div className="relative z-10 mx-auto flex max-w-4xl flex-col items-center gap-2 px-4 pb-1 pt-10 text-center md:px-8 md:pt-12">
           <h1
             id="explore-heading"
             className="max-w-xl text-lg leading-[32px] font-semibold tracking-tight md:text-2xl md:leading-[48px] md:tracking-tighter"

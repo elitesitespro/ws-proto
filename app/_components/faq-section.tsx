@@ -52,7 +52,7 @@ export function FaqSection() {
     <MotionConfig reducedMotion="user">
       <section
         aria-labelledby="faq-heading"
-        className="mx-auto w-full max-w-6xl px-3 py-6 md:px-6 md:py-8"
+        className="mx-auto w-full max-w-6xl px-3 pb-6 pt-10 md:px-6 md:pb-8 md:pt-12"
       >
         <motion.div
           className="mx-auto flex max-w-4xl flex-col items-center gap-2 text-center"
