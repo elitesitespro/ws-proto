@@ -5,8 +5,17 @@ export function LifestyleSection() {
     <section id="lifestyle" aria-labelledby="lifestyle-heading" className="bg-[#070405] text-white">
       <MegaMenuStatement
         headingId="lifestyle-heading"
-        title="Lifestyle"
-        description="Shop, work, learn and take care of the things that matter beyond your feed."
+        label="Lifestyle"
+        heading="Shop, work, learn and take care of the things that matter beyond your feed."
+        actions={[
+          "Browse products",
+          "Purchase items",
+          "Find opportunities",
+          "Join courses",
+          "Build wellness routines",
+        ]}
+        timelineSide="right"
+        connectToNext
       />
     </section>
   );
