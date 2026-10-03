@@ -1,5 +1,6 @@
 import { HeroSection } from "./_components/hero-section";
 import { ExploreCtaSection } from "./_components/explore-cta-section";
+import { EcosystemIntroSection } from "./_components/ecosystem-intro-section";
 import { FaqSection } from "./_components/faq-section";
 import { PlatformTimelineSection } from "./_components/platform-timeline-section";
 
