@@ -1,0 +1,76 @@
+.view { padding: 8px; color: #100806; }
+.title { display: flex; flex-direction: column; align-items: flex-start; margin-block: 24px; text-align: left; }
+.wordmark { font-size: var(--text-display); font-weight: 600; line-height: .95; letter-spacing: -.075em; }
+.actions { display: flex; flex-wrap: wrap; justify-content: flex-start; gap: 8px; }
+.primary { background: white; color: #100806; }
+.primary:hover { background: #fff1e8; }
+.primary svg { color: #e70036; }
+.secondary { background: transparent; color: #100806; border-color: currentColor; }
+.secondary:hover { background: #ffffff26; color: #100806; }
+.tagline { display: flex; align-items: center; justify-content: flex-start; gap: 8px; margin-top: 24px; font-size: var(--text-xs); text-align: left; }
+.tagline > span { width: 8px; height: 8px; flex-shrink: 0; border-radius: 50%; background: currentColor; }
+.scene { display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; padding: 24px 16px 24px 8px; }
+.host { position: relative; width: 208px; height: 280px; flex-shrink: 0; border-radius: 24px; overflow: hidden; transform: rotate(-7deg); box-shadow: 0 24px 40px #60230033; }
+.photo { object-fit: cover; }
+.badges { position: absolute; inset: 8px 8px auto; display: flex; justify-content: space-between; gap: 8px; color: white; font-size: var(--text-xs); font-weight: 600; }
+.live, .viewers { display: flex; align-items: center; gap: 8px; border-radius: 999px; padding: 8px; background: #10080680; }
+.live { background: #e70036; }
+.live > span { width: 8px; height: 8px; border-radius: 50%; background: white; animation: pulse 2s ease-in-out infinite; }
+.gift { display: flex; align-items: center; gap: 16px; padding: 16px; margin-bottom: 24px; background: #100806; color: white; border-radius: 24px; transform: rotate(4deg); box-shadow: 0 16px 32px #60230026; font-size: var(--text-xs); }
+.giftIcon { display: grid; place-items: center; width: 48px; height: 48px; flex-shrink: 0; border-radius: 16px; background: #ff5900; color: #100806; }
+.gift strong { font-weight: 600; }
+.gift p > span { display: block; color: #ffb990; }
+@keyframes pulse { 50% { box-shadow: 0 0 0 4px #ffffff40; opacity: .65; } }
+@media (max-width: 1279px) { .wordmark { font-size: var(--text-display-sm); } .host { width: 176px; height: 240px; } .gift { gap: 8px; padding: 8px; } }
+@media (min-width: 1024px) and (max-height: 800px) {
+  .title { margin-block: 16px; }
+  .wordmark { font-size: var(--text-display-sm); }
+  .tagline { margin-top: 16px; }
+  .scene { padding-block: 16px; }
+  .host { width: 176px; height: 208px; }
+}
+@media (max-width: 600px) {
+  .view { padding: 0; }
+  .title { margin-block: 16px; }
+  .title > :first-child { font-size: var(--text-base); }
+  .wordmark { font-size: var(--text-4xl); }
+  .actions a { padding-inline: 16px; }
+  .tagline { margin-top: 16px; }
+  .scene { gap: 8px; padding-inline: 16px; padding-bottom: 16px; }
+  .host { width: 144px; height: 200px; border-radius: 16px; }
+  .gift { flex-direction: column; align-items: flex-start; min-width: 0; max-width: 160px; overflow-wrap: anywhere; border-radius: 16px; }
+  .giftIcon { width: 32px; height: 32px; border-radius: 8px; }
+  .badges { gap: 0; }
+  .live, .viewers { gap: 0; padding: 8px; }
+  .live > span { margin-right: 8px; }
+  .viewers svg { display: none; }
+}
+@media (max-width: 600px) and (max-height: 700px) {
+  .title { margin-block: 8px; }
+  .tagline { margin-top: 8px; }
+  .scene { padding-top: 8px; }
+  .host { width: 136px; height: 144px; }
+  .gift { margin-bottom: 8px; }
+}
+@media (prefers-reduced-motion: reduce) { .live > span { animation: none; } }
+@media (min-width: 601px) and (max-width: 1023px) and (max-height: 900px) {
+  .title { margin-block: 8px; }
+  .tagline { margin-top: 8px; }
+  .scene { padding-block: 16px; }
+  .host { height: 176px; }
+}
+@media (max-width: 350px) {
+  .actions a { padding-inline: 8px; }
+  .gift { line-height: 1.25; }
+  .giftIcon { display: none; }
+  .host { width: 128px; }
+  .scene { padding-bottom: 8px; }
+}
+@media (min-width: 601px) and (max-height: 740px) {
+  .title { margin-block: 8px; }
+  .title > :first-child { font-size: var(--text-base); }
+  .wordmark { font-size: var(--text-4xl); }
+  .host { height: 160px; }
+  .scene { padding-block: 0; }
+  .tagline { margin-top: 8px; }
+}

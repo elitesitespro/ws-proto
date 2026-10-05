@@ -1,0 +1,161 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script>
+      tailwind = { config: { corePlugins: { preflight: false } } };
+    </script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter%3Awght%40100..900&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      *, ::before, ::after {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+      }
+    </style>
+
+    <style>
+      body {
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+    </style>
+  </head>
+  <body style="background-color: #FFFFFF">
+    <div
+      data-pencil-name="Prediction market · Bitcoin"
+      class="box-border w-[480px] h-[148px] flex flex-row gap-[16px] p-[16px] justify-start items-center bg-[#FFFFFF] rounded-[20px] overflow-hidden"
+    >
+      <div
+        data-pencil-name="Market details"
+        class="box-border [flex:1_1_0] h-full flex flex-col gap-[8px] justify-between items-start"
+      >
+        <div
+          data-pencil-name="Market status pill alignment"
+          class="box-border w-full h-[20px] shrink-0 flex flex-row gap-0 justify-between items-center"
+        >
+          <div
+            data-pencil-name="Widget label"
+            class="text-[10px]/[normal] box-border text-[#78838D] font-[Inter,system-ui,sans-serif] font-semibold tracking-[0.8px] text-left [white-space:nowrap]"
+          >
+            CRYPTO
+          </div>
+          <div
+            data-pencil-name="Market rules"
+            class="text-[11px]/[normal] box-border text-[#52636F] font-[Inter,system-ui,sans-serif] font-normal text-left [white-space:nowrap]"
+          >
+            Rules ↗
+          </div>
+        </div>
+        <div
+          data-pencil-name="Question"
+          class="text-[16px]/[20px] box-border w-full text-[#1C2927] font-[Inter,system-ui,sans-serif] font-semibold text-left"
+        >
+          Will Bitcoin hit $100,000 by December 31, 2026?
+        </div>
+        <div
+          data-pencil-name="Market activity and deadline"
+          class="box-border w-full h-fit shrink-0 flex flex-row gap-0 justify-between items-center"
+        >
+          <div
+            data-pencil-name="Ends soon"
+            class="text-[10px]/[normal] box-border text-[#7B838C] font-[Inter,system-ui,sans-serif] font-normal text-left [white-space:nowrap]"
+          >
+            $124.8k volume
+          </div>
+          <div
+            data-pencil-name="Market closing date"
+            class="text-[10px]/[normal] box-border text-[#7B838C] font-[Inter,system-ui,sans-serif] font-normal text-left [white-space:nowrap]"
+          >
+            Closes Dec 31
+          </div>
+        </div>
+      </div>
+      <div
+        data-pencil-name="Market odds and trading"
+        class="box-border w-[200px] shrink-0 h-full flex flex-col gap-[8px] justify-between items-start"
+      >
+        <div
+          data-pencil-name="Outcome probabilities"
+          class="box-border w-full h-fit shrink-0 flex flex-row gap-0 justify-between items-center"
+        >
+          <div
+            data-pencil-name="Leading outcome"
+            class="box-border w-fit shrink-0 h-fit flex flex-row gap-[8px] justify-start items-center"
+          >
+            <div
+              data-pencil-name="Yes percent"
+              class="text-[32px]/[normal] box-border text-[#223D34] font-[Inter,system-ui,sans-serif] font-semibold tracking-[-1.5px] text-left [white-space:nowrap]"
+            >
+              68%
+            </div>
+            <div
+              data-pencil-name="Yes label"
+              class="text-[11px]/[normal] box-border text-[#5F746A] font-[Inter,system-ui,sans-serif] font-medium text-left [white-space:nowrap]"
+            >
+              chance
+            </div>
+          </div>
+          <div
+            data-pencil-name="Market status pill"
+            class="box-border w-fit shrink-0 h-[20px] flex flex-row gap-0 p-[0px_8px] justify-center items-center bg-[#E9F5EF] rounded-[999px]"
+          >
+            <div
+              data-pencil-name="Market status label"
+              class="text-[9px]/[normal] box-border text-[#30775D] font-[Inter,system-ui,sans-serif] font-semibold text-left [white-space:nowrap]"
+            >
+              OPEN
+            </div>
+          </div>
+        </div>
+        <div
+          data-pencil-name="Outcome probability bar"
+          class="box-border w-full h-[4px] shrink-0 flex flex-row gap-0 justify-start items-start bg-[#E9EDF0] rounded-[999px] overflow-hidden"
+        >
+          <div
+            data-pencil-name="Yes bar fill"
+            class="box-border w-[136px] shrink-0 h-full bg-[#71B99B] rounded-[999px]"
+          ></div>
+        </div>
+        <div
+          data-pencil-name="Trade outcomes"
+          class="box-border w-full h-fit shrink-0 flex flex-row gap-[8px] justify-start items-start"
+        >
+          <div
+            data-pencil-name="Buy Yes  68¢"
+            class="box-border [flex:1_1_0] h-[36px] flex flex-row gap-0 justify-center items-center bg-[#E3F3EB] rounded-[999px]"
+          >
+            <div
+              data-pencil-name="Buy Yes  68¢ label"
+              class="text-[11px]/[normal] box-border text-[#256347] font-[Inter,system-ui,sans-serif] font-semibold text-left [white-space:nowrap]"
+            >
+              Buy Yes 68¢
+            </div>
+          </div>
+          <div
+            data-pencil-name="Buy No  32¢"
+            class="box-border [flex:1_1_0] h-[36px] flex flex-row gap-0 justify-center items-center bg-[#FBECEE] rounded-[999px]"
+          >
+            <div
+              data-pencil-name="Buy No  32¢ label"
+              class="text-[11px]/[normal] box-border text-[#A54451] font-[Inter,system-ui,sans-serif] font-semibold text-left [white-space:nowrap]"
+            >
+              Buy No 32¢
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

@@ -1,0 +1,90 @@
+.stage {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  max-width: 1600px;
+  margin-inline: auto;
+  pointer-events: none;
+}
+
+.slot {
+  position: absolute;
+  left: var(--slot-desktop-x);
+  top: var(--slot-desktop-y);
+  width: var(--slot-desktop-width);
+  max-width: var(--slot-desktop-max-width);
+  z-index: var(--slot-desktop-z);
+  pointer-events: auto;
+  transform-origin: center;
+  transform: rotate(var(--slot-desktop-rotation)) scale(var(--slot-desktop-scale));
+  will-change: transform;
+}
+
+.parallax,
+.entrance {
+  overflow: visible;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .slot {
+    will-change: auto;
+  }
+
+  .parallax,
+  .entrance {
+    transform: none !important;
+    opacity: 1 !important;
+  }
+}
+
+@media (max-width: 1279px) {
+  .slot[data-tablet-visible="false"] {
+    display: none;
+  }
+
+  .slot[data-tablet-visible="true"] {
+    left: var(--slot-tablet-x);
+    top: var(--slot-tablet-y);
+    width: var(--slot-tablet-width);
+    max-width: var(--slot-tablet-max-width);
+    z-index: var(--slot-tablet-z);
+    transform: rotate(var(--slot-tablet-rotation)) scale(var(--slot-tablet-scale));
+  }
+}
+
+@media (min-width: 1024px) and (max-width: 1279px) {
+  .slot[data-large-visible="false"] {
+    display: none;
+  }
+
+  .slot[data-large-visible="true"] {
+    display: block;
+    left: var(--slot-large-x);
+    top: var(--slot-large-y);
+    width: var(--slot-large-width);
+    max-width: var(--slot-large-max-width);
+    z-index: var(--slot-large-z);
+    transform: rotate(var(--slot-large-rotation)) scale(var(--slot-large-scale));
+  }
+}
+
+@media (max-width: 767px) {
+  /* Keep the side widgets in their reserved space while scrolling. */
+  .parallax {
+    transform: none !important;
+  }
+
+  .slot[data-mobile-visible="false"] {
+    display: none;
+  }
+
+  .slot[data-mobile-visible="true"] {
+    display: block;
+    left: var(--slot-mobile-x);
+    top: var(--slot-mobile-y);
+    width: var(--slot-mobile-width);
+    max-width: var(--slot-mobile-max-width);
+    z-index: var(--slot-mobile-z);
+    transform: rotate(var(--slot-mobile-rotation)) scale(var(--slot-mobile-scale));
+  }
+}

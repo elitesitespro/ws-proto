@@ -1,0 +1,148 @@
+.backdrop {
+  position: absolute;
+  inset-block: 0;
+  top: var(--map-top, 0px);
+  left: 50%;
+  width: 100vw;
+  transform: translateX(-50%);
+  overflow: hidden;
+  z-index: -1;
+  pointer-events: none;
+  animation: reveal 500ms ease-out both;
+}
+.film {
+  object-fit: cover;
+  object-position: 60% 40%;
+}
+.Vsion {
+  background: #171117;
+}
+.shade {
+  position: absolute;
+  inset: 0;
+}
+.Vsion .shade {
+  background:
+    linear-gradient(90deg, #17111790, #17111720 45%, #17111790),
+    linear-gradient(0deg, #171117ed, transparent 65%, #17111780);
+}
+.Forex {
+  background: oklch(76.8% 0.233 130.85);
+  color: #254d25;
+}
+.chart {
+  width: 100%;
+  height: 100%;
+  opacity: 0.55;
+}
+.chartLine {
+  stroke-dasharray: 1;
+  animation: trace 1.4s ease-out both;
+}
+.Forex .shade {
+  background: linear-gradient(180deg, #a4db3f70, transparent 80%);
+}
+.Arcade {
+  background: radial-gradient(ellipse at 75% 40%, #772458, #241130 70%);
+}
+.planet {
+  position: absolute;
+  width: 360px;
+  height: 360px;
+  right: 8%;
+  top: 16%;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #ffd38e, #dc6675 45%, #542454);
+  box-shadow: 0 0 96px #e8638840;
+  opacity: 0.55;
+}
+.stars {
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(circle, #ffecbc90 1px, transparent 2px);
+  background-size: 96px 96px;
+}
+.gameFloor {
+  position: absolute;
+  inset: 58% -50% -40%;
+  background:
+    repeating-linear-gradient(0deg, transparent 0 63px, #df7ebb40 64px 65px),
+    repeating-linear-gradient(90deg, transparent 0 63px, #df7ebb40 64px 65px);
+  transform: perspective(400px) rotateX(55deg);
+  transform-origin: center top;
+}
+.Arcade .shade {
+  background: linear-gradient(0deg, #241130a0, transparent 70%);
+}
+.WorldSpace {
+  background: #f0c75a;
+}
+.collage {
+  position: absolute;
+  inset: -8% -4% -8% 36%;
+  display: grid;
+  grid-template-columns: 1.2fr 1fr;
+  grid-template-rows: 1fr 1fr;
+  gap: 16px;
+  transform: rotate(-8deg);
+}
+.collage > div {
+  position: relative;
+  overflow: hidden;
+  border-radius: 24px;
+}
+.collage > div:first-child {
+  grid-row: span 2;
+}
+.collage img {
+  object-fit: cover;
+}
+.WorldSpace .shade {
+  background:
+    linear-gradient(90deg, #f0c75a, #f0c75ae8 42%, #f0c75a38),
+    linear-gradient(0deg, #f0c75a, transparent 50%);
+}
+@keyframes reveal {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@keyframes trace {
+  from {
+    stroke-dashoffset: 1;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+@media (max-width: 1023px) {
+  .film {
+    object-position: 60% center;
+  }
+  .Vsion .shade {
+    background: linear-gradient(0deg, #171117ed, #17111745 55%, #171117b0);
+  }
+  .collage {
+    inset: 8% -28% 8% 24%;
+  }
+  .WorldSpace .shade {
+    background:
+      linear-gradient(90deg, #f0c75ae8, #f0c75a45),
+      linear-gradient(0deg, #f0c75a, transparent 65%, #f0c75ae8);
+  }
+  .planet {
+    width: 240px;
+    height: 240px;
+    right: -8%;
+    top: 24%;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .backdrop,
+  .chartLine {
+    animation: none;
+  }
+}

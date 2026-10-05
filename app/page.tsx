@@ -5,6 +5,7 @@ import { EntertainmentSection } from "./_components/entertainment-section";
 import { ExploreCtaSection } from "./_components/explore-cta-section";
 import { FaqSection } from "./_components/faq-section";
 import { HeroSection } from "./_components/hero-section";
+import { IntelligenceSection } from "./_components/intelligence-section";
 import { LifestyleSection } from "./_components/lifestyle-section";
 import { MarketsSection } from "./_components/markets-section";
 import { PlatformTimelineSection } from "./_components/platform-timeline-section";
@@ -22,6 +23,7 @@ export default function Home() {
       <MarketsSection />
       <WalletSection />
       <CurrencySection />
+      <IntelligenceSection />
       <ExploreCtaSection />
       <FaqSection />
     </main>

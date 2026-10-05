@@ -1,0 +1,192 @@
+.activity [data-widget-motion] {
+  animation-play-state: paused;
+}
+
+.activity[data-playing="true"] [data-widget-motion] {
+  animation-play-state: running;
+}
+
+.activity [data-widget-motion="pulse"] {
+  animation: pulse 4s ease-in-out infinite;
+}
+
+.activity [data-widget-motion="ring"] {
+  animation: ring 3.6s ease-in-out infinite;
+}
+
+.activity [data-widget-motion="bar"],
+.activity [data-widget-motion="latest-bar"] {
+  transform-box: fill-box;
+  transform-origin: bottom;
+  animation: bar 4s ease-in-out infinite;
+}
+
+.activity [data-widget-motion="latest-bar"] {
+  animation: bar 4s ease-in-out infinite, latest-bar 4s ease-out infinite;
+}
+
+.activity [data-widget-motion="answer-pulse"] {
+  animation: answer-pulse 3.6s ease-in-out infinite;
+}
+
+.activity [data-widget-motion="course-fill"] {
+  transform-origin: left;
+  animation: course-fill 1.2s cubic-bezier(.22, 1, .36, 1) both;
+}
+
+.activity [data-widget-motion="price-up"] {
+  animation: price-up 1.2s ease-out;
+}
+
+.activity [data-widget-motion="price-down"] {
+  animation: price-down 1.2s ease-out;
+}
+
+.activity button:enabled {
+  transition: scale 120ms ease-out, background-color 120ms ease-out;
+}
+
+.activity button:enabled:active {
+  scale: .96;
+}
+
+.activity [data-widget-motion="shine"] {
+  position: relative;
+  overflow: hidden;
+}
+
+.activity [data-widget-motion="shine"]::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, transparent, #ffffff70, transparent);
+  transform: translateX(-100%);
+  animation: shine 5s ease-in-out infinite;
+  animation-play-state: inherit;
+}
+
+.activity [data-widget-motion="artwork"] {
+  animation: artwork 16s ease-in-out infinite;
+}
+
+.activity [data-widget-motion="dot"] {
+  display: inline-block;
+  animation: dot 1.8s ease-in-out infinite;
+}
+
+.activity [data-widget-motion="speaker"] {
+  animation: speaker 16s linear infinite;
+}
+
+.activity [data-widget-motion="live-dot"] {
+  animation: live-dot 2.4s ease-out infinite;
+}
+
+.activity [data-widget-motion="speaking-mic"] {
+  animation: speaking-mic 4s ease-in-out infinite;
+}
+
+/* Keep all animation clocks frozen when the stage is off screen or paused. */
+.activity:not([data-playing="true"]) [data-widget-motion] {
+  animation-play-state: paused;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: .55; }
+}
+
+@keyframes answer-pulse {
+  0%, 35%, 100% { box-shadow: 0 0 0 0 rgb(23 159 114 / 0); }
+  12% { box-shadow: 0 0 0 4px rgb(23 159 114 / .3); }
+}
+
+@keyframes latest-bar {
+  0%, 30%, 100% { fill: currentColor; }
+  8% { fill: #BCEAD7; }
+}
+
+@keyframes course-fill {
+  from { transform: scaleX(0); }
+  to { transform: scaleX(1); }
+}
+
+@keyframes price-up {
+  0%, 20% { color: #95D8B8; }
+  100% { color: white; }
+}
+
+@keyframes price-down {
+  0%, 20% { color: #FFA5B6; }
+  100% { color: white; }
+}
+
+@keyframes ring {
+  0%, 12%, 24%, 100% { transform: rotate(0); }
+  4%, 16% { transform: rotate(-12deg); }
+  8%, 20% { transform: rotate(12deg); }
+}
+
+@keyframes bar {
+  0%, 100% { transform: scaleY(1); }
+  45% { transform: scaleY(.65); }
+  75% { transform: scaleY(.85); }
+}
+
+@keyframes shine {
+  0%, 25% { transform: translateX(-100%); }
+  65%, 100% { transform: translateX(100%); }
+}
+
+@keyframes artwork {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.06); }
+}
+
+@keyframes dot {
+  0%, 60%, 100% { transform: translateY(0); opacity: .45; }
+  30% { transform: translateY(-3px); opacity: 1; }
+}
+
+@keyframes live-dot {
+  0% { box-shadow: 0 0 0 0 rgb(149 216 184 / .45); }
+  65%, 100% { box-shadow: 0 0 0 4px rgb(149 216 184 / 0); }
+}
+
+/* Each portrait gets a four-second turn, with a short pause between speakers. */
+@keyframes speaker {
+  0%, 22% { opacity: 1; }
+  24%, 99% { opacity: 0; }
+  100% { opacity: 1; }
+}
+
+@keyframes speaking-mic {
+  0%, 12%, 28%, 44%, 61%, 77%, 90%, 100% {
+    color: rgb(255 255 255 / .8);
+    background-color: rgb(255 255 255 / .1);
+    box-shadow: 0 0 0 0 rgb(101 185 154 / 0);
+  }
+  6%, 21%, 36%, 54%, 69%, 83% {
+    color: #95D8B8;
+    background-color: #203B31;
+    box-shadow: 0 0 0 4px rgb(101 185 154 / .2);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .activity button:enabled {
+    transition: none;
+  }
+
+  .activity button:enabled:active {
+    scale: 1;
+    translate: none;
+  }
+
+  .activity [data-widget-motion],
+  .activity [data-widget-motion]::after {
+    animation: none !important;
+  }
+
+  .toggle { display: none; }
+}

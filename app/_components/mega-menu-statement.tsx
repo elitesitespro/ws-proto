@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useRef, useState, type ReactNode } from "react";
 import {
   AnimatePresence,
   motion,
@@ -19,6 +19,7 @@ type MegaMenuStatementProps = {
   actions: readonly string[];
   timelineSide: "left" | "right";
   connectToNext?: boolean;
+  scenes?: readonly ReactNode[];
 };
 
 const cardShades = ["#252022", "#2a2527", "#302a2c", "#292426", "#332d2f"];
@@ -30,6 +31,7 @@ export function MegaMenuStatement({
   actions,
   timelineSide,
   connectToNext = false,
+  scenes,
 }: MegaMenuStatementProps) {
   const storyRef = useRef<HTMLDivElement>(null);
   const bridgePathRef = useRef<SVGPathElement>(null);
@@ -193,11 +195,15 @@ export function MegaMenuStatement({
               >
                 <div className="relative min-h-0 flex-1 overflow-hidden rounded-3xl bg-[#252022]">
                   <AnimatePresence initial={false}>
-                    {activeIndex >= 0 && (
+                    {(activeIndex >= 0 || scenes) && (
                       <motion.div
-                        key={activeIndex}
-                        aria-hidden="true"
-                        className="absolute inset-0 flex flex-col justify-end p-4 md:p-6"
+                        key={scenes ? Math.max(0, activeIndex) : activeIndex}
+                        aria-hidden={scenes ? undefined : true}
+                        className={
+                          scenes
+                            ? "absolute inset-0"
+                            : "absolute inset-0 flex flex-col justify-end p-4 md:p-6"
+                        }
                         style={{
                           backgroundColor:
                             cardShades[activeIndex % cardShades.length],
@@ -210,13 +216,19 @@ export function MegaMenuStatement({
                           ease: [0.22, 1, 0.36, 1],
                         }}
                       >
-                        <span className="text-xs leading-[24px] text-white/60">
-                          {String(activeIndex + 1).padStart(2, "0")} /{" "}
-                          {String(itemCount).padStart(2, "0")}
-                        </span>
-                        <span className="mt-1 text-lg leading-[36px] font-medium tracking-tight text-white">
-                          {actions[activeIndex]}
-                        </span>
+                        {scenes ? (
+                          scenes[Math.max(0, activeIndex)]
+                        ) : (
+                          <>
+                            <span className="text-xs leading-[24px] text-white/60">
+                              {String(activeIndex + 1).padStart(2, "0")} /{" "}
+                              {String(itemCount).padStart(2, "0")}
+                            </span>
+                            <span className="mt-1 text-lg leading-[36px] font-medium tracking-tight text-white">
+                              {actions[activeIndex]}
+                            </span>
+                          </>
+                        )}
                       </motion.div>
                     )}
                   </AnimatePresence>

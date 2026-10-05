@@ -139,8 +139,9 @@ export function SiteHeader() {
         aria-hidden={hidden}
         inert={hidden}
         onFocusCapture={() => setHidden(false)}
-        className={`sticky top-0 z-50 border-b border-border/50 bg-background/70 backdrop-blur-xl transition-[translate] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] motion-reduce:transition-none ${hidden ? "-translate-y-full" : "translate-y-0"
-          }`}
+        className={`sticky top-0 z-50 border-b border-white/20 bg-[#211C20]/75 bg-[linear-gradient(135deg,rgba(255,255,255,0.1),transparent_60%)] text-white shadow-[0_8px_24px_rgba(7,4,5,0.12),inset_0_1px_0_rgba(255,255,255,0.12)] backdrop-blur-[20px] backdrop-saturate-150 transition-[translate] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] motion-reduce:transition-none ${
+          hidden ? "-translate-y-full" : "translate-y-0"
+        }`}
       >
         <div className="relative mx-auto flex h-10 w-full max-w-7xl items-center justify-between gap-1 px-3 xl:px-4">
           <Link

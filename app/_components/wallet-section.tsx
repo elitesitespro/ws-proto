@@ -1,49 +1,4 @@
-import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-
-const walletFunctions = [
-  {
-    title: "Pay",
-    description: "Complete supported transactions across WorldStreet.",
-  },
-  {
-    title: "Receive",
-    description: "Receive eligible earnings, transfers or payments.",
-  },
-  {
-    title: "Track",
-    description: "See supported transaction activity in one place.",
-  },
-  {
-    title: "Move",
-    description: "Use eligible balances across participating WorldStreet services.",
-  },
-] as const;
-
-function WalletFunctionCard({
-  title,
-  description,
-}: (typeof walletFunctions)[number]) {
-  return (
-    <Card className="gap-0! overflow-visible! rounded-none! bg-transparent! py-0! ring-0!">
-      <div
-        aria-hidden="true"
-        className="aspect-[4/5] w-full rounded-2xl bg-[#292629]"
-      />
-      <CardHeader className="gap-1 px-0! pt-2">
-        <CardTitle
-          role="heading"
-          aria-level={3}
-          className="text-sm leading-[24px] font-medium tracking-tight text-white"
-        >
-          {title}
-        </CardTitle>
-        <CardDescription className="text-sm leading-[24px] text-white/65!">
-          {description}
-        </CardDescription>
-      </CardHeader>
-    </Card>
-  );
-}
+import { WalletPreview } from "./wallet-preview";
 
 export function WalletSection() {
   return (
@@ -65,10 +20,8 @@ export function WalletSection() {
           </h2>
         </div>
 
-        <div className="mt-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-          {walletFunctions.map((item) => (
-            <WalletFunctionCard key={item.title} {...item} />
-          ))}
+        <div className="mt-8">
+          <WalletPreview />
         </div>
       </div>
     </section>

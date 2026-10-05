@@ -30,7 +30,7 @@ export function CurrencySection() {
     <section
       id="currencies"
       aria-labelledby="currencies-heading"
-      className="overflow-hidden bg-[#070405] py-16 text-white"
+      className="overflow-hidden bg-[linear-gradient(180deg,#070405_0%,#0c0610_36%,#1a0c28_70%,#241034_100%)] py-16 text-white"
     >
       <div className="mx-auto w-full max-w-7xl px-4 text-center md:px-6">
         <h2
