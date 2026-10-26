@@ -1,12 +1,12 @@
 "use client";
 
 import { useEffect, useRef, type PointerEvent } from "react";
-import Link from "next/link";
 import { useScroll } from "motion/react";
 import { useReducedMotion } from "@/lib/use-reduced-motion";
 import { cn } from "cn";
+import { ACCOUNT_LINKS } from "@/components/layout/nav-links";
 import { buttonVariants } from "@/components/ui/button";
-import { visitorPlace } from "@/app/globe-preview/_components/visitor-place";
+import { visitorPlace } from "../globe-hero/visitor-place";
 import { RevealWords } from "../street/reveal-words";
 import { VividGlobe } from "../vivid/vivid-globe";
 import { VIVID_URL } from "../vivid/vivid-links";
@@ -446,12 +446,12 @@ export function JoinCta() {
           One account opens all thirteen platforms, a wallet for every currency, and Vivid to show you around.
         </p>
         <div className={styles.actions}>
-          <Link
-            href="/create-account"
+          <a
+            href={ACCOUNT_LINKS.join}
             className={cn(buttonVariants({ variant: "default", size: "lg" }), styles.primary)}
           >
             Create your account
-          </Link>
+          </a>
           <a
             href={VIVID_URL}
             target="_blank"

@@ -1,10 +1,10 @@
 "use client";
 
 import type { ComponentProps, CSSProperties, MouseEvent, RefObject } from "react";
-import Link from "next/link";
 import { useLenis } from "lenis/react";
 import { motion, type MotionStyle, type MotionValue } from "motion/react";
 import { cn } from "cn";
+import { ACCOUNT_LINKS } from "@/components/layout/nav-links";
 import { buttonVariants } from "@/components/ui/button";
 import { GlobeHeadline } from "./globe-headline";
 import { GlobeScrollCue } from "./globe-scroll-cue";
@@ -79,13 +79,13 @@ export function HeroCopy({ copyRef, opacity, y, cueOpacity, onWordChange, paused
           >
             Explore WorldStreet
           </a>
-          <Link
-            href="/create-account"
+          <a
+            href={ACCOUNT_LINKS.join}
             className={cn(buttonVariants({ variant: "outline", size: "lg" }), "px-3", styles.rise, styles.second)}
             style={at(5)}
           >
             Create your account
-          </Link>
+          </a>
         </div>
         <p className={cn(styles.hint, styles.rise)} style={at(6)}>
           Spin the globe, or tap a city

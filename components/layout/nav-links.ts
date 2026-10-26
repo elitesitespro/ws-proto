@@ -31,29 +31,25 @@ export const NAV_PAGES = [
 /** The phone menu lists Contact with them, as the live one does. */
 export const CONTACT_LINK = { label: "Contact", href: `${LIVE_SITE}/contact` } as const;
 
-/** The landing's chapters, in page order. `id` is the section's id on "/";
- *  `preview` is its id on /globe-preview, where it's named differently. */
-export const NAV_CHAPTERS: readonly { label: string; id: string; preview?: string }[] = [
+/** The landing's chapters, in page order, by their sections' ids on "/"
+ *  (the street's four districts, the wallet, Vivid). */
+export const NAV_CHAPTERS: readonly { label: string; id: string }[] = [
   { label: "Connect", id: "connect" },
   { label: "Entertainment", id: "entertainment" },
   { label: "Lifestyle", id: "lifestyle" },
   { label: "Markets", id: "markets" },
   { label: "Wallet", id: "wallet" },
-  { label: "Vivid", id: "intelligence", preview: "vivid" },
+  { label: "Vivid", id: "vivid" },
 ];
 
 export type NavChapter = (typeof NAV_CHAPTERS)[number];
 
-/** Pages that carry the chapters themselves, so a chapter there is an in-page hash. */
-const CHAPTER_PAGES = ["/", "/globe-preview"];
+/** On the landing it's an in-page hash (Lenis glides there); anywhere else it leads home to it. */
+export const chapterHref = (chapter: NavChapter, pathname: string | null) =>
+  pathname === "/" ? `#${chapter.id}` : `/#${chapter.id}`;
 
-/** On a page with the chapters it's an in-page hash (Lenis glides there); anywhere else it leads home to it. */
-export const chapterHref = (chapter: NavChapter, pathname: string | null) => {
-  if (pathname === "/globe-preview") return `#${chapter.preview ?? chapter.id}`;
-  return pathname === "/" ? `#${chapter.id}` : `/#${chapter.id}`;
-};
-
-export const isChapterPage = (pathname: string | null) => CHAPTER_PAGES.includes(pathname ?? "");
+/** Whether this is the page that carries the chapters. */
+export const isChapterPage = (pathname: string | null) => pathname === "/";
 
 export type NavPlatform = {
   name: string;
