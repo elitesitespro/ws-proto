@@ -6,7 +6,7 @@ export function EntertainmentSection() {
     <section
       id="entertainment"
       aria-labelledby="entertainment-heading"
-      className="bg-[#070405] text-white"
+      className="bg-background text-foreground"
     >
       <MegaMenuStatement
         headingId="entertainment-heading"

@@ -1,0 +1,763 @@
+/* An Xtream battle in Xtream's own colours (xtream.worldstreetgold.com):
+   its near-black ground, chili red for Zara's side and for live, ember for
+   Kojo's, the heat gradient between them, and gold for money. */
+.stage {
+  --chili: #e3122a;
+  --chili-hi: #ff5a66;
+  --ember: #f85810;
+  --ember-hi: #ff8a4c;
+  --value: #f5c76e;
+  --surface: #141011;
+  --raised: #1c1617;
+  --hair: rgba(255, 236, 230, 0.1);
+  height: 100%;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 256px);
+  grid-template-rows: minmax(0, 1fr);
+  gap: 16px;
+  text-align: left;
+  color: #f6f1ee;
+}
+.stage [data-side="zara"] {
+  --side: var(--chili);
+  --side-hi: var(--chili-hi);
+}
+.stage [data-side="kojo"] {
+  --side: var(--ember);
+  --side-hi: var(--ember-hi);
+}
+.battle {
+  display: grid;
+  grid-template-rows: minmax(0, 1fr) auto;
+  gap: 12px;
+  min-height: 0;
+}
+
+/* The two rooms, side by side */
+.screen {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2px;
+  min-height: 0;
+  overflow: hidden;
+  border-radius: 20px;
+  background: #000;
+  box-shadow:
+    0 0 0 1px var(--hair),
+    0 32px 80px -24px rgba(227, 18, 42, 0.45);
+}
+.half {
+  position: relative;
+  min-height: 0;
+  padding: 0;
+  border: 0;
+  background: #0b0708;
+  cursor: pointer;
+}
+.half video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: filter 600ms ease;
+}
+.half::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(11, 7, 8, 0.7), transparent 30%, transparent 62%, rgba(11, 7, 8, 0.75));
+  box-shadow: inset 0 0 0 0 var(--side);
+  transition: box-shadow 240ms ease;
+}
+.half[aria-pressed="true"]::after {
+  box-shadow: inset 0 0 0 3px var(--side);
+}
+.half:focus-visible {
+  outline: none;
+}
+.half:focus-visible::after {
+  box-shadow: inset 0 0 0 3px #fff;
+}
+.half:disabled {
+  cursor: default;
+}
+.backing {
+  position: absolute;
+  z-index: 1;
+  left: 50%;
+  top: 112px;
+  padding: 0 8px;
+  border-radius: var(--cx-r-pill);
+  background: var(--side);
+  color: #fff;
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 20px;
+  white-space: nowrap;
+  transform: translateX(-50%);
+  animation: pop 400ms cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+/* At the end the loser's room goes grey */
+.screen[data-winner="zara"] .half[data-side="kojo"] video,
+.screen[data-winner="kojo"] .half[data-side="zara"] video {
+  filter: grayscale(1) brightness(0.45);
+}
+
+/* The scoreboard over the top */
+.hud {
+  position: absolute;
+  inset: 12px 12px auto;
+  display: grid;
+  justify-items: center;
+  gap: 8px;
+  pointer-events: none;
+}
+.scores {
+  justify-self: stretch;
+  display: flex;
+  justify-content: space-between;
+}
+.scores p {
+  display: grid;
+  line-height: 1.1;
+}
+.scores p:last-child {
+  text-align: right;
+}
+.scores span {
+  font-size: 11px;
+  font-weight: 600;
+  opacity: 0.85;
+}
+.scores strong {
+  font-size: var(--text-xl);
+  font-weight: 700;
+  letter-spacing: -0.03em;
+}
+.tug {
+  position: relative;
+  justify-self: stretch;
+  height: 8px;
+  border-radius: var(--cx-r-pill);
+  background: var(--ember);
+  overflow: hidden;
+}
+.fill,
+.seam {
+  position: absolute;
+  inset: 0;
+  transform-origin: left;
+  transition: transform 700ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+.fill {
+  background: var(--chili);
+}
+/* The split between them, a white seam with a glow */
+.seam::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: -2px;
+  width: 4px;
+  background: #fff;
+  box-shadow: 0 0 12px 2px rgba(255, 255, 255, 0.8);
+}
+.clock {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.timer {
+  min-width: 56px;
+  padding: 0 12px;
+  border-radius: var(--cx-r-pill);
+  background: #fff;
+  color: #0b0708;
+  font-size: var(--text-sm);
+  font-weight: 700;
+  line-height: 28px;
+  text-align: center;
+}
+.timer[data-hot] {
+  background: var(--chili);
+  color: #fff;
+  animation: hot 1s ease-in-out infinite;
+}
+.plus {
+  padding: 0 8px;
+  border-radius: var(--cx-r-pill);
+  background: var(--ember);
+  color: #1c0a03;
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 24px;
+  animation: pop 500ms cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+.lead {
+  padding: 0 8px;
+  border-radius: var(--cx-r-pill);
+  background: rgba(11, 7, 8, 0.6);
+  backdrop-filter: blur(8px);
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 22px;
+}
+
+/* Gifts rising from the bottom of the side they backed */
+.bursts {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+.burst {
+  position: absolute;
+  bottom: 56px;
+  width: 0;
+  height: 0;
+  animation: hold 1900ms linear both;
+}
+.burst[data-side="zara"] {
+  left: 25%;
+}
+.burst[data-side="kojo"] {
+  left: 75%;
+}
+.burst img {
+  position: absolute;
+  left: -24px;
+  max-width: none;
+  bottom: 0;
+  width: 48px;
+  height: 48px;
+  animation: rise 1600ms var(--d) cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+/* A big gift takes over its room for a moment */
+.burst img.takeover {
+  left: -56px;
+  bottom: 120px;
+  width: 112px;
+  height: 112px;
+  filter: drop-shadow(0 0 24px var(--side));
+  animation: takeover 1800ms cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+/* The latest gift, bottom left; combos stack */
+.toast {
+  position: absolute;
+  left: 12px;
+  bottom: 12px;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  max-width: calc(100% - 24px);
+  padding: 6px 12px 6px 6px;
+  border-radius: var(--cx-r-pill);
+  background: rgba(11, 7, 8, 0.78);
+  backdrop-filter: blur(12px);
+  box-shadow: 0 0 0 1px var(--hair);
+  font-size: 11px;
+  line-height: 1.3;
+  animation: toast 3.2s ease both;
+}
+.toast > span {
+  display: grid;
+  min-width: 0;
+}
+.toast strong {
+  overflow: hidden;
+  font-weight: 600;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.toast img {
+  flex-shrink: 0;
+  border-radius: 50%;
+}
+.toast > img:last-child {
+  border-radius: 0;
+}
+.value {
+  color: var(--value);
+  font-weight: 600;
+}
+.combo {
+  display: inline-block;
+  margin-left: 6px;
+  color: #fff;
+  font-weight: 800;
+  animation: pop 360ms cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+.me {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: var(--chili);
+  color: #fff;
+  font-size: 10px;
+  font-weight: 700;
+}
+.toast .me {
+  width: 32px;
+  height: 32px;
+}
+.forfeit {
+  position: absolute;
+  right: 12px;
+  bottom: 12px;
+  padding: 0 8px;
+  border-radius: var(--cx-r-pill);
+  background: rgba(11, 7, 8, 0.6);
+  box-shadow: inset 0 0 0 1px rgba(248, 88, 16, 0.5);
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 24px;
+}
+.forfeit b {
+  margin-right: 4px;
+  color: var(--ember-hi);
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+/* Room for the toast: the forfeit steps up when they'd meet */
+.screen:has(.toast) .forfeit {
+  bottom: 60px;
+}
+
+/* The result, over both rooms */
+.result {
+  position: absolute;
+  inset: auto 12px 12px;
+  z-index: 3;
+  display: grid;
+  justify-items: center;
+  gap: 4px;
+  padding: 16px;
+  border-radius: 16px;
+  background: rgba(11, 7, 8, 0.82);
+  backdrop-filter: blur(16px);
+  box-shadow: 0 0 0 1px var(--hair);
+  font-size: var(--text-xs);
+  text-align: center;
+  animation: rise-in 500ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+.result > strong {
+  font-size: var(--text-2xl);
+  font-weight: 700;
+  letter-spacing: -0.04em;
+  background: linear-gradient(135deg, #ff2b45, #f85810 52%, #f8a008);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+.yours {
+  color: var(--value);
+}
+.rematch {
+  margin-top: 8px;
+}
+
+/* Your side and your gifts */
+.tray {
+  display: flex;
+  align-items: stretch;
+  gap: 8px;
+  min-width: 0;
+}
+.side {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+  padding: 0 12px;
+  border: 0;
+  border-radius: 14px;
+  background: var(--side);
+  color: #fff;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: background 240ms ease;
+}
+.side > span {
+  display: grid;
+  line-height: 1.2;
+}
+.side strong {
+  font-size: var(--text-xs);
+  font-weight: 700;
+}
+.side span span {
+  font-size: 11px;
+  opacity: 0.85;
+}
+.side:focus-visible,
+.gift:focus-visible,
+.tabs button:focus-visible,
+.say button:focus-visible {
+  outline: 2px solid #fff;
+  outline-offset: 2px;
+}
+.gifts {
+  flex: 1;
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 4px;
+  padding: 4px;
+  border-radius: 16px;
+  background: var(--surface);
+  box-shadow: inset 0 0 0 1px var(--hair);
+}
+.gift {
+  display: grid;
+  justify-items: center;
+  gap: 2px;
+  padding: 4px 0;
+  border: 0;
+  border-radius: 12px;
+  background: none;
+  color: var(--value);
+  font: inherit;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    background 160ms ease,
+    transform 160ms ease;
+}
+.gift img {
+  width: 32px;
+  height: 32px;
+  transition: transform 200ms cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.gift:hover:not(:disabled) {
+  background: var(--raised);
+}
+.gift:hover:not(:disabled) img {
+  transform: scale(1.18);
+}
+.gift:active:not(:disabled) {
+  transform: scale(0.94);
+}
+.gift:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+/* The room: chat, or who's backing whom */
+.room {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  gap: 8px;
+  min-height: 0;
+  padding: 8px;
+  border-radius: 20px;
+  background: var(--surface);
+  box-shadow: inset 0 0 0 1px var(--hair);
+  font-size: 12px;
+}
+.tabs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2px;
+  padding: 2px;
+  border-radius: var(--cx-r-pill);
+  background: #0b0708;
+}
+.tabs button {
+  border: 0;
+  border-radius: var(--cx-r-pill);
+  background: none;
+  color: rgba(246, 241, 238, 0.65);
+  font: inherit;
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 28px;
+  cursor: pointer;
+}
+.tabs button[aria-pressed="true"] {
+  background: var(--raised);
+  color: #f6f1ee;
+}
+.chat {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  gap: 8px;
+  margin: 0;
+  padding: 0 4px;
+  overflow: hidden;
+  list-style: none;
+  mask-image: linear-gradient(transparent, #000 32%);
+}
+.chat li {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  flex-shrink: 0;
+  line-height: 1.35;
+  animation: line 360ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+.chat li > img:first-child,
+.chat li > .me {
+  flex-shrink: 0;
+  border-radius: 50%;
+}
+.chat p {
+  flex: 1;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.chat b {
+  color: var(--chili-hi);
+  font-weight: 600;
+}
+/* A gift in the chat: a warm card in its side's colour */
+.chat li[data-gift] {
+  padding: 6px;
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--side) 14%, transparent);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--side) 30%, transparent);
+}
+.chat li[data-gift] b {
+  color: #f6f1ee;
+}
+.backers {
+  display: grid;
+  align-content: start;
+  gap: 16px;
+  padding: 4px;
+  overflow: hidden;
+}
+.backers h4 {
+  margin-bottom: 8px;
+  color: var(--side-hi);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+.backers ol {
+  display: grid;
+  gap: 4px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.backers li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 8px 4px 4px;
+  border-radius: var(--cx-r-pill);
+  background: var(--raised);
+}
+.backers li[data-you] {
+  box-shadow: inset 0 0 0 1px var(--value);
+}
+.backers li > span:first-child {
+  width: 16px;
+  text-align: center;
+  opacity: 0.6;
+}
+.backers li img {
+  border-radius: 50%;
+}
+.backers li > span:nth-of-type(2),
+.backers li > span:nth-child(3) {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.say {
+  display: flex;
+  gap: 4px;
+  padding: 4px;
+  border-radius: var(--cx-r-pill);
+  background: #0b0708;
+  box-shadow: inset 0 0 0 1px var(--hair);
+}
+.say:focus-within {
+  box-shadow: inset 0 0 0 1px rgba(246, 241, 238, 0.4);
+}
+.say input {
+  flex: 1;
+  min-width: 0;
+  padding: 0 8px;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  outline: none;
+}
+.say input::placeholder {
+  color: rgba(246, 241, 238, 0.45);
+}
+/* On a touch screen, 16px: any smaller and iOS zooms the page in on a tap */
+@media (pointer: coarse) {
+  .say input {
+    font-size: 16px;
+  }
+}
+.say button {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  flex-shrink: 0;
+  border: 0;
+  border-radius: 50%;
+  background: var(--chili);
+  color: #fff;
+  cursor: pointer;
+}
+.say button:disabled {
+  background: var(--raised);
+  color: rgba(246, 241, 238, 0.4);
+  cursor: default;
+}
+
+@keyframes rise {
+  0% {
+    opacity: 0;
+    transform: translate(0, 0) scale(calc(var(--s) * 0.4));
+  }
+  15% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translate(var(--x), -220px) scale(var(--s));
+  }
+}
+@keyframes takeover {
+  0% {
+    opacity: 0;
+    transform: scale(0.3) rotate(-12deg);
+  }
+  25% {
+    opacity: 1;
+    transform: scale(1.1) rotate(4deg);
+  }
+  40% {
+    transform: scale(1) rotate(0);
+  }
+  80% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-40px) scale(1.15);
+  }
+}
+@keyframes hold {
+  to {
+    opacity: 1;
+  }
+}
+@keyframes toast {
+  0% {
+    opacity: 0;
+    transform: translateY(8px) scale(0.96);
+  }
+  10%,
+  85% {
+    opacity: 1;
+    transform: none;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+@keyframes pop {
+  from {
+    opacity: 0;
+    transform: scale(0.5);
+  }
+}
+.backing {
+  animation-name: pop-centred;
+}
+@keyframes pop-centred {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) scale(0.5);
+  }
+}
+@keyframes hot {
+  50% {
+    transform: scale(1.08);
+  }
+}
+@keyframes line {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
+@keyframes rise-in {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+}
+
+/* A tablet or a phone: the battle takes the width; the chat goes, the
+   gifts and the toasts tell the story */
+@media (max-width: 1023px) {
+  .stage {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .room {
+    display: none;
+  }
+}
+@media (max-width: 600px) {
+  .scores strong {
+    font-size: var(--text-lg);
+  }
+  .forfeit {
+    display: none;
+  }
+  .backing {
+    top: 104px;
+  }
+  .side {
+    padding: 0 8px;
+  }
+  .side svg {
+    display: none;
+  }
+  .gift img {
+    width: 24px;
+    height: 24px;
+  }
+  .gift {
+    font-size: 10px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .timer[data-hot],
+  .plus,
+  .combo,
+  .backing,
+  .toast,
+  .chat li,
+  .result {
+    animation: none;
+  }
+  .fill,
+  .seam {
+    transition: none;
+  }
+}

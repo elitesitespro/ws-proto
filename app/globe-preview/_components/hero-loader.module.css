@@ -1,0 +1,282 @@
+/* The page's loader (hero-loader.tsx). Its progress, 0 to 1, is --load: the
+   larger of a slow creep, played here from the first paint, before any
+   script has run, and the real progress the script reports once it's
+   running (--load-real). Registered, so they animate, and the percentage is
+   counted from them. */
+@property --load-creep {
+  syntax: "<number>";
+  inherits: true;
+  initial-value: 0;
+}
+@property --load-real {
+  syntax: "<number>";
+  inherits: true;
+  initial-value: 0;
+}
+@property --load {
+  syntax: "<number>";
+  inherits: true;
+  initial-value: 0;
+}
+@property --load-pct {
+  syntax: "<integer>";
+  inherits: true;
+  initial-value: 0;
+}
+
+.loader {
+  /* The dotted planet: its radius, and its centre on the screen */
+  --disc-r: clamp(96px, 26vmin, 176px);
+  --disc-x: 50%;
+  --disc-y: 44%;
+  /* The opening in the dark over the real planet: under the dots while the
+     page loads; the script moves and widens it as the planet flies to the hero */
+  --hole-x: var(--disc-x);
+  --hole-y: var(--disc-y);
+  --hole-r: calc(var(--disc-r) - 1px);
+  --hole-soft: 1px;
+  --load: max(var(--load-creep), var(--load-real));
+  --load-pct: calc(var(--load) * 100 - 0.5);
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  animation: creep 7s cubic-bezier(0.2, 0.7, 0.3, 1) forwards;
+}
+
+@keyframes creep {
+  to {
+    --load-creep: 0.55;
+  }
+}
+
+.veil {
+  --hole: radial-gradient(
+    circle at var(--hole-x) var(--hole-y),
+    transparent var(--hole-r),
+    #000 calc(var(--hole-r) + var(--hole-soft))
+  );
+  position: absolute;
+  inset: 0;
+  background: var(--cx-bg);
+  -webkit-mask-image: var(--hole);
+  mask-image: var(--hole);
+}
+
+/* The planet in gold dots, lit from Lagos outwards as the page loads */
+.disc {
+  position: absolute;
+  left: calc(var(--disc-x) - var(--disc-r));
+  top: calc(var(--disc-y) - var(--disc-r));
+  width: calc(var(--disc-r) * 2);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: radial-gradient(circle at 64% 30%, #1f1a12, #120f0b 52%, #0c0a09 78%);
+  box-shadow:
+    inset 0 0 0 1px rgba(250, 204, 21, 0.08),
+    inset -16px -20px 48px rgba(0, 0, 0, 0.45);
+  transition: opacity 600ms var(--cx-ease);
+}
+
+.earth {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.earth path {
+  fill: none;
+  stroke-linecap: round;
+}
+
+/* The land's dots (drawn once, used by both layers below), dim */
+.dim {
+  stroke: #eab308;
+}
+
+/* The same dots, bright, inside a circle of light spreading from the hub */
+.lit {
+  --spread: calc(var(--load) * 1.9 * var(--disc-r));
+  --light: radial-gradient(
+    circle at var(--hub-x) var(--hub-y),
+    #000 calc(var(--spread) - 0.35 * var(--disc-r)),
+    transparent var(--spread)
+  );
+  stroke: #facc15;
+  -webkit-mask-image: var(--light);
+  mask-image: var(--light);
+}
+
+/* Arcs out from Lagos, each drawn over its own stretch of the progress
+   (from --load-at), and the city it reaches, lit as it lands */
+.arc {
+  fill: none;
+  stroke: #fde68a;
+  stroke-width: 1.1px;
+  stroke-linecap: round;
+  vector-effect: non-scaling-stroke;
+  stroke-dasharray: 1 2;
+  stroke-dashoffset: calc(1 - clamp(0, (var(--load) - var(--load-at)) * 6, 1));
+}
+
+.city {
+  fill: #fef3c7;
+  opacity: clamp(0, ((var(--load) - var(--load-at)) * 6 - 0.9) * 10, 1);
+}
+
+.hub {
+  fill: #fef3c7;
+}
+
+.hubGlow {
+  fill: #facc15;
+  opacity: 0.35;
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: pulse 1.6s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  50% {
+    opacity: 0.1;
+    transform: scale(1.8);
+  }
+}
+
+/* The planet's edge, filling clockwise from the top as the page loads */
+.ring {
+  position: absolute;
+  left: calc(var(--disc-x) - var(--disc-r));
+  top: calc(var(--disc-y) - var(--disc-r));
+  width: calc(var(--disc-r) * 2);
+  height: calc(var(--disc-r) * 2);
+}
+
+.ring svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  transition: filter 500ms var(--cx-ease);
+}
+
+.track {
+  fill: none;
+  stroke: rgba(250, 204, 21, 0.14);
+  stroke-width: 1.5px;
+  vector-effect: non-scaling-stroke;
+}
+
+.progress {
+  fill: none;
+  stroke: #facc15;
+  stroke-width: 2px;
+  stroke-linecap: round;
+  vector-effect: non-scaling-stroke;
+  stroke-dasharray: var(--load) 2;
+}
+
+.head {
+  transform: rotate(calc(var(--load) * 360deg));
+  transition: opacity 300ms;
+}
+
+.head circle {
+  fill: #fef3c7;
+}
+
+/* A glint running round the edge: it keeps moving (on the compositor) even
+   while the page is busy starting up and the progress can't be drawn */
+.glint {
+  position: absolute;
+  inset: -1px;
+  border-radius: 50%;
+  background: conic-gradient(transparent 0 80%, rgba(254, 243, 199, 0.5) 97%, transparent);
+  -webkit-mask-image: radial-gradient(farthest-side, transparent calc(100% - 2.5px), #000 calc(100% - 2px));
+  mask-image: radial-gradient(farthest-side, transparent calc(100% - 2.5px), #000 calc(100% - 2px));
+  animation: turn 2.4s linear infinite;
+  transition: opacity 300ms;
+}
+
+@keyframes turn {
+  to {
+    transform: rotate(1turn);
+  }
+}
+
+.caption {
+  position: absolute;
+  inset-inline: 0;
+  top: calc(var(--disc-y) + var(--disc-r) + 40px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  transition:
+    opacity 300ms var(--cx-ease),
+    translate 300ms var(--cx-ease);
+}
+
+.name {
+  color: var(--cx-text);
+  font-size: 18px;
+  font-weight: 500;
+  line-height: 24px;
+  letter-spacing: -0.01em;
+}
+
+.count {
+  color: var(--cx-text-muted);
+  font-size: 12px;
+  line-height: 16px;
+  font-variant-numeric: tabular-nums;
+}
+
+.count::before {
+  counter-reset: load var(--load-pct);
+  content: counter(load) "%";
+}
+
+/* Loaded: the real planet shows through as the dots fade, the edge flares */
+.loader[data-phase="lit"] .disc,
+.loader[data-phase="opening"] .disc {
+  opacity: 0;
+}
+
+.loader[data-phase="lit"] .ring svg {
+  filter: drop-shadow(0 0 12px rgba(250, 204, 21, 0.6));
+}
+
+.loader:not([data-phase="loading"]) .head,
+.loader:not([data-phase="loading"]) .glint {
+  opacity: 0;
+}
+
+/* Then the dark opens onto the hero (the script moves the hole and the ring) */
+.loader[data-phase="opening"] {
+  pointer-events: none;
+}
+
+.loader[data-phase="opening"] .caption {
+  opacity: 0;
+  translate: 0 8px;
+}
+
+/* Or, under reduced motion or away from the top of the page, it just fades */
+.loader[data-phase="fading"] {
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 400ms var(--cx-ease);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hubGlow {
+    animation: none;
+  }
+
+  .glint {
+    display: none;
+  }
+}

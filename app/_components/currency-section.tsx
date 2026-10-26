@@ -30,17 +30,17 @@ export function CurrencySection() {
     <section
       id="currencies"
       aria-labelledby="currencies-heading"
-      className="overflow-hidden bg-[linear-gradient(180deg,#070405_0%,#0c0610_36%,#1a0c28_70%,#241034_100%)] py-16 text-white"
+      className="overflow-hidden bg-[linear-gradient(180deg,#0C0A09_0%,#110F0E_36%,#171513_70%,#1C1917_100%)] py-16 text-foreground"
     >
       <div className="mx-auto w-full max-w-7xl px-4 text-center md:px-6">
         <h2
           id="currencies-heading"
-          className="mx-auto max-w-4xl text-xl leading-[44px] font-medium tracking-tight md:text-3xl md:leading-[56px] md:tracking-tighter"
+          className="cx-h2 mx-auto max-w-4xl bg-[image:var(--cx-heading-hero)] text-xl leading-[44px] md:text-3xl md:leading-[56px]"
         >
           Transact across currencies
         </h2>
         <p className="mt-2">
-          <span className="inline-flex h-5 items-center justify-center rounded-full border border-white/40 px-2 text-base leading-none font-medium tracking-tight md:h-6 md:text-lg">
+          <span className="inline-flex h-5 items-center justify-center rounded-full bg-surface-3 px-2 text-base leading-none font-medium tracking-tight md:h-6 md:text-lg">
             {centerType}
           </span>
         </p>

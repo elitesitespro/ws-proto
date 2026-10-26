@@ -1,12 +1,12 @@
 "use client";
 
 import Image from "next/image";
-import { ArrowRightIcon } from "lucide-react";
 import { motion, MotionConfig } from "motion/react";
 import { cn } from "cn";
 import { FaqAccordion, type FaqItem } from "@/components/faq/faq-accordion";
 import { revealHeading, revealItem, revealMutedItem, revealTitle } from "@/components/faq/faq-reveal-motion";
 import { buttonVariants } from "@/components/ui/button";
+import { Icon } from "@/components/icon";
 
 const faqItems: FaqItem[] = [
   {
@@ -74,7 +74,7 @@ export function FaqSection() {
             <motion.h2
               id="faq-heading"
               variants={revealTitle}
-              className="text-xl leading-[44px] font-semibold tracking-tight md:text-2xl md:leading-[52px] md:tracking-tighter"
+              className="cx-h2 text-xl leading-[44px] md:text-2xl md:leading-[52px]"
             >
               Frequently asked questions
             </motion.h2>
@@ -109,7 +109,7 @@ export function FaqSection() {
             )}
           >
             Visit the Help Center
-            <ArrowRightIcon aria-hidden="true" className="size-(--icon-size-min)" />
+            <Icon name="arrow-right" size={20} tone="current" />
           </a>
         </motion.div>
       </section>

@@ -1,4 +1,4 @@
-import { ArrowUpRight } from "@phosphor-icons/react/dist/ssr";
+import { Icon } from "@/components/icon";
 import { WidgetCard as Card } from "./widget-card";
 
 const marketBars = [
@@ -14,19 +14,20 @@ const barWidth = (264 - (marketBars.length - 1) * 4) / marketBars.length;
 export function ForexWidget() {
   return (
     <Card
+      data-hue="forex"
       role="group"
       aria-label="Sample forex quote: EUR / USD, 1.0846, up 0.42 percent over 24 hours"
-      className="w-full gap-3! rounded-[24px]! pt-2! pb-0! text-white"
+      className="w-full gap-3! pt-2! pb-0!"
     >
       <div className="px-2">
         <div className="flex items-center justify-between text-xs leading-3">
-          <span className="font-medium text-white/70">EUR / USD</span>
-          <span className="text-white/60">24h</span>
+          <span className="font-medium text-muted">EUR / USD</span>
+          <span className="text-muted">24h</span>
         </div>
         <div className="flex items-center gap-1">
-          <span className="text-xl leading-[44px] font-semibold tracking-tight">1.0846</span>
-          <span className="flex h-4 shrink-0 items-center gap-1 rounded-full bg-[#203B31] px-1 text-xs font-medium text-[#95D8B8]">
-            <ArrowUpRight size={20} weight="bold" aria-hidden="true" />
+          <span className="text-xl leading-[44px] font-light tabular-nums">1.0846</span>
+          <span className="flex h-4 shrink-0 items-center gap-1 rounded-pill bg-gain-wash px-1 text-xs font-medium text-gain tabular-nums">
+            <Icon name="arrow-up-right" size={20} tone="current" />
             +0.42%
           </span>
         </div>
@@ -34,7 +35,7 @@ export function ForexWidget() {
       <svg
         viewBox="0 0 264 48"
         preserveAspectRatio="none"
-        className="h-6 w-full shrink-0 text-[#79B8A6]"
+        className="h-6 w-full shrink-0 text-(--hue)"
         aria-hidden="true"
       >
         {marketBars.map((height, index) => (

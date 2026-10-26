@@ -6,7 +6,9 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint app components lib next.config.ts eslint.config.mjs postcss.config.mjs"
+    "lint": "eslint app components lib next.config.ts eslint.config.mjs postcss.config.mjs",
+    "ds:sync": "node ../worldstreet/design-system/scripts/vendor.mjs",
+    "ds:check": "node ../worldstreet/design-system/scripts/vendor.mjs --check"
   },
   "dependencies": {
     "@base-ui/react": "^1.8.0",
@@ -15,6 +17,7 @@
     "cn": "^0.4.0",
     "embla-carousel-auto-scroll": "^8.6.0",
     "embla-carousel-react": "^8.6.0",
+    "lenis": "^1.3.27",
     "lucide-react": "^1.49.0",
     "motion": "^13.5.0",
     "next": "16.3.8",

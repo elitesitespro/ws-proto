@@ -1,19 +1,24 @@
-import type { ComponentProps } from "react";
-import { cn } from "cn";
+import type { ComponentProps, CSSProperties } from "react";
 import { Card } from "@/components/ui/card";
 
-/** Shared solid charcoal surface for the floating hero widgets. */
-export function WidgetCard({
-  className,
-  ...props
-}: ComponentProps<typeof Card>) {
-  return (
-    <Card
-      {...props}
-      className={cn(
-        "bg-[#211C20] ring-1 ring-white/10 shadow-[0_16px_40px_rgba(0,0,0,0.24)]",
-        className,
-      )}
-    />
-  );
+/**
+ * The floating hero widgets' surface: the design system's stone card
+ * (bg-card, corner-lit, 20px). Widgets set only padding, gap and layout.
+ */
+export function WidgetCard(props: ComponentProps<typeof Card>) {
+  return <Card {...props} />;
 }
+
+/**
+ * WorldMeet's colour (WorldCall became WorldMeet): its own gold, as in the
+ * hub's registry and the app, on the stone cards here. Spread it as a card's
+ * style, then read var(--hue) … inside, as with data-hue.
+ */
+export const meetHue = {
+  "--hue": "#EAB308",
+  "--hue-rgb": "234, 179, 8",
+  "--hue-ink": "#FACC15",
+  "--hue-on": "#0C0A09",
+  "--hue-soft": "rgba(234, 179, 8, 0.12)",
+  "--hue-line": "rgba(234, 179, 8, 0.2)",
+} as CSSProperties;

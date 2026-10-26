@@ -15,16 +15,16 @@ export function HeroWidgetPlaceholder({
 }: HeroWidgetPlaceholderProps) {
   return (
     <Card
-      className="w-full justify-between gap-1! rounded-lg! p-1! text-white"
+      className="w-full justify-between gap-1! rounded-md! p-1!"
       style={{ aspectRatio }}
     >
-      <span className="text-xs leading-[20px] text-white/50">
+      <span className="text-xs leading-[20px] text-muted">
         {slotId.replace("slot-", "Slot ")}
       </span>
       <span className="wrap-anywhere text-xs leading-[20px] font-medium">
         {platform}
       </span>
-      <span className="text-xs leading-[20px] text-white/50">
+      <span className="text-xs leading-[20px] text-muted">
         {recommendedSize}
       </span>
     </Card>

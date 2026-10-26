@@ -96,14 +96,15 @@
   50% { opacity: .55; }
 }
 
+/* The call widgets read their softened call green from --hue-rgb (widget-card.tsx). */
 @keyframes answer-pulse {
-  0%, 35%, 100% { box-shadow: 0 0 0 0 rgb(23 159 114 / 0); }
-  12% { box-shadow: 0 0 0 4px rgb(23 159 114 / .3); }
+  0%, 35%, 100% { box-shadow: 0 0 0 0 rgba(var(--hue-rgb), 0); }
+  12% { box-shadow: 0 0 0 4px rgba(var(--hue-rgb), .3); }
 }
 
 @keyframes latest-bar {
   0%, 30%, 100% { fill: currentColor; }
-  8% { fill: #BCEAD7; }
+  8% { fill: var(--hue-ink); }
 }
 
 @keyframes course-fill {
@@ -112,13 +113,13 @@
 }
 
 @keyframes price-up {
-  0%, 20% { color: #95D8B8; }
-  100% { color: white; }
+  0%, 20% { color: var(--cx-gain); }
+  100% { color: var(--cx-text); }
 }
 
 @keyframes price-down {
-  0%, 20% { color: #FFA5B6; }
-  100% { color: white; }
+  0%, 20% { color: var(--cx-loss); }
+  100% { color: var(--cx-text); }
 }
 
 @keyframes ring {
@@ -149,8 +150,8 @@
 }
 
 @keyframes live-dot {
-  0% { box-shadow: 0 0 0 0 rgb(149 216 184 / .45); }
-  65%, 100% { box-shadow: 0 0 0 4px rgb(149 216 184 / 0); }
+  0% { box-shadow: 0 0 0 0 rgba(var(--hue-rgb), .45); }
+  65%, 100% { box-shadow: 0 0 0 4px rgba(var(--hue-rgb), 0); }
 }
 
 /* Each portrait gets a four-second turn, with a short pause between speakers. */
@@ -162,14 +163,14 @@
 
 @keyframes speaking-mic {
   0%, 12%, 28%, 44%, 61%, 77%, 90%, 100% {
-    color: rgb(255 255 255 / .8);
-    background-color: rgb(255 255 255 / .1);
-    box-shadow: 0 0 0 0 rgb(101 185 154 / 0);
+    color: var(--cx-text-2);
+    background-color: var(--cx-surface-3);
+    box-shadow: 0 0 0 0 rgba(var(--hue-rgb), 0);
   }
   6%, 21%, 36%, 54%, 69%, 83% {
-    color: #95D8B8;
-    background-color: #203B31;
-    box-shadow: 0 0 0 4px rgb(101 185 154 / .2);
+    color: var(--hue-ink);
+    background-color: var(--hue-soft);
+    box-shadow: 0 0 0 4px rgba(var(--hue-rgb), .2);
   }
 }
 

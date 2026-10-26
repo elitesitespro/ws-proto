@@ -1,0 +1,569 @@
+/* Arcade on cream paper and deep ink, in its own green (app/hues.css: the
+   lime of its controller rings, as on the dial): lime is your rank card and
+   you, its deep olive the game's clock and marks, and a yellow is the
+   streak. Right answers are emerald and wrong ones red, as in the app. */
+.stage {
+  --ink: #150f26;
+  --lime: #b5c478;
+  --lime-soft: #e6ecc9;
+  --olive: #556300;
+  --yellow: #ffcc2d;
+  --grey: #655e7a;
+  --paper: #fffdf8;
+  --right: #10b981;
+  --wrong: #ef4444;
+  height: 100%;
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
+  grid-template-rows: minmax(0, 1fr);
+  align-items: center;
+  gap: 32px;
+  color: var(--ink);
+  text-align: left;
+}
+
+/* The duel */
+.duel {
+  display: grid;
+  gap: 16px;
+  padding: 20px;
+  border-radius: 24px;
+  background: var(--paper);
+  box-shadow:
+    0 0 0 1px rgba(21, 15, 38, 0.06),
+    0 32px 64px -32px rgba(85, 99, 0, 0.4);
+}
+.head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+.player {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.player strong {
+  font-size: var(--text-2xl);
+  font-weight: 800;
+  letter-spacing: -0.04em;
+  line-height: 1;
+}
+.you,
+.bot {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  font-size: 11px;
+  font-style: normal;
+  font-weight: 700;
+}
+.you {
+  background: var(--lime);
+  color: var(--ink);
+}
+.bot {
+  background: var(--ink);
+  color: var(--yellow);
+}
+.rounds {
+  display: flex;
+  gap: 6px;
+}
+.rounds i {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: rgba(21, 15, 38, 0.12);
+  transition:
+    background 300ms ease,
+    transform 300ms ease;
+}
+.rounds i[data-state="done"] {
+  background: var(--ink);
+}
+.rounds i[data-state="now"] {
+  background: var(--olive);
+  transform: scale(1.4);
+}
+.versus {
+  display: flex;
+  justify-content: space-between;
+  margin-top: -8px;
+  color: var(--grey);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+.round {
+  display: grid;
+  gap: 12px;
+  animation: in 420ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+/* Eight seconds, running out */
+.clock {
+  height: 6px;
+  overflow: hidden;
+  border-radius: var(--cx-r-pill);
+  background: var(--lime-soft);
+}
+.clock i {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--olive);
+  transform-origin: left;
+  animation: clock 8s linear both;
+}
+.clock i[data-stopped] {
+  animation-play-state: paused;
+}
+.ask {
+  min-height: 2.5em;
+  font-size: var(--text-lg);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.25;
+}
+.answers {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+.answer {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 48px;
+  padding: 8px 12px 8px 8px;
+  border: 0;
+  border-radius: 14px;
+  background: #f0f2e4;
+  color: var(--ink);
+  font: inherit;
+  font-size: var(--text-xs);
+  font-weight: 600;
+  line-height: 1.25;
+  text-align: left;
+  cursor: pointer;
+  transition:
+    background 200ms ease,
+    transform 160ms ease,
+    box-shadow 200ms ease;
+}
+.answer:hover:not(:disabled) {
+  background: var(--lime-soft);
+  transform: translateY(-2px);
+}
+.answer:active:not(:disabled) {
+  transform: scale(0.97);
+}
+.answer:focus-visible {
+  outline: 2px solid var(--olive);
+  outline-offset: 2px;
+}
+.answer:disabled {
+  cursor: default;
+}
+.letter {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 28px;
+  height: 28px;
+  border-radius: 9px;
+  background: #fff;
+  color: var(--olive);
+  font-size: 11px;
+  font-weight: 800;
+}
+.answer[data-state="right"] {
+  background: var(--right);
+  color: #fff;
+  box-shadow: 0 12px 24px -12px var(--right);
+  animation: right 500ms cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.answer[data-state="wrong"] {
+  background: #fde8e8;
+  color: #9b1c1c;
+  animation: wrong 360ms ease;
+}
+.answer[data-state] .letter {
+  background: rgba(255, 255, 255, 0.85);
+  color: inherit;
+}
+.answer[data-state="right"] .letter {
+  color: var(--right);
+}
+.botPick {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  display: grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--ink);
+  color: var(--yellow);
+  box-shadow: 0 0 0 2px var(--paper);
+  animation: pop 400ms cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+.call {
+  color: var(--grey);
+  font-size: var(--text-xs);
+}
+.over {
+  display: grid;
+  justify-items: center;
+  gap: 8px;
+  padding-block: 24px;
+  text-align: center;
+  animation: in 420ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+.over strong {
+  font-size: var(--text-3xl);
+  font-weight: 800;
+  letter-spacing: -0.04em;
+  line-height: 1;
+}
+.over span {
+  color: var(--grey);
+}
+.again {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 8px;
+  padding: 0 20px;
+  border: 0;
+  border-radius: var(--cx-r-pill);
+  background: var(--ink);
+  color: #fff;
+  font: inherit;
+  font-weight: 600;
+  line-height: 44px;
+  cursor: pointer;
+}
+.again:focus-visible {
+  outline: 2px solid var(--olive);
+  outline-offset: 2px;
+}
+
+/* The board around you */
+.board {
+  position: relative;
+  display: grid;
+  gap: 8px;
+}
+.ghosts {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 0 8px;
+  list-style: none;
+}
+.ghosts li {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  color: rgba(21, 15, 38, 0.35);
+  animation: in 500ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+.ghosts b {
+  min-width: 2.6em;
+  color: rgba(21, 15, 38, 0.14);
+  font-size: var(--text-3xl);
+  font-weight: 800;
+  letter-spacing: -0.05em;
+  line-height: 1;
+}
+.ghosts span {
+  flex: 1;
+  font-weight: 600;
+}
+.ghosts small {
+  font-size: 11px;
+}
+/* Your card: Arcade's lime, tipped, the gamepad resting on it */
+.card {
+  position: relative;
+  display: grid;
+  gap: 8px;
+  padding: 20px;
+  border-radius: 24px;
+  background: var(--lime);
+  color: var(--ink);
+  box-shadow: 0 32px 64px -24px rgba(85, 99, 0, 0.55);
+  transform: rotate(-2deg);
+}
+.pad {
+  position: absolute;
+  right: -28px;
+  top: -64px;
+  width: 168px;
+  height: auto;
+  transform: rotate(-12deg);
+  filter: drop-shadow(0 24px 24px rgba(21, 15, 38, 0.35));
+  pointer-events: none;
+}
+.rank {
+  font-size: var(--text-display-sm);
+  font-weight: 800;
+  letter-spacing: -0.06em;
+  line-height: 0.9;
+  animation: climb 600ms cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+.me {
+  font-size: var(--text-xs);
+  font-weight: 600;
+  opacity: 0.85;
+}
+.bar {
+  height: 8px;
+  overflow: hidden;
+  border-radius: var(--cx-r-pill);
+  background: rgba(21, 15, 38, 0.14);
+}
+.bar i {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--ink);
+  transform-origin: left;
+  transition: transform 700ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+.xp {
+  display: flex;
+  justify-content: space-between;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+.xp span {
+  opacity: 0.7;
+}
+.since,
+.up {
+  justify-self: start;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0 12px;
+  border-radius: var(--cx-r-pill);
+  background: #fff;
+  color: var(--ink);
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 28px;
+}
+.since {
+  position: absolute;
+  top: -14px;
+  left: 20px;
+  transform: rotate(3deg);
+}
+.up {
+  position: absolute;
+  bottom: -14px;
+  right: 20px;
+  background: var(--yellow);
+  animation: toast 2.8s ease both;
+}
+.streak {
+  position: absolute;
+  left: -20px;
+  bottom: -36px;
+  display: grid;
+  justify-items: center;
+  align-content: center;
+  width: 88px;
+  height: 88px;
+  border-radius: 50%;
+  background: var(--yellow);
+  box-shadow: 0 16px 32px -12px rgba(21, 15, 38, 0.35);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  line-height: 1.1;
+  text-transform: uppercase;
+  transform: rotate(-8deg);
+  animation: flip 700ms cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+.streak b {
+  font-size: var(--text-2xl);
+  letter-spacing: -0.04em;
+}
+
+@keyframes clock {
+  from {
+    transform: scaleX(1);
+  }
+  to {
+    transform: scaleX(0);
+  }
+}
+@keyframes in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
+@keyframes right {
+  50% {
+    transform: scale(1.04);
+  }
+}
+@keyframes wrong {
+  25% {
+    transform: translateX(-4px);
+  }
+  75% {
+    transform: translateX(4px);
+  }
+}
+@keyframes pop {
+  from {
+    opacity: 0;
+    transform: scale(0.4);
+  }
+}
+@keyframes climb {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+}
+@keyframes toast {
+  0% {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  12%,
+  80% {
+    opacity: 1;
+    transform: none;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+@keyframes flip {
+  from {
+    transform: rotate(-8deg) rotateY(180deg) scale(0.8);
+  }
+}
+
+@media (min-width: 1024px) and (max-height: 850px) {
+  .duel {
+    gap: 12px;
+    padding: 16px;
+  }
+  .ask {
+    font-size: var(--text-base);
+  }
+  .ghosts li:first-child,
+  .versus {
+    display: none;
+  }
+  .answer {
+    min-height: 40px;
+  }
+}
+/* A tablet or a phone: your card in a strip above the duel; the ghosts,
+   the gamepad and the streak coin step aside */
+@media (max-width: 1023px) {
+  .stage {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: auto auto;
+    align-content: start;
+    gap: 16px;
+  }
+  .board {
+    order: -1;
+  }
+  .ghosts,
+  .pad,
+  .streak,
+  .since {
+    display: none;
+  }
+  .card {
+    grid-template-columns: auto minmax(0, 1fr);
+    align-items: center;
+    column-gap: 16px;
+    padding: 12px 16px;
+    transform: none;
+  }
+  .rank {
+    grid-row: span 3;
+    font-size: var(--text-4xl);
+  }
+  .up {
+    bottom: auto;
+    top: -14px;
+  }
+}
+/* A phone: tighter, the four answers still two by two */
+@media (max-width: 600px) {
+  .stage {
+    gap: 12px;
+  }
+  .duel {
+    gap: 10px;
+    padding: 12px;
+  }
+  .versus,
+  .call,
+  .letter {
+    display: none;
+  }
+  .player strong {
+    font-size: var(--text-xl);
+  }
+  .you,
+  .bot {
+    width: 32px;
+    height: 32px;
+  }
+  .ask {
+    min-height: 0;
+    font-size: var(--text-base);
+  }
+  .answers {
+    gap: 6px;
+  }
+  .answer {
+    min-height: 44px;
+    padding: 6px 10px;
+    font-size: 12px;
+  }
+  .card {
+    padding: 10px 14px;
+  }
+  .rank {
+    font-size: var(--text-3xl);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .round,
+  .over,
+  .answer[data-state],
+  .botPick,
+  .ghosts li,
+  .rank,
+  .up,
+  .streak {
+    animation: none;
+  }
+  .bar i {
+    transition: none;
+  }
+}

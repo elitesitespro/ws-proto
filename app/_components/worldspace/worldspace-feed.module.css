@@ -1,0 +1,514 @@
+/* WorldSpace's feed on dark liquid glass, as in the app: stories along the
+   top (a cyan ring is unseen, a hairline seen, the open one draws its timer
+   round the face), the open story's post, the composer. WorldSpace's cyan
+   (--hue) marks what's unseen, live or yours; the rest is the glass's ink. */
+
+.feed {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  min-width: 0;
+}
+
+/* Stories */
+.stories {
+  display: flex;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.story {
+  display: grid;
+  justify-items: center;
+  gap: 8px;
+  width: 64px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  font-size: var(--text-xs);
+  cursor: pointer;
+}
+.story:focus-visible {
+  outline: 2px solid var(--hue);
+  outline-offset: 4px;
+  border-radius: var(--cx-r-xs);
+}
+.ring {
+  position: relative;
+  width: 56px;
+  height: 56px;
+  padding: 4px;
+  border-radius: 50%;
+  box-shadow: inset 0 0 0 2px var(--hue);
+  transition:
+    box-shadow 300ms,
+    transform 300ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+.story:hover .ring {
+  transform: scale(1.06);
+}
+.story[data-state="seen"] .ring,
+.story[data-state="active"] .ring {
+  box-shadow: inset 0 0 0 1.5px rgba(255, 255, 255, 0.22);
+}
+/* Live jumps the queue: always ringed, with its tag */
+.story[data-live] .ring {
+  box-shadow: inset 0 0 0 2px var(--hue);
+}
+.ring img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+}
+.name {
+  max-width: 64px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--cx-glass-text-2);
+}
+.story[data-state="active"] .name {
+  color: var(--cx-glass-text);
+  font-weight: 600;
+}
+.chip {
+  position: absolute;
+  left: 50%;
+  bottom: -4px;
+  padding: 0 6px;
+  border-radius: var(--cx-r-pill);
+  background: var(--hue);
+  color: var(--hue-on);
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 16px;
+  transform: translateX(-50%);
+}
+.add {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  display: grid;
+  place-items: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--hue);
+  color: var(--hue-on);
+  box-shadow: 0 0 0 2px #0c0a09;
+}
+/* You, before there's a photo */
+.me {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background: rgba(var(--hue-rgb), 0.18);
+  color: var(--hue);
+}
+.progress {
+  position: absolute;
+  inset: 0;
+  overflow: visible;
+  transform: rotate(-90deg);
+  pointer-events: none;
+}
+.progress circle {
+  fill: none;
+  stroke: var(--hue);
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-dasharray: 1;
+  animation: timer 6s linear both;
+}
+/* The stories hold while you're reading, voting, listening or writing */
+.feed:hover .progress circle,
+.feed:has(input:focus) .progress circle,
+.feed:has([data-playing]) .progress circle {
+  animation-play-state: paused;
+}
+
+/* The open story's post */
+.post {
+  position: relative;
+  display: grid;
+  gap: 16px;
+  padding: 16px;
+  min-width: 0;
+  border-radius: var(--cx-r-card);
+  font-size: var(--text-xs);
+  line-height: 1.35;
+  color: var(--cx-glass-text);
+  user-select: none;
+  animation: swap 480ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+.who {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.who > div {
+  flex: 1;
+  min-width: 0;
+}
+.who span {
+  display: block;
+}
+.who > img,
+.who > .me {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex: none;
+}
+.quiet {
+  color: var(--cx-glass-text-2);
+}
+.said {
+  font-size: var(--text-base);
+  line-height: 1.25;
+  letter-spacing: -0.02em;
+}
+.actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+.actions .quiet {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* The kit's hairline pills; pressed (liked, aligned, listening) rings in the
+   cyan, and a liked heart fills */
+.pill {
+  flex: none;
+}
+.pill svg {
+  color: var(--hue);
+}
+.pill[aria-pressed="true"] {
+  box-shadow: inset 0 0 0 1.5px var(--hue);
+}
+.pill[aria-pressed="true"] svg :global(.b) {
+  opacity: 1;
+}
+.pill:focus-visible {
+  box-shadow: var(--cx-focus-ring);
+}
+
+/* A double-tap's heart */
+.burst {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  color: var(--hue);
+  pointer-events: none;
+  filter: drop-shadow(0 0 16px rgba(var(--hue-rgb), 0.7));
+  animation: burst 800ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+.burst svg :global(.b) {
+  opacity: 1;
+}
+
+/* A poll: the bars fill once you've voted */
+.poll {
+  display: grid;
+  gap: 8px;
+}
+.option {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 36px;
+  padding: 0 16px;
+  overflow: hidden;
+  border: 0;
+  border-radius: var(--cx-r-pill);
+  background: none;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.18);
+  color: inherit;
+  font: inherit;
+  font-size: var(--text-sm);
+  cursor: pointer;
+}
+.option:hover {
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.36);
+}
+.option[aria-pressed="true"] {
+  box-shadow: inset 0 0 0 1.5px var(--hue);
+  font-weight: 600;
+}
+.option > span {
+  position: relative;
+}
+.option > .fill {
+  position: absolute;
+  inset: 0;
+  background: rgba(var(--hue-rgb), 0.16);
+  transform: scaleX(var(--share, 0));
+  transform-origin: left;
+  transition: transform 800ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+.option[aria-pressed="true"] > .fill {
+  background: rgba(var(--hue-rgb), 0.34);
+}
+
+/* A voice note: the waveform lights bar by bar as it plays */
+.voice {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+.wave {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  height: 32px;
+}
+.wave i {
+  flex: 1;
+  height: calc(var(--h) * 100%);
+  border-radius: 2px;
+  background: var(--hue);
+  opacity: 0.35;
+}
+.voice[data-started] .wave i {
+  animation: lit 160ms calc(var(--i) * var(--length) / 32) both paused;
+}
+.voice[data-playing] .wave i {
+  animation-play-state: running;
+}
+
+/* The composer */
+.composer {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px;
+}
+.composer:has(input:focus-visible) {
+  outline: 2px solid var(--hue);
+  outline-offset: 2px;
+}
+.composer > .me {
+  width: 32px;
+  height: 32px;
+}
+.field {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+}
+.field input {
+  width: 100%;
+  height: 32px;
+  border: 0;
+  outline: none;
+  background: none;
+  color: var(--cx-glass-text);
+  font: inherit;
+  font-size: var(--text-sm);
+}
+/* The prompt, letters gathering left to right, holding, then dissolving */
+.prompt {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+  white-space: nowrap;
+  color: var(--cx-glass-text-2);
+  font-size: var(--text-sm);
+  pointer-events: none;
+  animation: hold 3.6s linear both;
+}
+.prompt span {
+  display: inline-block;
+  white-space: pre;
+  animation: gather 520ms calc(var(--i) * 16ms) cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+/* Posting is WorldSpace's own action here: the kit's button in the cyan */
+.send {
+  --cx-ember: var(--hue);
+  --cx-ember-press: color-mix(in srgb, var(--hue) 82%, #0c0a09);
+  --cx-on-primary: var(--hue-on);
+  --cx-glow-cta: 0 8px 24px -6px rgba(var(--hue-rgb), 0.7);
+}
+
+/* "Amara aligned with you", after you post */
+.toast {
+  position: absolute;
+  left: 50%;
+  top: 0;
+  z-index: 2;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+}
+.toast:not(:empty) {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 16px 4px 4px;
+  border-radius: var(--cx-r-pill);
+  background: rgba(12, 10, 9, 0.88);
+  box-shadow:
+    inset 0 0 0 1px rgba(var(--hue-rgb), 0.5),
+    0 8px 32px rgba(0, 0, 0, 0.5);
+  color: var(--cx-glass-text);
+  font-size: var(--text-xs);
+  white-space: nowrap;
+  animation: toast 480ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+.toast[data-leaving] {
+  animation: toastOut 400ms ease-in both;
+}
+.toast img {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+@keyframes timer {
+  from {
+    stroke-dashoffset: 1;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+@keyframes swap {
+  from {
+    opacity: 0;
+    transform: translateY(12px) scale(0.98);
+  }
+}
+@keyframes burst {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.3);
+  }
+  35% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1.15);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -90%) scale(1);
+  }
+}
+@keyframes lit {
+  to {
+    opacity: 1;
+  }
+}
+@keyframes gather {
+  from {
+    opacity: 0;
+    filter: blur(6px);
+    transform: translateX(-6px);
+  }
+}
+@keyframes hold {
+  86% {
+    opacity: 1;
+    filter: blur(0);
+  }
+  to {
+    opacity: 0;
+    filter: blur(6px);
+  }
+}
+@keyframes toast {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -20%) scale(0.92);
+  }
+}
+@keyframes toastOut {
+  to {
+    opacity: 0;
+    transform: translate(-50%, -80%);
+  }
+}
+
+/* On a phone or a shorter laptop, tighter; the composer goes where it's
+   short */
+@media (max-width: 1023px), (max-height: 850px) {
+  .feed,
+  .post {
+    gap: 8px;
+  }
+  .story {
+    width: 56px;
+  }
+  .ring {
+    width: 48px;
+    height: 48px;
+    padding: 3px;
+  }
+  .name {
+    max-width: 56px;
+  }
+}
+@media (max-width: 600px), (max-height: 760px) {
+  .composer {
+    display: none;
+  }
+  .said {
+    font-size: var(--text-sm);
+  }
+  .option {
+    height: 32px;
+  }
+}
+@media (max-width: 600px) {
+  .poll {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  }
+  .stories {
+    gap: 4px;
+  }
+  .story {
+    width: 52px;
+  }
+  .name {
+    max-width: 52px;
+  }
+}
+
+/* Without motion the stories don't play through; tap one to open it */
+@media (prefers-reduced-motion: reduce) {
+  .progress circle,
+  .post,
+  .burst,
+  .prompt,
+  .prompt span,
+  .toast:not(:empty) {
+    animation: none;
+  }
+  .progress circle {
+    stroke-dashoffset: 0;
+  }
+  .voice[data-started] .wave i {
+    animation-duration: 1ms;
+  }
+  .option > .fill,
+  .ring {
+    transition: none;
+  }
+}

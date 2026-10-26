@@ -20,11 +20,11 @@ export function GradientPreviewSection() {
       <div className="max-w-2xl">
         <h1
           id="gradient-preview-heading"
-          className="text-xl leading-[40px] font-semibold tracking-tight"
+          className="text-xl leading-[40px] font-medium tracking-tight"
         >
           Grainy gradient preview
         </h1>
-        <p className="mt-1 text-sm leading-[24px] opacity-70">
+        <p className="mt-1 text-sm leading-[24px] text-muted">
           One background component with five color variations.
         </p>
       </div>
@@ -37,7 +37,7 @@ export function GradientPreviewSection() {
             seed={preview.seed}
             className="flex h-32 flex-col justify-end p-3"
           >
-            <h2 className="text-base leading-[24px] font-semibold tracking-tight">
+            <h2 className="text-base leading-[24px] font-medium tracking-tight">
               {preview.name}
             </h2>
             <p className="mt-1 text-sm leading-[24px] opacity-80">

@@ -103,7 +103,7 @@ export function GrainyGradient({
       {...props}
       data-variant={variant}
       className={cn(
-        "relative isolate overflow-hidden rounded-xl bg-[linear-gradient(180deg,var(--gradient-top)_0%,var(--gradient-middle)_38%,var(--gradient-deep)_68%,var(--gradient-bottom)_100%)] text-white [--grain-opacity:0.5]",
+        "relative isolate overflow-hidden rounded-card bg-[linear-gradient(180deg,var(--gradient-top)_0%,var(--gradient-middle)_38%,var(--gradient-deep)_68%,var(--gradient-bottom)_100%)] text-white [--grain-opacity:0.5]",
         palettes[variant],
         className
       )}
@@ -115,11 +115,11 @@ export function GrainyGradient({
         ))}
       </div>
       <div
-        className="pointer-events-none absolute inset-0 z-10 bg-[radial-gradient(ellipse_94%_88%_at_50%_32%,transparent_40%,#02040d85_100%)]"
+        className="pointer-events-none absolute inset-0 z-10 bg-[radial-gradient(ellipse_94%_88%_at_50%_32%,transparent_40%,rgba(12,10,9,0.52)_100%)]"
         aria-hidden="true"
       />
       <div
-        className="pointer-events-none absolute inset-0 z-10 bg-[linear-gradient(180deg,transparent_42%,#02030c8f_100%)]"
+        className="pointer-events-none absolute inset-0 z-10 bg-[linear-gradient(180deg,transparent_42%,rgba(12,10,9,0.56)_100%)]"
         aria-hidden="true"
       />
       <div

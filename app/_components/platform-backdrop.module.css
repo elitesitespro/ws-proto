@@ -1,3 +1,6 @@
+/* Each backdrop sits inside its platform's data-hue (the timeline section or
+   its stacked block), so it paints from var(--hue) and its family. Vsion and
+   Arcade are dark scenes on stone. */
 .backdrop {
   position: absolute;
   inset-block: 0;
@@ -8,141 +11,214 @@
   overflow: hidden;
   z-index: -1;
   pointer-events: none;
-  animation: reveal 500ms ease-out both;
 }
-.film {
-  object-fit: cover;
-  object-position: 60% 40%;
-}
+/* Vision: its stage, near-black with two faint pools of its gold and a
+   whisper of film grain */
 .Vsion {
-  background: #171117;
-}
-.shade {
-  position: absolute;
-  inset: 0;
+  background:
+    radial-gradient(ellipse 40% 50% at 72% 50%, rgba(237, 178, 0, 0.1), transparent 70%),
+    radial-gradient(ellipse 30% 40% at 30% 90%, rgba(234, 179, 8, 0.06), transparent 70%),
+    #070605;
 }
 .Vsion .shade {
-  background:
-    linear-gradient(90deg, #17111790, #17111720 45%, #17111790),
-    linear-gradient(0deg, #171117ed, transparent 65%, #17111780);
+  opacity: 0.05;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
 }
+/* Forex: worldstreetgold.com's warm paper, ruled like a chart, with a soft
+   pool of its yellow where the ticket sits */
 .Forex {
-  background: oklch(76.8% 0.233 130.85);
-  color: #254d25;
-}
-.chart {
-  width: 100%;
-  height: 100%;
-  opacity: 0.55;
-}
-.chartLine {
-  stroke-dasharray: 1;
-  animation: trace 1.4s ease-out both;
+  background:
+    radial-gradient(ellipse 30% 40% at 84% 58%, rgba(255, 204, 45, 0.22), transparent 70%),
+    repeating-linear-gradient(0deg, transparent 0 63px, rgba(12, 10, 9, 0.05) 63px 64px),
+    repeating-linear-gradient(90deg, transparent 0 63px, rgba(12, 10, 9, 0.05) 63px 64px),
+    #f5f1e8;
 }
 .Forex .shade {
-  background: linear-gradient(180deg, #a4db3f70, transparent 80%);
+  background: radial-gradient(ellipse at 50% 50%, transparent 50%, rgba(245, 241, 232, 0.9));
 }
+/* Arcade: cream, a glow of its lime behind your card and a warm yellow one
+   low down */
 .Arcade {
-  background: radial-gradient(ellipse at 75% 40%, #772458, #241130 70%);
+  background:
+    radial-gradient(ellipse 34% 46% at 82% 46%, rgba(214, 226, 160, 0.7), transparent 70%),
+    radial-gradient(ellipse 30% 36% at 40% 96%, rgba(255, 231, 163, 0.6), transparent 70%),
+    #f6f3ec;
 }
-.planet {
+/* WorldMeet: its white, warmed by two soft pools of its gold, the larger
+   behind the world. */
+.WorldMeet {
+  background:
+    radial-gradient(ellipse 34% 46% at 62% 52%, rgba(234, 179, 8, 0.16), transparent 70%),
+    radial-gradient(ellipse 28% 36% at 92% 12%, rgba(250, 204, 21, 0.12), transparent 70%),
+    #fffcf5;
+}
+
+/* Xtream: its near-black ground, warmed by a chilli glow behind the battle
+   and an ember one high up; a live signal pulsing out from the middle in
+   its heat. */
+.XStream {
+  background:
+    radial-gradient(ellipse 40% 50% at 60% 58%, rgba(227, 18, 42, 0.22), transparent 70%),
+    radial-gradient(ellipse 30% 36% at 90% 10%, rgba(248, 88, 16, 0.16), transparent 70%),
+    #0b0708;
+}
+.signal i {
   position: absolute;
-  width: 360px;
-  height: 360px;
-  right: 8%;
-  top: 16%;
+  left: 60%;
+  top: 56%;
+  width: 640px;
+  aspect-ratio: 1;
+  border: 1px solid rgba(248, 88, 16, 0.4);
   border-radius: 50%;
-  background: linear-gradient(135deg, #ffd38e, #dc6675 45%, #542454);
-  box-shadow: 0 0 96px #e8638840;
-  opacity: 0.55;
+  opacity: 0;
+  transform: translate(-50%, -50%) scale(0.5);
+  animation: signal 6s ease-out infinite;
 }
-.stars {
+.signal i:nth-child(2) {
+  animation-delay: 2s;
+}
+.signal i:nth-child(3) {
+  animation-delay: 4s;
+}
+@keyframes signal {
+  0% {
+    opacity: 0.8;
+    transform: translate(-50%, -50%) scale(0.5);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(1.6);
+  }
+}
+.XStream .shade {
+  background: radial-gradient(ellipse at 50% 50%, transparent 55%, rgba(11, 7, 8, 0.7));
+}
+
+/* WorldSpace: deep space, as on the hub. Stars in three depths (the nearest
+   twinkle), and a faint haze of WorldSpace's cyan (as in its preview,
+   platform-views.module.css) where the room hangs. */
+.WorldSpace {
+  --hue-rgb: 34, 184, 214;
+  background:
+    radial-gradient(ellipse 36% 52% at 78% 54%, rgba(var(--hue-rgb), 0.16), transparent 70%),
+    radial-gradient(ellipse 30% 40% at 16% 84%, rgba(var(--hue-rgb), 0.06), transparent 70%),
+    var(--cx-bg);
+}
+.sky {
   position: absolute;
   inset: 0;
-  background-image: radial-gradient(circle, #ffecbc90 1px, transparent 2px);
-  background-size: 96px 96px;
+  width: 100%;
+  height: 100%;
 }
-.gameFloor {
-  position: absolute;
-  inset: 58% -50% -40%;
-  background:
-    repeating-linear-gradient(0deg, transparent 0 63px, #df7ebb40 64px 65px),
-    repeating-linear-gradient(90deg, transparent 0 63px, #df7ebb40 64px 65px);
-  transform: perspective(400px) rotateX(55deg);
-  transform-origin: center top;
+.sky circle {
+  fill: #fff;
 }
-.Arcade .shade {
-  background: linear-gradient(0deg, #241130a0, transparent 70%);
-}
-.WorldSpace {
-  background: #f0c75a;
-}
-.collage {
-  position: absolute;
-  inset: -8% -4% -8% 36%;
-  display: grid;
-  grid-template-columns: 1.2fr 1fr;
-  grid-template-rows: 1fr 1fr;
-  gap: 16px;
-  transform: rotate(-8deg);
-}
-.collage > div {
-  position: relative;
-  overflow: hidden;
-  border-radius: 24px;
-}
-.collage > div:first-child {
-  grid-row: span 2;
-}
-.collage img {
-  object-fit: cover;
+.twinkle {
+  animation: twinkle var(--t, 4s) ease-in-out var(--d, 0s) infinite;
 }
 .WorldSpace .shade {
-  background:
-    linear-gradient(90deg, #f0c75a, #f0c75ae8 42%, #f0c75a38),
-    linear-gradient(0deg, #f0c75a, transparent 50%);
+  background: radial-gradient(ellipse at 50% 50%, transparent 55%, rgba(12, 10, 9, 0.6));
 }
-@keyframes reveal {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
-}
-@keyframes trace {
-  from {
-    stroke-dashoffset: 1;
-  }
-  to {
-    stroke-dashoffset: 0;
-  }
-}
-@media (max-width: 1023px) {
-  .film {
-    object-position: 60% center;
-  }
-  .Vsion .shade {
-    background: linear-gradient(0deg, #171117ed, #17111745 55%, #171117b0);
-  }
-  .collage {
-    inset: 8% -28% 8% 24%;
-  }
-  .WorldSpace .shade {
-    background:
-      linear-gradient(90deg, #f0c75ae8, #f0c75a45),
-      linear-gradient(0deg, #f0c75a, transparent 65%, #f0c75ae8);
-  }
-  .planet {
-    width: 240px;
-    height: 240px;
-    right: -8%;
-    top: 24%;
+@keyframes twinkle {
+  50% {
+    opacity: 0.3;
   }
 }
 @media (prefers-reduced-motion: reduce) {
-  .backdrop,
-  .chartLine {
+  .twinkle {
     animation: none;
   }
+  .signal {
+    display: none;
+  }
+}
+
+/* AI Movie: its night navy, a faint dot grid as on the studio, a warm gold
+   light from the left and a cooler one behind the set */
+.AIMovie {
+  background:
+    radial-gradient(circle, rgba(143, 150, 192, 0.14) 1px, transparent 1.5px) 0 0 / 24px 24px,
+    radial-gradient(ellipse 34% 50% at 8% 40%, rgba(255, 204, 45, 0.12), transparent 70%),
+    radial-gradient(ellipse 40% 50% at 70% 60%, rgba(70, 82, 170, 0.22), transparent 70%),
+    #0b0e1b;
+}
+.AIMovie .shade {
+  background: radial-gradient(ellipse at 50% 50%, transparent 55%, rgba(5, 6, 13, 0.6));
+}
+
+/* WorldStore: its near-black, a gold pool of shop light where the listing
+   sits and a faint lime one where the money's held */
+.WorldStore {
+  background:
+    radial-gradient(ellipse 34% 50% at 50% 55%, rgba(250, 204, 21, 0.12), transparent 70%),
+    radial-gradient(ellipse 26% 40% at 88% 70%, rgba(201, 221, 37, 0.08), transparent 70%),
+    #0c0a09;
+}
+.WorldStore .shade {
+  background: radial-gradient(ellipse at 50% 50%, transparent 55%, rgba(12, 10, 9, 0.6));
+}
+
+/* Academy: its dark page, a warm light from above where the school stands
+   and a low gold glow */
+.Academy {
+  background:
+    radial-gradient(ellipse 26% 60% at 54% 0%, rgba(237, 178, 0, 0.14), transparent 70%),
+    radial-gradient(ellipse 40% 30% at 60% 100%, rgba(237, 178, 0, 0.08), transparent 70%),
+    #0c0a09;
+}
+.Academy .shade {
+  background: radial-gradient(ellipse at 50% 50%, transparent 55%, rgba(12, 10, 9, 0.6));
+}
+
+/* WorldHealth: its pale mint, a soft teal light behind the consultation
+   and a fainter one high on the left */
+.WorldHealth {
+  background:
+    radial-gradient(ellipse 36% 48% at 70% 56%, rgba(45, 212, 191, 0.16), transparent 70%),
+    radial-gradient(ellipse 28% 36% at 30% 12%, rgba(16, 185, 129, 0.08), transparent 70%),
+    #f4f8f7;
+}
+
+/* Crypto: worldstreetgold.com's night for it, near-black with a cold blue
+   glow behind the desk and a little of its gold high up, under a sky of
+   small stars that breathe */
+.Crypto {
+  background:
+    radial-gradient(ellipse 38% 46% at 66% 54%, rgba(37, 99, 235, 0.14), transparent 70%),
+    radial-gradient(ellipse 26% 32% at 92% 8%, rgba(255, 204, 45, 0.1), transparent 70%),
+    #05070c;
+}
+.cryptoSky {
+  position: absolute;
+  inset: 0;
+  background-image:
+    radial-gradient(circle at 20% 30%, rgba(255, 255, 255, 0.8) 0 1px, transparent 1.5px),
+    radial-gradient(circle at 70% 80%, rgba(255, 255, 255, 0.55) 0 1px, transparent 1.5px),
+    radial-gradient(circle at 45% 60%, rgba(140, 200, 255, 0.7) 0 1.2px, transparent 2px);
+  background-size:
+    180px 180px,
+    240px 240px,
+    320px 320px;
+  opacity: 0.6;
+  animation: crypto-breathe 6s ease-in-out infinite alternate;
+}
+@keyframes crypto-breathe {
+  to {
+    opacity: 0.3;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .cryptoSky {
+    animation: none;
+  }
+}
+
+/* Prediction: cream, with a pool of its teal under the crowd's chart and a
+   faint warm one, for no, low on the right. The teal stays clear of the foot,
+   where the street runs out of the cream into Connect. */
+.Prediction {
+  background:
+    radial-gradient(ellipse 30% 40% at 58% 56%, rgba(123, 198, 206, 0.24), transparent 70%),
+    radial-gradient(ellipse 26% 32% at 94% 92%, rgba(217, 65, 23, 0.07), transparent 70%),
+    #f6f3ec;
 }

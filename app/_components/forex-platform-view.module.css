@@ -1,0 +1,35 @@
+/* Forex's mark (an ink tile, a yellow candlestick), its name and its
+   sessions; "the world." underlined in its yellow. */
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: var(--text-sm);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+.mark {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  background: #0c0a09;
+  color: #ffcc2d;
+}
+.when {
+  margin-left: 8px;
+  color: #6b655c;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+.world {
+  background: linear-gradient(transparent 62%, rgba(255, 204, 45, 0.85) 62%, rgba(255, 204, 45, 0.85) 92%, transparent 92%);
+}
+@media (max-width: 600px) {
+  .when {
+    display: none;
+  }
+}

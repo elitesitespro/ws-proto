@@ -1,0 +1,524 @@
+/* Vivid's switchboard (vivid-switchboard.tsx): questions on the left, the
+   globe in the middle, the platforms that answer them on the right, joined
+   by dotted gold wires (the loader's and the CTA's arcs). Laid out across on
+   a laptop; on a phone it stands up, and the routes swipe through the globe. */
+.board {
+  --globe: clamp(220px, 19vw, 272px);
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) var(--globe) minmax(0, 1fr);
+  column-gap: clamp(64px, 8vw, 128px);
+  row-gap: 20px;
+  align-items: center;
+}
+
+/* The globe's flight from the dashboard's dock: over the wallet, under
+   Vivid's heading (vivid-section.module.css lifts it), so the words stay
+   clear as it passes behind them */
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.wires {
+  position: absolute;
+  top: 0;
+  left: 0;
+  overflow: visible;
+  pointer-events: none;
+}
+/* A wire: gold dots, faint at rest; the lit route's run toward the
+   platform, into the globe and out the other side */
+.wire {
+  fill: none;
+  stroke: #eab308;
+  stroke-width: 2.4px;
+  stroke-linecap: round;
+  stroke-dasharray: 0 9;
+  opacity: 0.22;
+  transition: opacity 300ms var(--cx-ease);
+}
+.wire[data-on] {
+  stroke: #facc15;
+  opacity: 0.95;
+  animation: flow 600ms linear infinite;
+}
+@keyframes flow {
+  to {
+    stroke-dashoffset: -18;
+  }
+}
+
+.label {
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 16px;
+}
+.labelAsk {
+  grid-column: 1;
+  text-align: right;
+}
+.labelWhere {
+  grid-column: 3;
+}
+
+/* The routes: one row each across the board's three columns */
+.routes {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-column: 1 / -1;
+  grid-row: 2;
+  grid-template-columns: subgrid;
+  row-gap: 12px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.route {
+  display: grid;
+  grid-column: 1 / -1;
+  grid-template-columns: subgrid;
+  align-items: center;
+}
+
+/* What you ask, in your own words, set like something said */
+.ask {
+  grid-column: 1;
+  color: #a8a29e;
+  font-size: 20px;
+  line-height: 28px;
+  letter-spacing: -0.01em;
+  text-align: right;
+  text-wrap: balance;
+  transition: color 300ms var(--cx-ease);
+}
+.route[data-on] .ask {
+  color: #fafaf9;
+}
+
+/* Where it sends you: the platform, in its colour, and what Vivid says */
+.card {
+  display: grid;
+  grid-column: 3;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  column-gap: 14px;
+  row-gap: 2px;
+  align-items: start;
+  padding: 14px 16px;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.03);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.08);
+  color: #fafaf9;
+  text-decoration: none;
+  transition:
+    background 300ms var(--cx-ease),
+    box-shadow 300ms var(--cx-ease);
+}
+.route[data-on] .card {
+  background: rgba(var(--hue-rgb), 0.07);
+  box-shadow: inset 0 0 0 1px rgba(var(--hue-rgb), 0.45);
+}
+.card:focus-visible {
+  outline: 2px solid #facc15;
+  outline-offset: 3px;
+}
+.tile {
+  display: grid;
+  grid-row: span 2;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  background: var(--hue-soft);
+  color: var(--hue);
+}
+.place {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 15px;
+  font-weight: 500;
+  line-height: 22px;
+}
+.pro {
+  padding: 1px 8px;
+  border-radius: 999px;
+  background: #eab308;
+  color: #1c1917;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 18px;
+}
+.answer {
+  grid-column: 2;
+  color: #d6d3d1;
+  font-size: 14px;
+  line-height: 21px;
+}
+.go {
+  grid-column: 3;
+  grid-row: 1;
+  color: rgba(255, 255, 255, 0.4);
+  transition: color 200ms var(--cx-ease);
+}
+.card:hover .go {
+  color: var(--hue-ink);
+}
+
+/* The globe's place, in the middle of the routes, with a little gold light
+   behind it. Its canvas is wider than it, for the rings it gives off. */
+.slot {
+  position: relative;
+  z-index: 2;
+  grid-column: 2;
+  grid-row: 2;
+  justify-self: center;
+  width: var(--globe);
+  aspect-ratio: 1;
+}
+.slot::before {
+  content: "";
+  position: absolute;
+  inset: -40%;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, rgba(234, 179, 8, 0.14), rgba(234, 179, 8, 0.04) 55%, transparent);
+  pointer-events: none;
+}
+.canvas {
+  position: absolute;
+  inset: -25%;
+  width: 150%;
+  height: 150%;
+  pointer-events: none;
+}
+/* The globe takes a click: it wakes, and says where it goes */
+.globeLink {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+}
+.globeLink:focus-visible {
+  outline: 2px solid #facc15;
+  outline-offset: 8px;
+}
+.tip {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  margin-top: -18px;
+  padding: 6px 14px;
+  border-radius: 999px;
+  background: rgba(28, 25, 23, 0.9);
+  box-shadow: inset 0 0 0 1px rgba(234, 179, 8, 0.4);
+  color: #fde68a;
+  font-size: 14px;
+  font-weight: 500;
+  white-space: nowrap;
+  opacity: 0;
+  transform: translate(-50%, 6px);
+  transition:
+    opacity 240ms ease,
+    transform 240ms cubic-bezier(0.22, 1, 0.36, 1);
+  pointer-events: none;
+}
+.globeLink:hover .tip,
+.globeLink:focus-visible .tip {
+  opacity: 1;
+  transform: translate(-50%, 0);
+}
+
+/* Your own question, under the globe, wired up into it */
+.composer {
+  display: flex;
+  grid-column: 1 / -1;
+  grid-row: 3;
+  justify-self: center;
+  align-items: center;
+  gap: 8px;
+  width: min(100%, 480px);
+  margin-top: 64px;
+  padding: 6px 6px 6px 20px;
+  border-radius: 28px;
+  background: rgba(255, 255, 255, 0.06);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.08);
+  transition:
+    background 200ms ease,
+    box-shadow 200ms ease;
+  scroll-margin-top: 45svh;
+}
+.composer:focus-within {
+  background: rgba(255, 255, 255, 0.09);
+  box-shadow: inset 0 0 0 1px rgba(234, 179, 8, 0.5);
+}
+.input {
+  flex: 1;
+  min-width: 0;
+  border: 0;
+  background: transparent;
+  color: #fafaf9;
+  font: inherit;
+  font-size: 16px;
+  outline: none;
+}
+.input::placeholder {
+  color: rgba(255, 255, 255, 0.45);
+}
+.send {
+  display: grid;
+  flex-shrink: 0;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border: 0;
+  border-radius: 50%;
+  background: #eab308;
+  color: #1c1917;
+  cursor: pointer;
+  transition: transform 120ms ease;
+}
+.send:active {
+  transform: scale(0.95);
+}
+.send:focus-visible {
+  outline: 2px solid #facc15;
+  outline-offset: 2px;
+}
+.fine {
+  grid-column: 1 / -1;
+  grid-row: 4;
+  margin-top: -8px;
+  color: rgba(255, 255, 255, 0.45);
+  font-size: 12px;
+  line-height: 16px;
+  text-align: center;
+}
+
+/* A phone's pieces: the row's place-markers, the wires through the globe
+   and the platforms round it */
+.dots,
+.feed,
+.orbit {
+  display: none;
+}
+
+/* On a phone or a tablet the switchboard stands up: each route is a slide,
+   its question over the globe and its answer under it, and you swipe them
+   through. The globe holds still in the middle, between the two, and talks
+   each one through as it comes in; they come in by themselves until you
+   swipe or tap. */
+@media (max-width: 1023px) {
+  .board {
+    --globe: 184px;
+    --ask: 84px;
+    --feed: 36px;
+    --gutter: 16px;
+    grid-template-columns: minmax(0, 1fr);
+    row-gap: 0;
+  }
+  .label {
+    display: none;
+  }
+  /* The row, out to the screen's edges, a slide at a time in the middle,
+     the next just showing */
+  .routes {
+    display: flex;
+    grid-column: 1;
+    grid-row: 1;
+    gap: 12px;
+    margin-inline: calc(var(--gutter) * -1);
+    padding-block: 4px;
+    padding-inline: max(calc(var(--gutter) + 20px), calc(50% + var(--gutter) - 220px));
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+  }
+  .routes::-webkit-scrollbar {
+    display: none;
+  }
+  .route {
+    flex: 0 0 min(100%, 440px);
+    grid-column: auto;
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: var(--ask) calc(var(--globe) + 2 * var(--feed)) auto;
+    align-items: start;
+    scroll-snap-align: center;
+    scroll-snap-stop: always;
+    opacity: 0.35;
+    transition: opacity 300ms var(--cx-ease);
+  }
+  .route[data-on] {
+    opacity: 1;
+  }
+  /* The question, said to Vivid */
+  .ask {
+    grid-row: 1;
+    grid-column: 1;
+    align-self: end;
+    justify-self: center;
+    padding: 10px 18px;
+    border-radius: 22px;
+    background: rgba(255, 255, 255, 0.06);
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.1);
+    font-size: 17px;
+    line-height: 24px;
+    text-align: center;
+    transition:
+      color 300ms var(--cx-ease),
+      box-shadow 300ms var(--cx-ease);
+  }
+  .route[data-on] .ask {
+    box-shadow: inset 0 0 0 1px rgba(234, 179, 8, 0.5);
+  }
+  .card {
+    grid-row: 3;
+    grid-column: 1;
+  }
+  /* The globe, between the two, still while they slide past; swipes go
+     through it to the row */
+  .slot {
+    grid-column: 1;
+    grid-row: 1;
+    align-self: start;
+    margin-top: calc(4px + var(--ask) + var(--feed));
+    pointer-events: none;
+  }
+  .globeLink {
+    display: none;
+  }
+  .feed {
+    position: absolute;
+    left: 50%;
+    display: block;
+    width: 4px;
+    height: calc(var(--feed) - 12px);
+    margin-left: -2px;
+    background: radial-gradient(circle, #facc15 1.3px, transparent 1.8px) 50% 0 / 4px 9px repeat-y;
+    animation: feed 600ms linear infinite;
+  }
+  /* The thirteen, each in its colour, going slowly round; the one the
+     answer's from comes up bright, and for the wallet they all do */
+  .orbit {
+    position: absolute;
+    inset: -16px;
+    display: block;
+    border-radius: 50%;
+    box-shadow: inset 0 0 0 1px rgba(234, 179, 8, 0.12);
+    animation: orbit 80s linear infinite;
+  }
+  .orbit i {
+    --s: 1;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 8px;
+    height: 8px;
+    margin: -4px;
+    border-radius: 50%;
+    background: var(--hue);
+    opacity: 0.4;
+    transform: rotate(calc(var(--k) * 1turn / 13)) translateY(calc(var(--globe) / -2 - 16px)) scale(var(--s));
+    transition:
+      opacity 400ms ease,
+      transform 400ms var(--cx-ease),
+      box-shadow 400ms ease;
+  }
+  .orbit[data-all] i {
+    --s: 1.25;
+    opacity: 0.9;
+  }
+  .orbit i[data-on] {
+    --s: 1.9;
+    opacity: 1;
+    box-shadow: 0 0 10px var(--hue);
+  }
+  .feedIn {
+    bottom: calc(100% + 6px);
+  }
+  .feedOut {
+    top: calc(100% + 6px);
+  }
+  .dots {
+    display: flex;
+    grid-row: 2;
+    justify-content: center;
+    margin-top: 16px;
+  }
+  .dots button {
+    position: relative;
+    width: 36px;
+    height: 24px;
+    padding: 0 4px;
+    border: 0;
+    background: none;
+    cursor: pointer;
+  }
+  .dots button::after,
+  .dots i {
+    content: "";
+    position: absolute;
+    top: 10px;
+    left: 4px;
+    right: 4px;
+    height: 4px;
+    border-radius: 2px;
+  }
+  .dots button::after {
+    background: rgba(255, 255, 255, 0.18);
+  }
+  .dots button[data-on]::after {
+    background: #facc15;
+  }
+  /* While it waits to bring the next in, the bar fills */
+  .dots button:has(i)::after {
+    background: rgba(250, 204, 21, 0.3);
+  }
+  .dots i {
+    z-index: 1;
+    background: #facc15;
+    transform-origin: left;
+    animation: fill linear both;
+  }
+  .composer {
+    grid-row: 3;
+    margin-top: 28px;
+  }
+  .fine {
+    margin-top: 4px;
+  }
+}
+@media (min-width: 768px) and (max-width: 1023px) {
+  .board {
+    --globe: 208px;
+    --gutter: 24px;
+  }
+}
+@keyframes orbit {
+  to {
+    rotate: 1turn;
+  }
+}
+@keyframes feed {
+  to {
+    background-position: 50% 9px;
+  }
+}
+@keyframes fill {
+  from {
+    transform: scaleX(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .wire[data-on],
+  .feed,
+  .orbit {
+    animation: none;
+  }
+}

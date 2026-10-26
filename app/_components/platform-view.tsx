@@ -1,6 +1,5 @@
 import type { ShowcasePlatformName } from "./platform-showcase-content";
 import { WorldspacePlatformView } from "./worldspace-platform-view";
-import { WorldcallPlatformView } from "./worldcall-platform-view";
 import { WorldmeetPlatformView } from "./worldmeet-platform-view";
 import { VsionPlatformView } from "./vsion-platform-view";
 import { AiMoviePlatformView } from "./ai-movie-platform-view";
@@ -16,7 +15,6 @@ import { PredictionPlatformView } from "./prediction-platform-view";
 
 const views = {
   WorldSpace: WorldspacePlatformView,
-  WorldCall: WorldcallPlatformView,
   WorldMeet: WorldmeetPlatformView,
   Vsion: VsionPlatformView,
   "AI Movie": AiMoviePlatformView,

@@ -1,76 +1,42 @@
-"use client";
-import { useState } from "react";
 import Image from "next/image";
-import { Button } from "@/components/ui/button";
 import { PlatformViewShell } from "./platform-view-shell";
-import styles from "./platform-views.module.css";
-import { Clapperboard } from "lucide-react";
+import { AiMovieSet } from "./ai-movie/ai-movie-set";
+import styles from "./ai-movie-platform-view.module.css";
 
+/**
+ * AI Movie (movie.worldstreetgold.com), in its own night navy and gold: its
+ * mark and its line, then a set you can direct (ai-movie/).
+ */
 export function AiMoviePlatformView() {
-  const [scene, setScene] = useState(0);
   return (
     <PlatformViewShell
       name="AI Movie"
+      glass="dark"
+      eyebrow={
+        <span className={styles.brand}>
+          <span className={styles.mark}>
+            <Image src="/assets/ai-movie/mark.webp" alt="" width={24} height={14} />
+          </span>
+          AI Movie
+          <span className={styles.when}>Sun 14:30 · Day one on set</span>
+        </span>
+      }
       title={
         <>
-          From a spark.
+          One studio for every film
           <br />
-          <span>To the big screen.</span>
-        </>
-      }
-      controls={
-        <>
-          {["Scene 01", "Scene 02"].map((name, i) => (
-            <Button
-              key={name}
-              variant="ghost"
-              aria-pressed={scene === i}
-              onClick={() => setScene(i)}
-            >
-              {name}
-            </Button>
-          ))}
+          you want to{" "}
+          <span className={styles.marked}>
+            make.
+            {/* The gold zigzag under it, as on worldstreetgold.com */}
+            <svg aria-hidden="true" viewBox="0 0 120 24" preserveAspectRatio="none" className={styles.stroke}>
+              <path d="M3 8 L40 18 L62 9 L84 18 L117 6" pathLength={1} />
+            </svg>
+          </span>
         </>
       }
     >
-      <div className={styles.panel}>
-        <div className={styles.row}>
-          <strong>The next frontier</strong>
-          <Clapperboard size={24} />
-        </div>
-        <div className={styles.studio}>
-          <div className={styles.script}>
-            <strong>{scene ? "Int. Studio" : "Ext. Desert"}</strong>
-            <p>
-              {scene
-                ? "Light enters the room. A new story begins."
-                : "A traveller follows the light across the sand."}
-            </p>
-            <span className={`${styles.muted} ${styles.secondaryDetail}`}>
-              Script → characters → scene
-            </span>
-          </div>
-          <div className={styles.storyboard}>
-            <Image
-              key={scene}
-              src={`/assets/images/${scene ? "academy-course.jpg" : "dune-0.jpg"}`}
-              alt="Illustrative storyboard frame"
-              fill
-              sizes="300px"
-              className={styles.cover}
-            />
-            <span>Storyboard preview</span>
-          </div>
-        </div>
-        <div
-          className={styles.timeline}
-          aria-label="Illustrative editing timeline"
-        >
-          {Array.from({ length: 6 }, (_, i) => (
-            <span key={i} />
-          ))}
-        </div>
-      </div>
+      <AiMovieSet />
     </PlatformViewShell>
   );
 }

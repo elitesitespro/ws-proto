@@ -2,29 +2,23 @@
 
 import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
-import {
-  Check,
-  RotateCcw,
-  Heart,
-  MessageCircle,
-  Mic,
-  MicOff,
-  MonitorUp,
-  Phone,
-  Users,
-  Video,
-} from "lucide-react";
+import { Icon } from "@/components/icon";
 import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
 import styles from "./connect-product-scene.module.css";
 
 const stories = [
   ["WorldSpace", "A thought becomes a conversation.", "Create posts"],
   ["WorldSpace", "Find a corner that feels like you.", "Join communities"],
-  ["WorldCall", "A familiar voice. A little closer.", "Make one-to-one calls"],
+  ["WorldMeet", "A familiar voice. A little closer.", "Make one-to-one calls"],
   ["WorldMeet", "Bring everyone into the room.", "Start video meetings"],
   ["WorldMeet", "Make room for your next big idea.", "Share your screen"],
 ];
 const people = ["Amara", "Elena", "Jay", "Alex"];
+// WorldSpace is the hub's social hue; WorldMeet (which WorldCall became) is
+// gold, as in its own app ("meet" has no entry in hues.css, so it takes the
+// default, WorldStreet's gold).
+const hues = ["social", "social", "meet", "meet", "meet"];
 function Avatar({ src, size = 40 }: { src: string; size?: number }) {
   return (
     <Image
@@ -160,9 +154,10 @@ function Walkthrough({
   const [speakersPaused, setSpeakersPaused] = useState(false);
   const story = stories[step];
   return (
-    <div
+    <Card
       ref={sceneRef}
       className={styles.scene}
+      data-hue={hues[step]}
       data-playing={!manual && elapsed < 12000}
       onClickCapture={() => setManual(true)}
     >
@@ -173,19 +168,18 @@ function Walkthrough({
         <span>{story[0]}</span>
         <span className={styles.muted}>{instruction}</span>
         <Button
-          variant="ghost"
-          size="icon"
-          className={styles.replay}
+          variant="secondary"
+          size="icon-sm"
           aria-label="Replay walkthrough"
           onClick={onReplay}
         >
-          <RotateCcw size={20} />
+          <Icon name="rotate-ccw" tone="current" />
         </Button>
       </header>
       <div className={styles.visual}>
         {step === 0 && (
           <div
-            className={`${styles.post} ${styles.surface}`}
+            className={`${styles.post} ${styles.surface} cx-lit`}
             data-published={selected}
           >
             <div className={styles.identity}>
@@ -223,21 +217,23 @@ function Walkthrough({
             </p>
             <div className={styles.actions}>
               <Button
-                variant="ghost"
+                variant="secondary"
+                size="sm"
                 className={styles.secondary}
                 aria-label="Like sample post"
                 aria-pressed={liked}
                 onClick={() => setLiked(!liked)}
               >
-                <Heart size={20} fill={liked ? "currentColor" : "none"} />
+                <Icon name="heart" tone={liked ? "gradient" : "current"} />
                 <span className={styles.likeCount}>{liked ? 129 : 128}</span>
               </Button>
               <Button
+                size="sm"
                 className={styles.primary}
                 data-pressing={!manual && elapsed >= 4200 && elapsed < 4800}
                 onClick={() => setSelected(!selected)}
               >
-                {selected ? <Check size={20} /> : <MessageCircle size={20} />}
+                <Icon name={selected ? "check" : "chat"} tone="current" />
                 {selected ? "Shared" : "Share post"}
               </Button>
             </div>
@@ -253,10 +249,10 @@ function Walkthrough({
                 <br />
                 Belong.
               </span>
-              <Users size={64} />
+              <Icon name="users" size={64} tone="current" />
             </div>
             <div
-              className={`${styles.surface} ${styles.clubDetails}`}
+              className={`${styles.surface} ${styles.clubDetails} cx-lit`}
               data-joined={selected}
             >
               <span className={styles.eyebrow}>Your people are here</span>
@@ -279,12 +275,13 @@ function Walkthrough({
                 </span>
               </div>
               <Button
+                size="sm"
                 className={styles.primary}
                 aria-pressed={selected}
                 data-pressing={!manual && elapsed >= 2200 && elapsed < 2800}
                 onClick={() => setSelected(!selected)}
               >
-                {selected ? <Check size={20} /> : <Users size={20} />}
+                <Icon name={selected ? "check" : "users"} tone="current" />
                 {selected ? "Joined" : "Join community"}
               </Button>
             </div>
@@ -298,7 +295,7 @@ function Walkthrough({
             >
               <Avatar src="elena-avatar.jpg" size={144} />
               <span className={styles.callBadge}>
-                <Phone size={24} />
+                <Icon name="phone" size={24} tone="current" />
               </span>
             </div>
             <h4>Elena Morgan</h4>
@@ -314,20 +311,22 @@ function Walkthrough({
             />
             <div className={styles.actions}>
               <Button
+                variant="secondary"
                 className={styles.secondary}
                 size="icon"
                 aria-label="Mute sample call"
                 aria-pressed={muted}
                 onClick={() => setMuted(!muted)}
               >
-                {muted ? <MicOff size={24} /> : <Mic size={24} />}
+                <Icon name={muted ? "mic-off" : "mic"} size={24} tone="current" />
               </Button>
               <Button
+                variant={selected ? "destructive" : "default"}
                 className={styles.primary}
                 data-pressing={!manual && elapsed >= 1200 && elapsed < 1600}
                 onClick={() => setSelected(!selected)}
               >
-                <Phone size={20} />
+                <Icon name={selected ? "phone-end" : "phone"} tone="current" />
                 {selected
                   ? "End call"
                   : !manual && elapsed >= 1600
@@ -369,14 +368,16 @@ function Walkthrough({
                     fill
                     sizes="(max-width: 600px) 120px, 280px"
                   />
-                  <span>{name}</span>
-                  <Mic size={20} />
+                  <span className="cx-chip--glass cx-glass-light">{name}</span>
+                  <Icon name="mic" tone="current" />
                 </div>
               ))}
             </div>
             <div className={styles.dock}>
-              <Video size={24} aria-hidden="true" />
+              <Icon name="video" size={24} tone="current" />
               <Button
+                variant="secondary"
+                size="sm"
                 className={styles.secondary}
                 aria-pressed={speakersPaused}
                 onClick={() => setSpeakersPaused(!speakersPaused)}
@@ -389,7 +390,7 @@ function Walkthrough({
         {step === 4 && (
           <div className={styles.share}>
             <div className={styles.screenHeader}>
-              <MonitorUp size={20} />
+              <Icon name="screen-share" tone="current" />
               <span>
                 {selected ? "Choose your screen" : "Amara is presenting"}
               </span>
@@ -417,7 +418,7 @@ function Walkthrough({
               )}
               {selected && (
                 <div className={styles.shareChooser}>
-                  <MonitorUp size={32} />
+                  <Icon name="screen-share" size={32} tone="current" />
                   <span>Project presentation</span>
                   <span className={styles.muted}>Ready to share</span>
                 </div>
@@ -429,6 +430,8 @@ function Walkthrough({
                 <Avatar src="elena-avatar.jpg" />
               </div>
               <Button
+                variant="secondary"
+                size="sm"
                 className={styles.secondary}
                 data-pressing={!manual && elapsed >= 1800 && elapsed < 2400}
                 aria-pressed={selected}
@@ -446,6 +449,6 @@ function Walkthrough({
         </span>
         <h3>{story[1]}</h3>
       </footer>
-    </div>
+    </Card>
   );
 }

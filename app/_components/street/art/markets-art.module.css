@@ -1,0 +1,515 @@
+/* Markets Row's billboard art: the financial district at night, and each
+   exit's own look while you're at it. All four stay mounted and crossfade;
+   the frame dims the face until the car arrives, and lays its copy over the
+   bottom left, so each subject sits top right (top half on a phone). */
+.art {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  container-type: size;
+  background: #171412;
+  pointer-events: none;
+}
+
+/* A composition, filling the face; the one in view is opaque */
+.scene {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  opacity: 0;
+  transform: scale(1.04);
+  transition:
+    opacity 450ms var(--cx-ease),
+    transform 450ms var(--cx-ease);
+}
+.art[data-focus="Forex"] .city,
+.art[data-focus="Crypto"] .city,
+.art[data-focus="Prediction"] .city {
+  opacity: 0;
+  transform: scale(1.03);
+}
+.art[data-focus="Forex"] .forex,
+.art[data-focus="Crypto"] .crypto,
+.art[data-focus="Prediction"] .prediction {
+  opacity: 1;
+  transform: none;
+}
+
+/* The district at night: a glow behind the tallest towers and a warm haze
+   over the street */
+.city {
+  opacity: 1;
+  transform: none;
+  background:
+    radial-gradient(ellipse 45% 40% at 86% 20%, rgba(255, 204, 45, 0.1), transparent 70%),
+    radial-gradient(ellipse 90% 45% at 75% 100%, rgba(255, 169, 90, 0.14), transparent 70%),
+    linear-gradient(#0b0a0d, #141014 55%, #1d1611);
+}
+.skyline {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  /* The towers give way on the left, where the billboard's words go */
+  mask-image: linear-gradient(to right, transparent 30%, #000 66%);
+}
+.spire {
+  stroke: #3d342c;
+  stroke-width: 0.45;
+}
+
+/* Each tower's windows: dark until the car arrives, then on one tower after
+   another along the street */
+.windows {
+  opacity: 0;
+  transition: opacity 280ms ease;
+  transition-delay: calc(var(--i) * 60ms + 200ms);
+}
+.art[data-lit] .windows {
+  opacity: var(--on);
+}
+
+/* The close across the tops. A window over it slides open left to right as
+   the car arrives (the two move together), so the line seems to draw itself. */
+.wipe,
+.unwipe {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  transition: transform 1600ms var(--cx-ease) 300ms;
+}
+.wipe {
+  transform: translateX(-100%);
+}
+.unwipe {
+  transform: translateX(100%);
+}
+.art[data-lit] .wipe,
+.art[data-lit] .unwipe {
+  transform: none;
+}
+.close,
+.closeGlow {
+  fill: none;
+  stroke: #ffcc2d;
+  stroke-linejoin: round;
+  vector-effect: non-scaling-stroke;
+}
+.close {
+  stroke-width: 2;
+}
+.closeGlow {
+  stroke-width: 8;
+  stroke-opacity: 0.14;
+}
+/* Its high, on the tallest tower, once the line gets there */
+.peak {
+  fill: #ffcc2d;
+  opacity: 0;
+  transform: scale(0.3);
+  transform-box: fill-box;
+  transform-origin: center;
+  transition:
+    opacity 300ms ease 1500ms,
+    transform 600ms var(--cx-spring) 1500ms;
+}
+.art[data-lit] .peak {
+  opacity: 1;
+  transform: none;
+}
+
+/* The LED ticker strung across the district: amber type under the panel's
+   pixel grid. It runs while the district is lit and in view. */
+.ticker {
+  position: absolute;
+  top: 6%;
+  left: 0;
+  right: 0;
+  display: flex;
+  align-items: center;
+  height: max(28px, 7cqh);
+  overflow: hidden;
+  background: rgba(8, 7, 6, 0.72);
+  box-shadow:
+    inset 0 1px rgba(255, 204, 45, 0.16),
+    inset 0 -1px rgba(255, 204, 45, 0.16);
+  font-size: max(12px, 2.8cqh);
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+  white-space: nowrap;
+  mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
+}
+.ticker::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(90deg, rgba(8, 7, 6, 0.35) 1px, transparent 1px),
+    linear-gradient(rgba(8, 7, 6, 0.35) 1px, transparent 1px);
+  background-size: 3px 3px;
+}
+.tape {
+  display: flex;
+  flex-shrink: 0;
+  animation: crawl 72s linear infinite paused;
+}
+.art[data-lit]:not([data-focus]) .tape {
+  animation-play-state: running;
+}
+.tape span {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5em;
+  padding-right: 1em;
+  color: rgba(255, 228, 176, 0.6);
+}
+.tape span::after {
+  content: "";
+  width: 0.3em;
+  height: 0.3em;
+  margin-left: 0.5em;
+  border-radius: 50%;
+  background: rgba(255, 204, 45, 0.45);
+}
+.tape b {
+  color: #ffd66b;
+  font-weight: 500;
+  text-shadow: 0 0 0.6em rgba(255, 204, 45, 0.45);
+}
+/* The tape holds three copies, so a third of it is one lap */
+@keyframes crawl {
+  to {
+    transform: translateX(-33.3333%);
+  }
+}
+
+/* A flag or a coin: round, lit from the top left, sliding in with its scene */
+.disc {
+  position: absolute;
+  left: var(--x);
+  top: var(--y);
+  width: var(--s);
+  aspect-ratio: 1;
+  translate: -50% -50%;
+  border-radius: 50%;
+  overflow: hidden;
+  transform: translateY(4cqmin) scale(0.94);
+  transition: transform 600ms var(--cx-ease) var(--d);
+}
+.disc img {
+  max-width: none;
+}
+.disc::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: radial-gradient(circle at 32% 26%, rgba(255, 255, 255, 0.3), transparent 52%);
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.16),
+    inset 0 -0.8cqmin 1.6cqmin rgba(0, 0, 0, 0.18);
+}
+.art[data-focus="Forex"] .forex .disc,
+.art[data-focus="Crypto"] .crypto .disc {
+  transform: none;
+}
+
+/* Forex in worldstreetgold.com's dress: warm paper ruled like a chart, ink
+   candles (filled where the price fell), and its yellow on the latest */
+.forex {
+  --chart-x: 0%;
+  --chart-y: 6%;
+  --chart-w: 100%;
+  --chart-h: 78%;
+  background:
+    radial-gradient(ellipse 55% 60% at 68% 30%, #fffdf7, transparent 70%),
+    repeating-linear-gradient(rgba(12, 10, 9, 0.05) 0 1px, transparent 1px 10cqh),
+    #f5f1e8;
+}
+.candles {
+  position: absolute;
+  left: var(--chart-x);
+  top: var(--chart-y);
+  width: var(--chart-w);
+  height: var(--chart-h);
+  overflow: visible;
+  /* The early candles fade where the words go */
+  mask-image: linear-gradient(to right, transparent 16%, #000 58%);
+}
+.wick,
+.rise,
+.fall,
+.now {
+  stroke: #0c0a09;
+  stroke-width: 1.5;
+  vector-effect: non-scaling-stroke;
+}
+.rise {
+  fill: #fffdf7;
+}
+.fall {
+  fill: #0c0a09;
+}
+.now {
+  fill: #ffcc2d;
+}
+/* Where the price is now: a dashed line out to its tag */
+.priceLine {
+  position: absolute;
+  left: calc(var(--chart-x) + var(--chart-w) * 0.8);
+  right: 4cqw;
+  top: calc(var(--chart-y) + var(--chart-h) * var(--now));
+  border-top: 1px dashed rgba(12, 10, 9, 0.5);
+}
+.price {
+  position: absolute;
+  right: 3cqw;
+  top: calc(var(--chart-y) + var(--chart-h) * var(--now));
+  translate: 0 -50%;
+  padding: 0.5em 0.85em;
+  border-radius: var(--cx-r-pill);
+  background: #ffcc2d;
+  color: #0c0a09;
+  box-shadow: 0 0 0 max(2px, 0.5cqmin) #f5f1e8;
+  font-size: max(12px, 2.6cqmin);
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+}
+.forex .disc {
+  box-shadow:
+    0 0 0 max(3px, 0.8cqmin) #fffdf7,
+    0 3cqmin 6cqmin -2cqmin rgba(12, 10, 9, 0.45);
+}
+.forex .disc[data-far] {
+  filter: blur(0.6px);
+}
+
+/* Crypto in worldstreetgold.com's night: a few stars, its gold line, and
+   the coins in orbit round Bitcoin (the ring passing behind it, then in
+   front) */
+.crypto {
+  background:
+    radial-gradient(circle at 72% 36%, rgba(255, 204, 45, 0.14), transparent 30cqmin),
+    radial-gradient(ellipse 80% 70% at 72% 24%, rgba(36, 64, 102, 0.5), transparent 70%),
+    #070f1a;
+}
+.star {
+  position: absolute;
+  left: var(--x);
+  top: var(--y);
+  width: 2px;
+  height: 2px;
+  border-radius: 50%;
+  background: #e6edf7;
+  opacity: var(--a);
+}
+.spark,
+.orbit {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+.sparkLine,
+.sparkGlow,
+.ring {
+  fill: none;
+  stroke: #ffcc2d;
+  vector-effect: non-scaling-stroke;
+}
+.sparkLine {
+  stroke-width: 2;
+  stroke-opacity: 0.7;
+}
+.sparkGlow {
+  stroke-width: 10;
+  stroke-opacity: 0.1;
+}
+.ring {
+  stroke-width: 1.5;
+  stroke-opacity: 0.3;
+}
+.near {
+  stroke-opacity: 0.6;
+}
+.tall {
+  display: none;
+}
+.btc {
+  box-shadow: 0 0 10cqmin rgba(255, 204, 45, 0.3);
+}
+.crypto .disc[data-far] {
+  filter: blur(0.5px) brightness(0.75);
+}
+
+/* Prediction on its cream: the crowd's chance on a night-teal card in its
+   teal, and yes and no in its own two colours */
+.prediction {
+  background:
+    radial-gradient(ellipse 40% 45% at 74% 40%, rgba(123, 198, 206, 0.3), transparent 70%),
+    radial-gradient(ellipse 70% 60% at 80% 8%, #fffdf8, transparent 70%),
+    #f6f3ec;
+}
+.card {
+  position: absolute;
+  top: 8%;
+  right: 5%;
+  width: 42%;
+  height: 62%;
+  overflow: hidden;
+  border-radius: var(--cx-r-card);
+  background:
+    radial-gradient(ellipse 80% 60% at 50% 100%, rgba(123, 198, 206, 0.16), transparent 70%),
+    #0e1a1b;
+  box-shadow: 0 3cqmin 8cqmin -3cqmin rgba(14, 26, 27, 0.55);
+  rotate: -2deg;
+  transform: translateY(4cqmin);
+  transition: transform 600ms var(--cx-ease) 60ms;
+}
+.art[data-focus="Prediction"] .card {
+  transform: none;
+}
+.odds {
+  position: absolute;
+  top: 9%;
+  right: 7%;
+  display: grid;
+  justify-items: end;
+  gap: 1cqmin;
+  color: #eef3f1;
+  line-height: 1;
+}
+.odds strong {
+  font-size: 15cqmin;
+  font-weight: 400;
+  letter-spacing: -0.04em;
+  font-variant-numeric: tabular-nums;
+}
+.odds span {
+  color: #a6dce3;
+  font-size: max(12px, 2.6cqmin);
+  font-weight: 500;
+}
+/* Yes and no, split as the crowd has it */
+.split {
+  width: 100%;
+  height: max(4px, 1cqmin);
+  margin-top: 0.5cqmin;
+  border-radius: var(--cx-r-pill);
+  background: linear-gradient(
+    90deg,
+    #0d7a6b 0 calc(var(--yes) * 1% - 1px),
+    transparent 0 calc(var(--yes) * 1% + 1px),
+    #c5390f 0
+  );
+}
+.crowd {
+  position: absolute;
+  left: 7%;
+  right: 7%;
+  top: 48%;
+  bottom: 12%;
+}
+.crowd svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+/* Even odds */
+.even {
+  stroke: rgba(238, 243, 241, 0.22);
+  stroke-width: 1;
+  stroke-dasharray: 3 5;
+  vector-effect: non-scaling-stroke;
+}
+.crowdLine {
+  fill: none;
+  stroke: #7bc6ce;
+  stroke-width: 2.5;
+  stroke-linejoin: round;
+  vector-effect: non-scaling-stroke;
+}
+/* Where the chance is now, at the end of the line */
+.head {
+  position: absolute;
+  left: 100%;
+  top: var(--y);
+  width: max(8px, 1.8cqmin);
+  aspect-ratio: 1;
+  translate: -50% -50%;
+  border-radius: 50%;
+  background: #7bc6ce;
+  box-shadow:
+    0 0 0 max(4px, 1cqmin) rgba(123, 198, 206, 0.22),
+    0 0 4cqmin rgba(123, 198, 206, 0.55);
+}
+
+/* A phone (a portrait face): each subject in the top half, the copy below */
+@container (aspect-ratio < 1) {
+  .disc {
+    left: var(--px);
+    top: var(--py);
+  }
+
+  .skyline {
+    mask-image: linear-gradient(#000 34%, transparent 64%);
+  }
+  .candles {
+    mask-image: none;
+  }
+
+  /* Forex: a wider chart, its start off the left edge, so the latest
+     candles are big enough to read */
+  .forex {
+    --chart-x: -50%;
+    --chart-y: -3%;
+    --chart-w: 140%;
+    --chart-h: 73%;
+  }
+
+  .crypto {
+    background:
+      radial-gradient(circle at 52% 26%, rgba(255, 204, 45, 0.14), transparent 30cqmin),
+      radial-gradient(ellipse 90% 50% at 52% 20%, rgba(36, 64, 102, 0.5), transparent 70%),
+      #070f1a;
+  }
+  .spark {
+    height: 50%;
+  }
+  .wide {
+    display: none;
+  }
+  .tall {
+    display: inline;
+  }
+
+  .card {
+    top: 6%;
+    left: 7%;
+    right: 7%;
+    width: auto;
+    height: 40%;
+    rotate: -1.5deg;
+  }
+  .odds strong {
+    font-size: 14cqmin;
+  }
+  .crowd {
+    top: 56%;
+    bottom: 10%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .art *,
+  .art *::before,
+  .art *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+}

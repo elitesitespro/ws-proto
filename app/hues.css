@@ -1,0 +1,109 @@
+/* Copied from worldstreet-hub/app/hues.css so the platforms here wear the same
+   colours as in the hub. Keep the two in step. */
+/* Every section and platform in its own colour, kept subtle (lib/hues.ts
+   says which goes where, and why). Gold is WorldStreet's, and the only
+   strong colour: each platform's is a soft companion to it (Owen, 15 Oct
+   2026: "color codes that closely resonate or complement the brand color…
+   gold, so the platforms don't look too occupied"). All of them sit at one
+   lightness and a low, even saturation, so side by side they read as one
+   family under the gold; each keeps the family of the light in its own art
+   (Academy's peach, Crypto's violet, WorldSpace's blue visor, Shop's brass).
+   Put data-hue="<id>" on an element and read, inside it:
+     --hue       the colour, for small things: a glyph, a dot, a thin ring,
+                 a short rule, a figure that matters
+     --hue-rgb   "r, g, b", for rgba(var(--hue-rgb), .12)
+     --hue-soft  a faint fill for a glyph's chip
+     --hue-line  a hairline in the colour (a ring, a rule, an edge)
+     --hue-ink   the colour as text (a deeper shade on paper)
+     --hue-on    text on a --hue fill
+   The colour marks where you are; it never fills a card, washes a
+   background or glows (the platform previews, /explore/<id>, are the one
+   place it's worn as a page colour). Buttons stay WorldStreet gold: gold is
+   "do this". All literals on purpose (no var() chains). Keep lib/hues.ts
+   HUES in step. */
+
+[data-hue] {
+  --hue: #eab308;
+  --hue-rgb: 234, 179, 8;
+  --hue-ink: #facc15;
+  --hue-on: #0c0a09;
+  --hue-soft: rgba(var(--hue-rgb), 0.12);
+  --hue-line: rgba(var(--hue-rgb), 0.2);
+}
+
+/* Trade and Forex: jade, the green of money beside gold. */
+[data-hue="trade"],
+[data-hue="forex"] {
+  --hue: #81caa0;
+  --hue-rgb: 129, 202, 160;
+  --hue-ink: #aae0bf;
+}
+/* Crypto: a soft lavender, from the violet light behind its gold coins. */
+[data-hue="crypto"] {
+  --hue: #bdade5;
+  --hue-rgb: 189, 173, 229;
+  --hue-ink: #d5c9f4;
+}
+/* Prediction: a quiet teal. */
+[data-hue="prediction"] {
+  --hue: #7bc6ce;
+  --hue-rgb: 123, 198, 206;
+  --hue-ink: #a6dce3;
+}
+/* Learn and Academy: apricot, the peach glow off Academy's open book. */
+[data-hue="learn"],
+[data-hue="academy"] {
+  --hue: #f4a988;
+  --hue-rgb: 244, 169, 136;
+  --hue-ink: #ffc9af;
+}
+/* Watch and Xstream: a soft coral red, for live. */
+[data-hue="watch"],
+[data-hue="xtreme"] {
+  --hue: #f28881;
+  --hue-rgb: 242, 136, 129;
+  --hue-ink: #fdaba4;
+}
+/* Vsion: dusty rose, from its film strip's light. */
+[data-hue="vision"] {
+  --hue: #e6a9c5;
+  --hue-rgb: 230, 169, 197;
+  --hue-ink: #f7c8dd;
+}
+/* Play and Arcade: a soft olive lime, from Arcade's controller rings. */
+[data-hue="play"],
+[data-hue="arcade"] {
+  --hue: #b5c478;
+  --hue-rgb: 181, 196, 120;
+  --hue-ink: #cfdca4;
+}
+/* Community and WorldSpace: the blue of WorldSpace's helmet visor, softened. */
+[data-hue="community"],
+[data-hue="social"] {
+  --hue: #90bbed;
+  --hue-rgb: 144, 187, 237;
+  --hue-ink: #b3d4fa;
+}
+/* Shop: brass, from its pedestal lights: a darker, quieter cousin of the gold. */
+[data-hue="shop"] {
+  --hue: #caa86f;
+  --hue-rgb: 202, 168, 111;
+  --hue-ink: #ddc399;
+}
+
+/* On paper the colour as text needs its deep shade. */
+[data-theme="light"] [data-hue] { --hue-ink: #a16207; }
+[data-theme="light"] [data-hue="trade"],
+[data-theme="light"] [data-hue="forex"] { --hue-ink: #006e40; }
+[data-theme="light"] [data-hue="crypto"] { --hue-ink: #624d8b; }
+[data-theme="light"] [data-hue="prediction"] { --hue-ink: #006974; }
+[data-theme="light"] [data-hue="learn"],
+[data-theme="light"] [data-hue="academy"] { --hue-ink: #913e10; }
+[data-theme="light"] [data-hue="watch"],
+[data-theme="light"] [data-hue="xtreme"] { --hue-ink: #963633; }
+[data-theme="light"] [data-hue="vision"] { --hue-ink: #834163; }
+[data-theme="light"] [data-hue="play"],
+[data-theme="light"] [data-hue="arcade"] { --hue-ink: #556300; }
+[data-theme="light"] [data-hue="community"],
+[data-theme="light"] [data-hue="social"] { --hue-ink: #285d94; }
+[data-theme="light"] [data-hue="shop"] { --hue-ink: #7a5200; }

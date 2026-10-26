@@ -47,7 +47,7 @@ export function FloatingWidgetStage({
         <Button
           variant="ghost"
           size="sm"
-          className={`${activity.toggle} pointer-events-auto absolute right-2 bottom-1 z-20 text-white/70 hover:bg-white/10 hover:text-white`}
+          className={`${activity.toggle} pointer-events-auto absolute right-2 bottom-1 z-20`}
           onClick={() => setPaused((value) => !value)}
           aria-pressed={paused}
           aria-label="Pause widget animations"

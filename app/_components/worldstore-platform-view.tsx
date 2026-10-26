@@ -1,68 +1,44 @@
-"use client";
-import { useState } from "react";
-import { Button } from "@/components/ui/button";
-import { PlatformViewShell, MiniStat } from "./platform-view-shell";
-import styles from "./platform-views.module.css";
-import type { CSSProperties } from "react";
-import { Heart, ShoppingBag } from "lucide-react";
+import { PlatformViewShell } from "./platform-view-shell";
+import { WorldstoreDeal } from "./worldstore/worldstore-deal";
+import styles from "./worldstore-platform-view.module.css";
 
+/**
+ * WorldStore (shop.worldstreetgold.com), in its own dark and gold: its W, its
+ * line from worldstreetgold.com, then a deal you can run from offer to
+ * escrow to the seller being paid (worldstore/).
+ */
 export function WorldstorePlatformView() {
-  const [color, setColor] = useState(0);
-  const [saved, setSaved] = useState(false);
-  const colors = ["#bca57d", "#829575", "#d7b0aa"];
   return (
     <PlatformViewShell
       name="WorldStore"
+      glass="dark"
+      eyebrow={
+        <span className={styles.brand}>
+          <span className={styles.mark}>
+            {/* The WorldStreet W, in ink on the gold tile, as in the app's header */}
+            <svg viewBox="0 0 82 56" aria-hidden="true">
+              <path d="M40.9 25.2 27.6 49 4 7h26.7l10.2 18.2Z" />
+              <path d="M77.9 7 54.3 49 40.9 25.2 51.2 7h26.7Z" />
+            </svg>
+          </span>
+          WorldStore
+          <span className={styles.when}>Wed 14:20 · A tote from Lekki</span>
+        </span>
+      }
       title={
         <>
-          Small finds.
-          <br />
-          <span>Big personality.</span>
-        </>
-      }
-      extra={
-        <>
-          <MiniStat value="Discover" label="Meet local sellers" />
-          <MiniStat value="Sell" label="Give your ideas a shop" />
+          Buy it. Sell it.{" "}
+          <span className={styles.marked}>
+            Safely.
+            {/* The drawn zigzag under it, as on worldstreetgold.com */}
+            <svg aria-hidden="true" viewBox="0 0 120 24" preserveAspectRatio="none" className={styles.stroke}>
+              <path d="M3 8 L40 18 L62 9 L84 18 L117 6" pathLength={1} />
+            </svg>
+          </span>
         </>
       }
     >
-      <div className={`${styles.panel} ${styles.shop}`}>
-        <div className={styles.product}>
-          <div
-            className={styles.tote}
-            style={{ "--bag-color": colors[color] } as CSSProperties}
-          >
-            <ShoppingBag aria-hidden="true" />
-          </div>
-        </div>
-        <div className={styles.productCopy}>
-          <span className={`${styles.accent} ${styles.compactHide}`}>
-            The everyday edit
-          </span>
-          <strong>Everyday tote</strong>
-          <span className={styles.large}>₦45,000</span>
-          <div className={styles.swatches}>
-            {colors.map((c, i) => (
-              <button
-                key={c}
-                style={{ background: c }}
-                aria-label={["Sand", "Sage", "Rose"][i]}
-                aria-pressed={color === i}
-                onClick={() => setColor(i)}
-              />
-            ))}
-          </div>
-          <Button
-            className={styles.reaction}
-            aria-pressed={saved}
-            onClick={() => setSaved(!saved)}
-          >
-            <Heart size={20} fill={saved ? "currentColor" : "none"} />
-            {saved ? "Saved" : "Save"}
-          </Button>
-        </div>
-      </div>
+      <WorldstoreDeal />
     </PlatformViewShell>
   );
 }

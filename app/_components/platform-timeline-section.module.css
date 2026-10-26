@@ -3,6 +3,96 @@
   overflow: clip;
 }
 
+/* With an intro, it comes up over the end of the dive before it (that
+   page's stage holds on screen until its own end), so the heading arrives
+   as the dive comes out into the sky. Only where the intro is pinned, and
+   the dive plays: not in short windows or under reduced motion. */
+@media (min-height: 561px) and (prefers-reduced-motion: no-preference) {
+  .overDive {
+    margin-top: calc(var(--dive-overlap) * -1);
+  }
+}
+
+/* With an intro, the sky the dive came out into (the first platform's
+   colour, set in the TSX) fills the screen behind it, pinned, until the
+   first platform's scene takes over */
+.sky {
+  position: sticky;
+  top: 80px;
+  height: 0;
+  pointer-events: none;
+}
+
+.skyFill {
+  position: absolute;
+  inset-inline: 0;
+  top: -80px;
+  overflow: hidden;
+  height: 100svh;
+  background: var(--hue);
+}
+/* Night, coming down over the sky from the top: solid above, a screen of
+   dusk below; it starts a whole height up (translated in the TSX) */
+.nightfall {
+  position: absolute;
+  inset-inline: 0;
+  top: 0;
+  height: 200%;
+  background: linear-gradient(to bottom, var(--cx-bg) 50%, transparent);
+}
+
+/* The intro heading, when there is one: pinned with the dial's stage while
+   the section opens, centred in the space under the header, over the rest,
+   in ink for the sky */
+.intro {
+  position: sticky;
+  top: 80px;
+  z-index: 1;
+  height: 0;
+  color: var(--hue-on);
+  pointer-events: none;
+}
+
+.introStage {
+  position: absolute;
+  inset-inline: 0;
+  top: 0;
+  height: calc(100svh - 80px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  padding-inline: 16px;
+}
+.introLine {
+  font-size: var(--text-lg);
+  line-height: 1.4;
+  text-align: center;
+  text-wrap: balance;
+  /* Softer than the heading: its colour, part see-through (its opacity is
+     the fade in and out) */
+  color: color-mix(in srgb, var(--hue-on) 72%, transparent);
+}
+
+/* Where the platforms stack instead, it sits above them in the flow, on the
+   section's own colour */
+@media (max-height: 560px), (prefers-reduced-motion: reduce) {
+  .sky {
+    display: none;
+  }
+  .intro {
+    position: static;
+    height: auto;
+    color: inherit;
+  }
+  .introStage {
+    position: static;
+    height: auto;
+    padding-block: 64px 32px;
+  }
+}
+
 .orbitLayout {
   isolation: isolate;
   --map-top: -80px;
@@ -11,7 +101,12 @@
   display: grid;
   grid-template-columns: minmax(0, 2fr) minmax(0, 3fr);
   gap: 32px;
-  padding-inline: 48px;
+  /* The box runs the full width, its padding holding the content to the
+     page's column (max-w-7xl): the foot fade (set in the TSX as the page
+     leaves the last platform) is a mask, and a mask paints nothing outside
+     its box, so on a column-wide box it cut the dial's planet, which hangs
+     off the column's left edge, straight down the middle */
+  padding-inline: max(48px, calc((100% - 80rem) / 2 + 48px));
   clip-path: inset(-80px -50vw 0);
 }
 
@@ -24,27 +119,77 @@
   transform: translate(-50%, -50%);
 }
 
+/* The dial's planet: the world at night from over the pole, a little wider
+   than the ring, holding the platforms' scenes back from the dial */
 .orbitCutout {
   --cutout-radius: calc(var(--orbit-size) / 2 + var(--cutout-gap));
   position: absolute;
   top: 50%;
-  right: calc(100% - var(--cutout-radius));
-  width: calc(50vw + var(--cutout-radius));
+  left: 0;
+  width: calc(var(--cutout-radius) * 2);
   height: calc(var(--cutout-radius) * 2);
-  transform: translateY(-50%);
-  background: #070405;
-  border-radius: 0 var(--cutout-radius) var(--cutout-radius) 0;
+  transform: translate(-50%, -50%);
+  overflow: hidden;
+  background: var(--cx-bg);
+  border-radius: 50%;
+  box-shadow: 0 24px 80px rgba(12, 10, 9, 0.32);
   pointer-events: none;
 }
 
-.orbitRail {
-  border-radius: 50%;
-  border: 2px solid rgb(255 255 255 / 24%);
-  pointer-events: none;
+.globe {
+  position: absolute;
+  inset: 0;
+  background: url("/assets/globe/night-polar.webp") center / cover no-repeat;
+  will-change: transform;
+}
+
+/* Light that doesn't turn with the world: the limb falling into shadow, and
+   a thin gold edge of atmosphere, as on the globe above */
+.orbitCutout::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: radial-gradient(circle, transparent 52%, rgba(12, 10, 9, 0.5) 84%, rgba(12, 10, 9, 0.85) 100%);
+  box-shadow:
+    inset 0 0 0 1px rgba(234, 179, 8, 0.28),
+    inset 0 0 48px rgba(234, 179, 8, 0.14);
+}
+
+/* The bezel: a fine ring of marks that turns with the platforms */
+.bezel {
+  position: absolute;
+  inset: 0;
+  overflow: visible;
+  color: var(--cx-text);
+  will-change: transform;
+}
+
+.bezelRail {
+  fill: none;
+  stroke: currentColor;
+  stroke-opacity: 0.22;
+  stroke-width: 1.5px;
+  vector-effect: non-scaling-stroke;
+}
+
+.tick,
+.tickMajor {
+  stroke: currentColor;
+  stroke-width: 1.5px;
+  vector-effect: non-scaling-stroke;
+}
+
+.tick {
+  stroke-opacity: 0.18;
+}
+
+.tickMajor {
+  stroke-opacity: 0.5;
 }
 
 .orbitLabel {
-  color: #fff;
+  color: var(--cx-text);
   pointer-events: none;
 }
 
@@ -59,6 +204,7 @@
   top: 50%;
   width: 24px;
   height: 32px;
+  /* The section's fill, cut into the dial; on a dark scene the platform's colour */
   background: var(--timeline-background);
   clip-path: polygon(0 50%, 100% 0, 100% 100%);
   transition: background-color 500ms;
@@ -89,7 +235,25 @@
 .detailScroller {
   min-height: 0;
   overflow: visible;
-  border-radius: 8px;
+  border-radius: var(--cx-r-sm);
+}
+/* A platform's colour and scene: the whole screen (the layout is pinned
+   80px down), with room over every edge for its drift, so no edge ever
+   shows as one fades over another */
+.scenery {
+  --map-top: 0px;
+  position: absolute;
+  top: calc(-80px - 10vh);
+  left: 50%;
+  width: 100vw;
+  height: calc(100svh + 20vh + 80px);
+  overflow: hidden;
+}
+
+/* The platforms scroll through here: the one leaving is lifted out of the
+   flow (popLayout) and both move together. */
+.detailPages {
+  position: relative;
 }
 
 /* Short landscape windows use page flow rather than an inner scroll area. */
@@ -144,8 +308,8 @@
   .orbitCutout {
     top: auto;
     bottom: calc(-432px - var(--cutout-gap));
-    right: calc(100% - 80px - var(--cutout-radius));
-    transform: none;
+    left: 80px;
+    transform: translateX(-50%);
   }
 
   .platformDetails {
@@ -154,6 +318,9 @@
     max-width: 560px;
     margin-inline: auto;
     padding-block: 8px;
+    /* A swipe across is the page's own (to the next platform); up and down
+       still scroll */
+    touch-action: pan-y pinch-zoom;
   }
 
   .detailScroller {

@@ -1,13 +1,5 @@
 "use client";
-import {
-  BriefcaseBusiness,
-  Check,
-  Headphones,
-  Heart,
-  MapPin,
-  ShoppingBag,
-  Sparkles,
-} from "lucide-react";
+import { Icon } from "@/components/icon";
 import { Photo, Status, Walkthrough } from "./walkthrough";
 import s from "./walkthrough.module.css";
 const captions = [
@@ -63,14 +55,14 @@ export function LifestyleScene({ step }: { step: number }) {
       }
       captions={captions[step]}
       actions={actions[step]}
-      tone="lifestyle"
+      hue={["shop", "shop", "work", "academy", "health"][step]}
     >
       {({ stage, progress }) => (
         <>
           {step === 0 && (
             <div className={s.product}>
               <div className={s.productArt} data-finish={stage >= 2}>
-                <Headphones size={160} strokeWidth={1} />
+                <Icon name="headphones" size={160} tone="current" />
                 <span>Everyday sound.</span>
               </div>
               <div className={s.productCopy}>
@@ -93,9 +85,13 @@ export function LifestyleScene({ step }: { step: number }) {
             </div>
           )}
           {step === 1 && (
-            <div className={s.receipt}>
+            <div className={`${s.receipt} cx-lit`}>
               <div className={s.receiptIcon}>
-                {stage === 3 ? <Check size={40} /> : <ShoppingBag size={40} />}
+                <Icon
+                  name={stage === 3 ? "check" : "shopping-bag"}
+                  size={40}
+                  tone="current"
+                />
               </div>
               <h3>{stage === 3 ? "It's in the bag." : "Your order"}</h3>
               <div className={s.row}>
@@ -128,12 +124,12 @@ export function LifestyleScene({ step }: { step: number }) {
                 <i />
                 <i />
                 <i />
-                <MapPin size={48} />
+                <Icon name="map-pin" size={48} tone="current" />
                 <span>Remote, together.</span>
               </div>
-              <div className={s.job}>
+              <div className={`${s.job} cx-liquid cx-glass-light`}>
                 <span className={s.status}>
-                  <BriefcaseBusiness size={20} />
+                  <Icon name="briefcase" tone="current" />
                   Design · Remote
                 </span>
                 <h3>Product designer</h3>
@@ -146,7 +142,7 @@ export function LifestyleScene({ step }: { step: number }) {
                   <span>
                     {stage < 2 ? "Your experience" : "Profile attached"}
                   </span>
-                  <Check size={20} />
+                  <Icon name="check" tone="current" />
                 </div>
                 {stage === 3 && <Status>Application sent</Status>}
               </div>
@@ -193,7 +189,7 @@ export function LifestyleScene({ step }: { step: number }) {
                   transform: `scale(${stage === 2 ? 1 + Math.sin((progress - 0.44) * Math.PI * 7) * 0.06 : 1})`,
                 }}
               >
-                <Heart size={32} />
+                <Icon name="heart" size={32} tone="current" />
                 <strong>
                   {stage < 2
                     ? "A moment for you"
@@ -206,7 +202,7 @@ export function LifestyleScene({ step }: { step: number }) {
               </div>
               <div className={s.routine}>
                 <span>
-                  <Sparkles size={20} />
+                  <Icon name="sparkle" tone="current" />
                   Mindful minute
                 </span>
                 <div className={s.row}>
@@ -217,7 +213,7 @@ export function LifestyleScene({ step }: { step: number }) {
                   {["M", "T", "W", "T", "F"].map((d, i) => (
                     <span key={i} data-done={i < 2 || (i === 2 && stage === 3)}>
                       {i < 2 || (i === 2 && stage === 3) ? (
-                        <Check size={20} />
+                        <Icon name="check" tone="current" />
                       ) : (
                         d
                       )}

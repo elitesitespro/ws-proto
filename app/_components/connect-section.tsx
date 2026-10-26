@@ -6,7 +6,7 @@ export function ConnectSection() {
     <section
       id="connect"
       aria-labelledby="connect-heading"
-      className="bg-[#070405] text-white"
+      className="bg-background text-foreground"
     >
       <MegaMenuStatement
         headingId="connect-heading"
@@ -24,6 +24,7 @@ export function ConnectSection() {
         ))}
         timelineSide="right"
         connectToNext
+        entrance
       />
     </section>
   );

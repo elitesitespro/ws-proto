@@ -1,43 +1,40 @@
+/* The universal wallet as it looks in the hub: a stone canvas, the balance on
+   a corner-lit card, gold only on the one action that moves money, emerald
+   only on money coming in. */
 .screen {
-  background: #171518;
-  border: 1px solid #ffffff14;
-  border-radius: 24px;
+  background: var(--cx-bg);
+  border-radius: var(--cx-r-lg);
   overflow: hidden;
-  color: #fff;
+  color: var(--cx-text);
   font-size: 14px;
   line-height: 1.5;
-  box-shadow: 0 32px 80px #0004;
-}
-.screen svg {
-  width: 20px;
-  height: 20px;
-  flex-shrink: 0;
+  box-shadow: var(--cx-shadow-xl);
 }
 .screen strong,
 .screen h3,
 .screen h4 {
-  font-weight: 600;
+  font-weight: 500;
 }
 .topbar {
   display: flex;
   align-items: center;
   gap: 16px;
   padding: 16px 24px;
-  border-bottom: 1px solid #ffffff10;
+  border-bottom: 1px solid var(--cx-hairline);
 }
 .brand {
   display: flex;
   align-items: center;
   gap: 8px;
-  font-weight: 600;
+  font-weight: 500;
 }
 .brand > span {
-  color: #ffffff60;
+  color: var(--cx-text-muted);
   font-weight: 400;
 }
 .preview {
   margin-left: auto;
-  color: #ffffff70;
+  color: var(--cx-text-muted);
   font-size: 12px;
 }
 .avatar {
@@ -46,7 +43,8 @@
   height: 32px;
   width: 32px;
   flex-shrink: 0;
-  background: #363036;
+  background: var(--cx-surface-3);
+  color: var(--cx-text-2);
   border-radius: 50%;
   font-size: 12px;
 }
@@ -55,7 +53,7 @@
   grid-template-columns: 192px minmax(0, 1fr);
 }
 .sidebar {
-  border-right: 1px solid #ffffff10;
+  background: var(--cx-surface);
   padding: 24px 16px;
   display: flex;
   flex-direction: column;
@@ -63,7 +61,7 @@
   gap: 32px;
 }
 .caption {
-  color: #ffffff70;
+  color: var(--cx-text-muted);
   font-size: 12px;
 }
 .sidebar .caption {
@@ -75,18 +73,25 @@
   align-items: center;
   gap: 8px;
   padding: 8px;
-  border-radius: 8px;
+  border-radius: var(--cx-r-icon);
 }
 .active {
-  background: #ffffff08;
+  background: var(--cx-surface-3);
   margin: 16px 0 8px;
 }
 .sidebar a {
-  color: #ffffff80;
-  transition: background 0.2s;
+  color: var(--cx-text-muted);
+  transition:
+    background var(--cx-dur-fast),
+    color var(--cx-dur-fast);
 }
 .sidebar a:hover {
-  background: #ffffff08;
+  background: var(--cx-surface-2);
+  color: var(--cx-text);
+}
+.sidebar a:focus-visible {
+  outline: none;
+  box-shadow: var(--cx-focus-ring);
 }
 .profile {
   display: flex;
@@ -95,7 +100,7 @@
 }
 .profile small {
   display: block;
-  color: #ffffff60;
+  color: var(--cx-text-muted);
   font-size: 12px;
 }
 .main {
@@ -113,35 +118,35 @@
   margin: 8px 0 0;
   font-size: var(--text-lg);
   line-height: 1.2;
-  letter-spacing: -0.04em;
+  letter-spacing: var(--cx-h3-ls);
 }
 .connected {
   display: flex;
   align-items: center;
   gap: 8px;
-  color: #ffffff80;
+  color: var(--cx-text-muted);
   font-size: 12px;
 }
 .connected i {
   height: 8px;
   width: 8px;
   border-radius: 50%;
-  background: #c5e6a4;
+  background: var(--cx-ember);
 }
 .overview {
   display: grid;
   grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr);
   gap: 32px;
 }
-.balance {
-  background: #dce6cf;
-  color: #252d20;
-  padding: 24px;
-  border-radius: 16px;
+/* The balance: a stone card (the shared Card) with the figure in light 300. */
+.screen .balance {
+  padding: var(--cx-card-pad);
+  gap: 0;
   min-height: 248px;
   display: flex;
   flex-direction: column;
   justify-content: center;
+  font-size: 14px;
 }
 .balanceLabel,
 .panelHeading {
@@ -151,50 +156,41 @@
   gap: 8px;
 }
 .balanceLabel {
-  color: #252d20b3;
+  color: var(--cx-text-muted);
   font-size: 12px;
 }
-.amount {
+.currency {
+  display: inline-flex;
+  align-items: center;
+  height: 24px;
+  padding: 0 8px;
+  border-radius: var(--cx-r-pill);
+  background: var(--cx-surface-3);
+  color: var(--cx-text-2);
+}
+.screen .amount {
   display: block;
   font-size: var(--text-3xl);
-  line-height: 1.2;
-  letter-spacing: -0.05em;
+  font-weight: 300;
+  line-height: 1.05;
+  letter-spacing: -0.045em;
   margin-top: 16px;
   font-variant-numeric: tabular-nums;
 }
+/* Cents: smaller and dim, so the figure reads like a price. */
 .amount > span {
-  color: #252d2070;
+  font-size: 0.5em;
+  letter-spacing: -0.02em;
+  color: var(--cx-text-muted);
 }
 .balance p {
   margin: 8px 0 24px;
-  color: #252d2099;
+  color: var(--cx-text-muted);
   font-size: 12px;
 }
 .actions {
   display: flex;
   gap: 8px;
-}
-.screen .primary,
-.screen .secondary {
-  height: 40px;
-  padding: 8px 16px;
-  gap: 8px;
-  font-size: 14px;
-}
-.screen .primary {
-  background: #252d20;
-  color: #fff;
-}
-.screen .primary:hover {
-  background: #3b4932;
-}
-.screen .secondary {
-  background: #252d2010;
-  color: #252d20;
-  border: 1px solid #252d2020;
-}
-.screen .secondary:hover {
-  background: #252d2020;
 }
 .summary {
   display: flex;
@@ -210,25 +206,32 @@
 .summary strong {
   display: block;
   font-size: var(--text-base);
-  color: #fff;
+  color: var(--cx-text);
+  font-variant-numeric: tabular-nums;
 }
 .summary > div > span:last-child {
-  color: #ffffff80;
+  color: var(--cx-text-muted);
   font-size: 12px;
 }
 .flowIcon {
-  background: #ffffff06;
-  border: 1px solid #ffffff10;
+  background: var(--cx-surface-3);
+  color: var(--cx-text-2);
   border-radius: 50%;
   height: 40px;
   width: 40px;
   display: grid;
   place-items: center;
+  flex-shrink: 0;
+}
+/* Money in wears the emerald chip; money out stays neutral, as in the hub. */
+.flowIcon[data-direction="in"] {
+  background: var(--cx-gain-wash);
+  color: var(--cx-gain);
 }
 .summary p {
   font-size: 12px;
   margin: 0;
-  color: #ffffff60;
+  color: var(--cx-text-muted);
 }
 .activity {
   margin-top: 40px;
@@ -246,8 +249,9 @@
 }
 .activityHeading > span {
   font-size: 12px;
-  color: #ffffff60;
+  color: var(--cx-text-muted);
 }
+/* Filters: the system's segmented control, a neutral thumb on the pick. */
 .filters {
   display: flex;
   gap: 8px;
@@ -255,14 +259,13 @@
   flex-wrap: wrap;
 }
 .filters button {
-  font-size: 12px;
-  height: 32px;
+  font-size: 14px;
   padding: 0 16px;
-  color: #ffffff80;
+  color: var(--cx-text-muted);
 }
 .filters button[aria-pressed="true"] {
-  background: #ffffff0d;
-  color: white;
+  background: var(--cx-surface-3);
+  color: var(--cx-text);
 }
 .tableHeading,
 .row {
@@ -272,10 +275,10 @@
   align-items: center;
 }
 .tableHeading {
-  color: #ffffff50;
+  color: var(--cx-text-muted);
   font-size: 12px;
   padding: 8px 0;
-  border-bottom: 1px solid #ffffff10;
+  border-bottom: 1px solid var(--cx-hairline);
 }
 .tableHeading > :last-child {
   text-align: right;
@@ -288,18 +291,18 @@
   width: 100%;
   background: transparent;
   border: 0;
-  border-bottom: 1px solid #ffffff08;
+  border-bottom: 1px solid var(--cx-hairline);
   color: inherit;
   text-align: left;
   font: inherit;
   cursor: pointer;
-  transition: background 0.2s;
+  transition: background var(--cx-dur-fast);
 }
 .row:hover {
-  background: #ffffff04;
+  background: var(--cx-row-hover);
 }
 .row:focus-visible {
-  outline: 2px solid #dce6cf;
+  outline: 2px solid var(--cx-peach);
   outline-offset: 4px;
 }
 .transaction {
@@ -310,47 +313,44 @@
 }
 .transaction small {
   display: block;
-  color: #ffffff60;
+  color: var(--cx-text-muted);
   font-size: 12px;
 }
+/* A service's glyph in its platform hue, on that hue's faint chip. */
 .serviceIcon {
   display: grid;
   place-items: center;
   height: 40px;
   width: 40px;
   flex-shrink: 0;
-  border-radius: 8px;
-  background: #292c25;
-  color: #dce6cf;
+  border-radius: var(--cx-r-icon);
+  background: var(--hue-soft, var(--cx-surface-3));
+  color: var(--hue, var(--cx-text-2));
 }
-.serviceIcon[data-color="peach"] {
-  background: #332920;
-  color: #dfb38c;
-}
-.serviceIcon[data-color="purple"] {
-  background: #2b2536;
-  color: #bfa8e6;
+/* WorkWorld has no hue id: its sage, softened into the same family. */
+.serviceIcon[data-hue="workworld"] {
+  --hue: #b4c69c;
+  --hue-rgb: 180, 198, 156;
 }
 .date {
-  color: #ffffff60;
+  color: var(--cx-text-muted);
   font-size: 12px;
 }
 .status {
   display: flex;
   align-items: center;
   gap: 8px;
-  color: #ffffff80;
+  color: var(--cx-text-muted);
   font-size: 12px;
-}
-.status svg {
-  color: #dce6cf;
 }
 .row > strong {
   font-weight: 500;
   text-align: right;
+  font-variant-numeric: tabular-nums;
 }
-.row > strong[data-incoming="true"] {
-  color: #c5e6a4;
+.row > strong[data-incoming="true"],
+.detailBody > strong[data-incoming="true"] {
+  color: var(--cx-gain);
 }
 .footer {
   margin-top: 24px;
@@ -358,14 +358,18 @@
   gap: 8px;
   align-items: center;
   font-size: 12px;
-  color: #ffffff40;
+  color: var(--cx-text-muted);
 }
 .panel {
   display: grid;
   gap: 8px;
   font-size: 12px;
+  color: var(--cx-text-muted);
 }
-.panel .amount {
+.panel strong {
+  color: var(--cx-text);
+}
+.screen .panel .amount {
   margin: 0;
 }
 .panel .primary {
@@ -380,9 +384,6 @@
   min-height: 368px;
   padding: 16px 0;
 }
-.detail > button {
-  font-size: 14px;
-}
 .detailBody {
   display: grid;
   justify-items: center;
@@ -390,22 +391,36 @@
   padding: 24px 0;
   text-align: center;
 }
+.detailBody .serviceIcon {
+  height: 56px;
+  width: 56px;
+  border-radius: var(--cx-r-md);
+  margin-bottom: 8px;
+}
 .detailBody h4,
 .detailBody p {
   margin: 0;
 }
 .detailBody > strong {
   font-size: var(--text-xl);
+  font-weight: 300;
+  letter-spacing: -0.03em;
+  font-variant-numeric: tabular-nums;
 }
 .detailBody p {
-  color: #ffffff60;
+  color: var(--cx-text-muted);
   font-size: 12px;
 }
 .detailBody > span:last-child {
   display: flex;
   align-items: center;
   gap: 8px;
-  color: #c5e6a4;
+  height: 32px;
+  padding: 0 16px 0 8px;
+  margin-top: 8px;
+  border-radius: var(--cx-r-pill);
+  background: var(--cx-surface-3);
+  color: var(--cx-text-2);
 }
 @media (max-width: 1100px) {
   .workspace {
@@ -459,11 +474,11 @@
     grid-template-columns: 1fr;
     gap: 24px;
   }
-  .balance {
+  .screen .balance {
     padding: 16px;
     min-height: 232px;
   }
-  .amount {
+  .screen .amount {
     font-size: var(--text-2xl);
   }
   .summary {
@@ -531,9 +546,9 @@
   }
   .actions > button {
     flex: 1;
-    padding: 8px;
+    padding: 0 8px;
   }
-  .amount {
+  .screen .amount {
     font-size: var(--text-xl);
   }
   .topbar {
@@ -548,12 +563,12 @@
   .overview {
     grid-template-columns: minmax(0, 1fr);
   }
-  .balance {
+  .screen .balance {
     min-width: 0;
   }
   .panel .primary {
     white-space: normal;
     height: auto;
-    min-height: 40px;
+    min-height: 36px;
   }
 }

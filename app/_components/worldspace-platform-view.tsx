@@ -2,125 +2,50 @@
 
 import { useState } from "react";
 import Image from "next/image";
-import { CalendarDays, Check, Heart, Users } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import { PlatformViewShell } from "./platform-view-shell";
+import { WorldspaceFeed } from "./worldspace/worldspace-feed";
+import { WorldspaceRoom } from "./worldspace/worldspace-room";
 import styles from "./worldspace-platform-view.module.css";
 
+/**
+ * WorldSpace, set in space, as on the hub and the app's own sign-in. Its feed
+ * on the left (stories playing through people's posts, and a composer that
+ * posts), a live Space Voice room on the right, orbiting the helmet. Joining
+ * from either side takes you into the room. WorldSpace's cyan (the shell's
+ * data-hue, set in platform-views.module.css) marks what's live and yours.
+ */
 export function WorldspacePlatformView() {
-  const [liked, setLiked] = useState(false);
   const [joined, setJoined] = useState(false);
-  const [going, setGoing] = useState(false);
+  const join = () => setJoined(!joined);
+
   return (
     <PlatformViewShell
       name="WorldSpace"
+      glass="dark"
+      eyebrow={
+        <span className={styles.brand}>
+          <Image src="/assets/worldspace/mark.webp" alt="" width={40} height={25} className={styles.mark} />
+          WorldSpace
+        </span>
+      }
       title={
         <>
           Find your people.
           <br />
-          <span>Share your world.</span>
+          <span>Share your </span>
+          <span className={styles.marked}>
+            world.
+            {/* A hand-drawn W under the word, drawing itself in */}
+            <svg aria-hidden="true" viewBox="0 0 120 24" preserveAspectRatio="none" className={styles.stroke}>
+              <path d="M3 7 L31 19 L59 6 L88 19 L117 6" pathLength={1} />
+            </svg>
+          </span>
         </>
       }
     >
-      <div className={styles.board}>
-        <section
-          className={`${styles.card} ${styles.message}`}
-          aria-label="Amara’s post"
-        >
-          <div className={styles.identity}>
-            <Image
-              src="/assets/images/amara-avatar.jpg"
-              alt=""
-              width={40}
-              height={40}
-            />
-            <div>
-              <strong>Amara</strong>
-              <span className={styles.muted}>Just shared</span>
-            </div>
-          </div>
-          <p>What are you creating this week?</p>
-          <Button
-            className={styles.like}
-            aria-pressed={liked}
-            onClick={() => setLiked(!liked)}
-          >
-            <Heart
-              size={20}
-              aria-hidden="true"
-              fill={liked ? "currentColor" : "none"}
-            />
-            {liked ? "129" : "128"} likes
-          </Button>
-        </section>
-        <section
-          className={`${styles.card} ${styles.post}`}
-          aria-label="Creative corner"
-        >
-          <span className={styles.detail}>Creative corner</span>
-          <h4>Good ideas find good company.</h4>
-          <div className={styles.people}>
-            <div className={styles.avatars} aria-hidden="true">
-              {[
-                "amara-avatar.jpg",
-                "elena-avatar.jpg",
-                "active-meeting-1.jpg",
-              ].map((src) => (
-                <Image
-                  key={src}
-                  src={`/assets/images/${src}`}
-                  alt=""
-                  width={40}
-                  height={40}
-                />
-              ))}
-            </div>
-            <span>Your kind of people.</span>
-          </div>
-        </section>
-        <section
-          className={`${styles.card} ${styles.community}`}
-          aria-label="Creative club community"
-        >
-          <div className={styles.heading}>
-            <Users size={24} aria-hidden="true" />
-            <h4>Creative club</h4>
-          </div>
-          <p className={styles.detail}>
-            Share work. Find collaborators.
-          </p>
-          <Button
-            variant="ghost"
-            className={styles.action}
-            aria-pressed={joined}
-            onClick={() => setJoined(!joined)}
-          >
-            {joined ? <Check size={20} aria-hidden="true" /> : null}
-            {joined ? "Joined" : "Join club"}
-          </Button>
-        </section>
-        <section
-          className={`${styles.card} ${styles.event}`}
-          aria-label="Design and chill event"
-        >
-          <div className={styles.heading}>
-            <CalendarDays size={24} aria-hidden="true" />
-            <span className={styles.detail}>Community hangout</span>
-          </div>
-          <h4>Design &amp; chill</h4>
-          <p className={styles.detail}>
-            Fresh faces. New ideas.
-          </p>
-          <Button
-            variant="ghost"
-            className={styles.action}
-            aria-pressed={going}
-            onClick={() => setGoing(!going)}
-          >
-            {going ? <Check size={20} aria-hidden="true" /> : null}
-            {going ? "Interested" : "Count me in"}
-          </Button>
-        </section>
+      <div className={styles.space}>
+        <WorldspaceFeed joined={joined} onJoin={join} />
+        <WorldspaceRoom joined={joined} onJoin={join} />
       </div>
     </PlatformViewShell>
   );

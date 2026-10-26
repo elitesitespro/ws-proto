@@ -1,0 +1,711 @@
+/* Lifestyle St's billboard art. By default a high street at dusk: four shop
+   windows in brass and warm light (a thing to buy, a trade, a school, a
+   doctor). Looking at an exit, that platform's own picture in its own
+   colours. The frame's words sit bottom-left, so the subject sits top-right
+   (the top half on a phone). Every layer stays mounted and crossfades on
+   data-focus; data-lit switches the shop lights on. */
+.art {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  container-type: size;
+  background: #171412;
+}
+
+/* The layers, one shown at a time */
+.layer {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  opacity: 0;
+  transform: scale(1.04);
+  transition:
+    opacity 450ms var(--cx-ease, cubic-bezier(0.22, 1, 0.36, 1)),
+    transform 600ms var(--cx-ease, cubic-bezier(0.22, 1, 0.36, 1));
+}
+.art:not([data-focus="WorldStore"]):not([data-focus="WorkWorld"]):not([data-focus="Academy"]):not([data-focus="WorldHealth"])
+  .street,
+.art[data-focus="WorldStore"] .store,
+.art[data-focus="WorkWorld"] .work,
+.art[data-focus="Academy"] .school,
+.art[data-focus="WorldHealth"] .health {
+  opacity: 1;
+  transform: none;
+}
+.layer img {
+  max-width: none;
+}
+
+/* A small label on the picture */
+.chip {
+  position: absolute;
+  z-index: 2;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 24px;
+  padding: 0 10px 0 8px;
+  border-radius: var(--cx-r-pill, 100px);
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1;
+  letter-spacing: 0;
+  white-space: nowrap;
+}
+.chip::before {
+  content: "";
+  width: 6px;
+  height: 6px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+/* A spotlight: a soft cone of light from above */
+.beam {
+  --light: 255 222 140;
+  position: absolute;
+  transform: translateX(-50%);
+  background: conic-gradient(
+    from 166deg at 50% 0%,
+    transparent,
+    rgb(var(--light) / 0.12) 9deg,
+    rgb(var(--light) / 0.2) 14deg,
+    rgb(var(--light) / 0.12) 19deg,
+    transparent 28deg
+  );
+  pointer-events: none;
+}
+
+/* ---- Life, handled: the high street at dusk ---- */
+.street {
+  background: linear-gradient(
+    180deg,
+    #14152a 0%,
+    #231f33 22%,
+    #4a3030 42%,
+    #7a4a30 53%,
+    #2a1c15 58%,
+    #120e0c 70%,
+    #0e0b09 100%
+  );
+}
+/* The town beyond, down the street */
+.skyline {
+  position: absolute;
+  left: 0;
+  top: 38%;
+  width: 28%;
+  height: 20%;
+  background:
+    radial-gradient(circle at 26% 52%, rgba(255, 190, 110, 0.75) 0 1.5px, transparent 2.5px),
+    radial-gradient(circle at 58% 24%, rgba(255, 190, 110, 0.6) 0 1.5px, transparent 2.5px),
+    radial-gradient(circle at 76% 58%, rgba(255, 190, 110, 0.7) 0 1.5px, transparent 2.5px),
+    #1c1520;
+  clip-path: polygon(
+    0 40%,
+    18% 40%,
+    18% 18%,
+    34% 18%,
+    34% 52%,
+    50% 52%,
+    50% 0,
+    66% 0,
+    66% 30%,
+    82% 30%,
+    82% 46%,
+    100% 46%,
+    100% 100%,
+    0 100%
+  );
+}
+/* The shop building: brick courses and a brass cornice */
+.facade {
+  position: absolute;
+  left: 27%;
+  right: 0;
+  top: 6%;
+  height: 52%;
+  background:
+    linear-gradient(90deg, rgba(0, 0, 0, 0.4), transparent 5%),
+    repeating-linear-gradient(180deg, transparent 0 calc(4cqh - 1px), rgba(255, 255, 255, 0.025) calc(4cqh - 1px) 4cqh),
+    linear-gradient(180deg, #271e19, #1b1512);
+  box-shadow: inset 0 max(2px, 0.35cqh) 0 rgba(202, 168, 111, 0.6);
+}
+/* The brass fascia over the windows */
+.fascia {
+  position: absolute;
+  left: 30%;
+  right: 3%;
+  top: 10.5%;
+  height: 2.4%;
+  border-radius: 2px;
+  background: linear-gradient(180deg, #e2c58e, #a8844f 55%, #6e5432);
+  opacity: 0.85;
+}
+/* A lantern on the corner, the first light on */
+.lamp {
+  position: absolute;
+  left: 23.5%;
+  top: 22%;
+  width: 2cqw;
+  aspect-ratio: 2 / 3;
+  border-radius: 30% 30% 20% 20%;
+  background: radial-gradient(circle at 50% 55%, #fff4d6, #ffc46b 45%, #c27a2a);
+  box-shadow: 0 0 0 max(1.5px, 0.2cqw) #6b5030;
+  filter: brightness(0.35);
+  transition: filter 500ms var(--cx-ease, ease);
+}
+.lamp::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 22cqw;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255, 190, 110, 0.32), rgba(255, 170, 90, 0.08) 40%, transparent 70%);
+  transform: translate(-50%, -50%);
+  opacity: 0;
+  transition: opacity 600ms var(--cx-ease, ease);
+}
+/* Its bracket, back to the wall */
+.lamp::after {
+  content: "";
+  position: absolute;
+  left: 100%;
+  top: 22%;
+  width: 1.6cqw;
+  height: max(2px, 0.3cqh);
+  background: #4a3a28;
+}
+.art[data-lit] .lamp {
+  filter: brightness(1);
+}
+.art[data-lit] .lamp::before {
+  opacity: 1;
+}
+/* The pavement's edge */
+.kerb {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 84%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(202, 168, 111, 0.22) 60%, rgba(202, 168, 111, 0.32));
+}
+
+/* The four windows, lit one after another */
+.windows {
+  position: absolute;
+  left: 31%;
+  right: 4%;
+  top: 16%;
+  height: 34%;
+  display: flex;
+  gap: 2.6cqw;
+}
+.window {
+  --delay: 200ms;
+  position: relative;
+  flex: 1;
+}
+.window:nth-child(2) {
+  --delay: 340ms;
+}
+.window:nth-child(3) {
+  --delay: 480ms;
+}
+.window:nth-child(4) {
+  --delay: 620ms;
+}
+/* Its sill */
+.window::before {
+  content: "";
+  position: absolute;
+  z-index: 1;
+  left: -7%;
+  right: -7%;
+  top: 100%;
+  height: max(4px, 1.1cqh);
+  border-radius: 2px;
+  background: linear-gradient(180deg, #d8b97f, #7a5c36);
+}
+/* The light it throws on the pavement */
+.window::after {
+  content: "";
+  position: absolute;
+  left: -45%;
+  right: -45%;
+  top: 100%;
+  height: 120%;
+  background: radial-gradient(ellipse 50% 50% at 50% 0%, rgba(255, 176, 88, 0.3), transparent 72%);
+  opacity: 0;
+  transition: opacity 700ms var(--cx-ease, ease) var(--delay);
+}
+/* The arched pane in its brass frame */
+.pane {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  border-radius: 50% 50% 3px 3px / 34% 34% 3px 3px;
+  background: #3a2414;
+  box-shadow:
+    0 0 0 max(3px, 0.45cqw) #b08a52,
+    0 0 0 max(5px, 0.8cqw) #1a130f;
+}
+.view {
+  object-fit: cover;
+  filter: sepia(0.18) saturate(0.4) brightness(0.3);
+  transition: filter 700ms var(--cx-ease, ease) var(--delay);
+}
+/* Each pane framed on its subject */
+.pane[data-pane="learn"] .view {
+  object-position: 74% 50%;
+}
+.pane[data-pane="doctor"] .view {
+  object-position: 16% 30%;
+}
+/* Warm light inside, and the glass */
+.pane::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(115deg, transparent 36%, rgba(255, 244, 220, 0.12) 44%, transparent 54%),
+    radial-gradient(ellipse 90% 45% at 50% 0%, rgba(255, 190, 110, 0.35), transparent 75%);
+  opacity: 0.35;
+  transition: opacity 700ms var(--cx-ease, ease) var(--delay);
+}
+.art[data-lit] .view {
+  filter: sepia(0.18) saturate(1.05) brightness(1);
+}
+.art[data-lit] .pane::after,
+.art[data-lit] .window::after {
+  opacity: 1;
+}
+
+/* ---- WorldStore: its dark and gold ---- */
+.store {
+  background:
+    radial-gradient(ellipse 60% 70% at 76% 30%, rgba(250, 204, 21, 0.1), transparent 70%),
+    linear-gradient(180deg, #14110f, #0c0a09);
+}
+/* Its W, large on the back wall */
+.storeW {
+  position: absolute;
+  right: 4%;
+  top: 7%;
+  width: 44cqw;
+  height: auto;
+  aspect-ratio: 82 / 56;
+  fill: rgba(250, 204, 21, 0.04);
+  stroke: rgba(250, 204, 21, 0.22);
+  stroke-width: 1;
+}
+.storeW path {
+  vector-effect: non-scaling-stroke;
+}
+/* A find on its plinth */
+.stand {
+  position: absolute;
+  bottom: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.stand[data-item="vase"] {
+  left: 55%;
+  top: 30%;
+  width: min(16cqw, 30cqh);
+}
+.stand[data-item="perfume"] {
+  left: 72%;
+  top: 12%;
+  width: min(23cqw, 42cqh);
+}
+.spot {
+  left: 50%;
+  bottom: 55%;
+  width: 260%;
+  height: 120cqh;
+  mask-image: linear-gradient(180deg, transparent 35%, #000 85%, transparent);
+}
+.find {
+  position: relative;
+  z-index: 1;
+  flex: none;
+  width: 100%;
+  aspect-ratio: 1;
+  margin-bottom: -10%;
+}
+.cutout {
+  object-fit: contain;
+  filter: drop-shadow(0 1.5cqh 1.5cqh rgba(0, 0, 0, 0.55));
+}
+/* The one gentle loop: the perfume lifts off its plinth, only while shown */
+.stand[data-item="perfume"] .find {
+  animation: lift 6s ease-in-out infinite alternate paused;
+}
+.art[data-focus="WorldStore"] .stand[data-item="perfume"] .find {
+  animation-play-state: running;
+}
+.plinth {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+  width: 72%;
+  background:
+    linear-gradient(180deg, transparent 30%, rgba(0, 0, 0, 0.6)),
+    linear-gradient(90deg, #0b0908 0%, #26201b 30%, #3a3029 48%, #1c1714 78%, #0b0908 100%);
+}
+/* Its top, lit gold by the spot */
+.plinth::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  aspect-ratio: 4;
+  border-radius: 50%;
+  background: radial-gradient(ellipse 60% 70% at 50% 45%, #6a5638, #2a221c 72%);
+  box-shadow: inset 0 1px 0 rgba(250, 204, 21, 0.45);
+  transform: translateY(-50%);
+}
+.held {
+  right: 4%;
+  bottom: 8%;
+  background: rgba(28, 25, 23, 0.85);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.1);
+  color: #fafaf9;
+}
+/* Lime: money held safe, as on WorldStore */
+.held::before {
+  background: #c9dd25;
+}
+
+/* ---- Worldwork: its black and white ---- */
+.work {
+  background:
+    radial-gradient(ellipse 50% 60% at 78% 40%, rgba(255, 255, 255, 0.07), transparent 70%),
+    #0a0a0a;
+}
+.trades {
+  position: absolute;
+  right: 0;
+  top: -6%;
+  width: 42%;
+  height: 112%;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-rows: repeat(3, minmax(0, 1fr));
+  gap: 1.4cqw;
+  transform: rotate(-5deg);
+}
+.trade {
+  position: relative;
+  overflow: hidden;
+  border-radius: clamp(8px, 1.4cqw, 16px);
+  background: #171717;
+}
+.trade img {
+  object-fit: cover;
+  filter: grayscale(1) contrast(1.3) brightness(0.5);
+  transform: scale(1.08);
+}
+/* The one nearby, in full light */
+.trade[data-near] {
+  box-shadow: 0 0 0 2px #fafafa;
+}
+.trade[data-near] img {
+  filter: grayscale(1) contrast(1.3) brightness(1.05);
+}
+.near {
+  left: 8%;
+  bottom: 8%;
+  padding: 0 8px 0 7px;
+  background: #fafafa;
+  color: #0a0a0a;
+}
+
+/* ---- Mastery Academy: its dark and gold ---- */
+.school {
+  background:
+    radial-gradient(ellipse 45% 60% at 76% 20%, rgba(237, 178, 0, 0.12), transparent 70%),
+    #0f0d0b;
+}
+/* The school's art, its pedestal fading into the dark */
+.piece {
+  position: absolute;
+  right: -3cqw;
+  top: -16cqh;
+  width: 88cqw;
+  aspect-ratio: 8 / 5;
+  mask-image: radial-gradient(ellipse 58% 66% at 68% 52%, #000 45%, transparent 100%);
+}
+.piece img {
+  object-fit: cover;
+}
+/* The warm light on it */
+.warmth {
+  --light: 237 178 0;
+  left: 72%;
+  top: -10%;
+  width: 70cqw;
+  height: 70%;
+  mask-image: linear-gradient(180deg, transparent, #000 50%, transparent);
+}
+/* A certificate leaning on the pedestal: ink, a double gold rule, a seal */
+.cert {
+  position: absolute;
+  right: 2%;
+  bottom: 6%;
+  width: 24cqw;
+  aspect-ratio: 1.414;
+  display: grid;
+  align-content: center;
+  justify-items: center;
+  gap: 1.4cqh;
+  border-radius: 4px;
+  background: linear-gradient(150deg, #241c13, #15110d 70%);
+  box-shadow:
+    inset 0 0 0 max(3px, 0.5cqw) #1a140f,
+    inset 0 0 0 max(4px, 0.65cqw) rgba(237, 178, 0, 0.8),
+    inset 0 0 0 max(6px, 0.95cqw) #1a140f,
+    inset 0 0 0 max(7px, 1.05cqw) rgba(237, 178, 0, 0.45),
+    0 2cqh 5cqh -1cqh rgba(0, 0, 0, 0.8);
+  transform: rotate(7deg);
+}
+.certMark {
+  width: 22%;
+  height: auto;
+}
+.certLines {
+  width: 56%;
+  height: 22%;
+  background:
+    linear-gradient(#edb200, #edb200) 50% 0 / 100% max(2px, 0.35cqh) no-repeat,
+    linear-gradient(rgba(237, 178, 0, 0.4), rgba(237, 178, 0, 0.4)) 50% 55% / 80% max(1px, 0.2cqh) no-repeat,
+    linear-gradient(rgba(237, 178, 0, 0.4), rgba(237, 178, 0, 0.4)) 50% 100% / 60% max(1px, 0.2cqh) no-repeat;
+}
+.seal {
+  position: absolute;
+  right: 9%;
+  bottom: 12%;
+  width: 16%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, #ffe08a, #edb200 45%, #a77800);
+  box-shadow: 0 0 0 max(2px, 0.3cqw) rgba(237, 178, 0, 0.3);
+}
+/* Its ribbon */
+.seal::after {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  left: 28%;
+  top: 70%;
+  width: 44%;
+  height: 70%;
+  background: #b88a00;
+  clip-path: polygon(0 0, 100% 0, 100% 100%, 50% 74%, 0 100%);
+}
+
+/* ---- WorldHealth: its white and teal on pale mint ---- */
+.health {
+  background: radial-gradient(
+    ellipse 100% 115% at 100% 0%,
+    #f4f8f7 0%,
+    #eef5f3 40%,
+    #cfe3df 58%,
+    #3f8079 80%,
+    #0f2f2c 100%
+  );
+}
+.halo {
+  position: absolute;
+  right: 0;
+  top: -6%;
+  width: 56cqw;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(0, 119, 110, 0.14), transparent 65%);
+}
+/* The video tile: soft corners, a white edge, a teal shadow */
+.call {
+  position: absolute;
+  right: 5%;
+  top: 8%;
+  width: 39%;
+  height: 56%;
+  overflow: hidden;
+  border-radius: clamp(16px, 3cqw, 28px);
+  background: #e6f4f1;
+  box-shadow:
+    0 0 0 max(4px, 0.7cqw) #fff,
+    0 4cqh 10cqh -3cqh rgba(0, 95, 90, 0.45);
+}
+.feed {
+  object-fit: cover;
+  object-position: 0% 40%;
+}
+.healthMark {
+  position: absolute;
+  z-index: 1;
+  left: 16px;
+  top: 16px;
+}
+.doctor {
+  left: 16px;
+  bottom: 16px;
+  background: rgba(255, 255, 255, 0.92);
+  color: #0d1211;
+}
+.doctor::before {
+  background: #00776e;
+}
+
+/* ---- A phone: portrait, the picture in the top half ---- */
+@container (aspect-ratio < 1) {
+  .street {
+    background: linear-gradient(180deg, #14152a 0%, #2a2133 4%, #130f0d 52%, #0e0b09 100%);
+  }
+  .skyline,
+  .lamp {
+    display: none;
+  }
+  .facade {
+    left: 0;
+    top: 4%;
+    height: 44%;
+  }
+  .fascia {
+    left: 4%;
+    right: 4%;
+    top: 7.5%;
+    height: 1.8%;
+  }
+  .windows {
+    left: 7%;
+    right: 7%;
+    top: 12%;
+    height: 30%;
+    gap: 3cqw;
+  }
+  .pane {
+    border-radius: 50% 50% 3px 3px / 26% 26% 3px 3px;
+  }
+
+  .storeW {
+    right: 10%;
+    top: 5%;
+    width: 80cqw;
+  }
+  .stand[data-item="vase"] {
+    left: 8%;
+    top: 23%;
+    width: 30cqw;
+  }
+  .stand[data-item="perfume"] {
+    left: 48%;
+    top: 11%;
+    width: 42cqw;
+  }
+  .held {
+    right: auto;
+    bottom: auto;
+    left: 6%;
+    top: 3%;
+  }
+
+  .trades {
+    left: -4%;
+    right: -4%;
+    top: 3%;
+    width: auto;
+    height: 44%;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-rows: repeat(2, minmax(0, 1fr));
+    gap: 2cqw;
+    transform: rotate(-4deg);
+  }
+  /* The tailor to the top row's middle */
+  .trade:first-child,
+  .trade[data-near] {
+    order: -1;
+  }
+
+  .piece {
+    right: auto;
+    left: -50cqw;
+    top: -18cqh;
+    width: 150cqw;
+  }
+  .warmth {
+    left: 48%;
+    top: -12%;
+    width: 120cqw;
+    height: 52%;
+  }
+  .cert {
+    right: -7%;
+    bottom: auto;
+    top: 28%;
+    width: 32cqw;
+    transform: rotate(8deg);
+  }
+
+  .health {
+    background: radial-gradient(
+      ellipse 140% 80% at 50% 0%,
+      #f4f8f7 0%,
+      #eef5f3 42%,
+      #cfe3df 58%,
+      #3f8079 78%,
+      #0f2f2c 100%
+    );
+  }
+  .halo {
+    right: -15%;
+    top: -12%;
+    width: 130cqw;
+  }
+  .call {
+    left: 8%;
+    right: 8%;
+    top: 6%;
+    width: auto;
+    height: 40%;
+  }
+  .healthMark {
+    left: 12px;
+    top: 12px;
+  }
+  .doctor {
+    left: 12px;
+    bottom: 12px;
+  }
+}
+
+@keyframes lift {
+  to {
+    transform: translateY(-3%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .layer,
+  .lamp,
+  .lamp::before,
+  .window::after,
+  .view,
+  .pane::after {
+    transition: none;
+  }
+  .layer {
+    transform: none;
+  }
+  .stand[data-item="perfume"] .find {
+    animation: none;
+  }
+}

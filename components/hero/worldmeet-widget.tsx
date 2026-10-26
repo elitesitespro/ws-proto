@@ -1,6 +1,6 @@
 import Image from "next/image";
-import { DotsThree, Microphone, PhoneDisconnect, VideoCamera } from "@phosphor-icons/react/dist/ssr";
-import { WidgetCard as Card } from "./widget-card";
+import { Icon } from "@/components/icon";
+import { WidgetCard as Card, meetHue } from "./widget-card";
 import { MeetingTimer } from "./meeting-timer";
 
 /** Keep the portrait crops from the export's shared image. */
@@ -20,7 +20,7 @@ function MeetingPortrait({ header = false, index = 0 }: { header?: boolean; inde
           transform: `matrix(${header ? 15 : 11.321}, 0, 0, ${header ? 11.25 : 8.491}, ${-x * ratio}, ${-(header ? 150.662 : 214.404) * ratio})`,
         }}
       />
-      {!header && index === 3 && <span data-widget-motion="pulse" className="absolute inset-0 rounded-full border-4 border-[#4CBE61]" />}
+      {!header && index === 3 && <span data-widget-motion="pulse" className="absolute inset-0 rounded-full border-4 border-(--hue)" />}
     </span>
   );
 }
@@ -28,16 +28,16 @@ function MeetingPortrait({ header = false, index = 0 }: { header?: boolean; inde
 /** Sample meeting preview for the landing page. */
 export function WorldMeetWidget() {
   return (
-    <Card role="group" aria-label="Sample daily meet: Agilie, 8 participants" className="w-full gap-0! rounded-[24px]! p-0! text-xs text-white">
+    <Card role="group" aria-label="Sample daily meet: Agilie, 8 participants" style={meetHue} className="w-full gap-0! p-0! text-xs">
       <div className="flex items-center gap-1 p-2">
         <MeetingPortrait header />
         <div className="flex-1">
-          <p className="text-white/65">Daily meet</p>
+          <p className="text-muted">Daily meet</p>
           <p className="font-medium">Agilie</p>
         </div>
         <MeetingTimer />
-        <span aria-hidden="true" className="flex size-6 shrink-0 items-center justify-center rounded-full bg-white/10">
-          <DotsThree size={24} weight="bold" />
+        <span aria-hidden="true" className="flex size-6 shrink-0 items-center justify-center rounded-full bg-surface-3">
+          <Icon name="more" size={24} tone="current" />
         </span>
       </div>
       <div className="h-8 overflow-hidden" aria-hidden="true">
@@ -45,12 +45,12 @@ export function WorldMeetWidget() {
           {Array.from({ length: 6 }, (_, index) => <MeetingPortrait key={index} index={index} />)}
         </div>
       </div>
-      <p className="flex items-center justify-center gap-1 leading-3 text-white/65"><span aria-hidden="true">{[0, 1, 2].map((dot) => <span key={dot} data-widget-motion="dot" style={{ animationDelay: `${dot * 0.2}s` }}>•</span>)}</span> typing</p>
-      <div className="flex items-center gap-1 bg-black/20 p-2" aria-hidden="true">
-        <span className="flex size-6 items-center justify-center rounded-full bg-white/10"><Microphone size={24} weight="fill" /></span>
-        <span className="flex size-6 items-center justify-center rounded-full bg-white/15 text-white/70"><VideoCamera size={24} weight="fill" /></span>
-        <span className="flex size-6 items-center justify-center rounded-full bg-white/10"><span className="flex size-3 items-center justify-center rounded-full bg-[#FF675A] text-white">8</span></span>
-        <span className="ml-auto flex size-6 items-center justify-center rounded-full bg-[#FF6658] text-white"><PhoneDisconnect size={24} weight="fill" /></span>
+      <p className="flex items-center justify-center gap-1 leading-3 text-muted"><span aria-hidden="true">{[0, 1, 2].map((dot) => <span key={dot} data-widget-motion="dot" style={{ animationDelay: `${dot * 0.2}s` }}>•</span>)}</span> typing</p>
+      <div className="flex items-center gap-1 bg-surface-2 p-2" aria-hidden="true">
+        <span className="flex size-6 items-center justify-center rounded-full bg-surface-3"><Icon name="mic" size={24} tone="current" /></span>
+        <span className="flex size-6 items-center justify-center rounded-full bg-surface-3 text-muted"><Icon name="video" size={24} tone="current" /></span>
+        <span className="flex size-6 items-center justify-center rounded-full bg-surface-3"><span className="flex size-3 items-center justify-center rounded-full bg-(--hue) font-medium text-(--hue-on) tabular-nums">8</span></span>
+        <span className="ml-auto flex size-6 items-center justify-center rounded-full bg-loss text-white"><Icon name="phone-end" size={24} tone="current" /></span>
       </div>
     </Card>
   );

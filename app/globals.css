@@ -1,30 +1,67 @@
 @import "tailwindcss";
+/* Lenis's own rules for its smooth scroll (components/layout/smooth-scroll.tsx) */
+@import "lenis/dist/lenis.css";
+/* The WorldStreet design system, vendored into ds/ by `pnpm ds:sync` (never
+   edit ds/). Tokens, the .cx-* kit and the WorldStreet brand sit in Tailwind's
+   components layer, so a utility on a kit element still wins. Then its
+   Tailwind v4 utilities: bg-ember, text-muted, bg-surface-2, rounded-card,
+   rounded-pill, shadow-cta, text-h1 … */
+@import "../ds/styles/index.css" layer(components);
+@import "../ds/styles/theme.css";
+/* Points --background, --card, --primary … at the system, on the brand
+   element. The app's own block further down (same selector) wins where the
+   two overlap. */
+@import "../ds/styles/shadcn-bridge.css";
+/* Each platform's own colour (data-hue="crypto" … then var(--hue)). */
+@import "./hues.css";
 @source "../app";
 @source "../components";
 
-@custom-variant dark (&:is(.dark *));
+/* The system scopes `dark:` to .cx-dark; this app puts .dark (and
+   data-theme="dark") on <html>, so the variant answers to both. */
+@custom-variant dark (&:is(.dark *, .cx-dark *));
 
 @theme inline {
-  /* One spacing step is 8px; use whole-number spacing utilities. */
+  /* One spacing step is 8px; use whole-number spacing utilities. The
+     system's 4px steps are there too, prefixed: p-cx-3 is 12px, p-cx-5 20px. */
   --spacing: 8px;
-  /* Major Third (1.25) from 14px, rounded to the nearest 4px. */
-  --text-*: initial;
-  --text-xs: 16px;
-  --text-sm: 16px;
-  --text-base: 20px;
-  --text-lg: 28px;
-  --text-xl: 36px;
-  --text-2xl: 44px;
-  --text-3xl: 52px;
-  --text-4xl: 64px;
+
+  /* The app's type names, mapped onto the design system's ramp (14 · 16 · 20
+     · 32 · 52 · 64) with its tracking and leading. The system steps the
+     heading sizes down at tablet and phone widths, so these follow. New code
+     can use the system's own names: text-h1 … text-h4, text-lead, text-body,
+     text-small. */
+  --text-xs: var(--cx-small);
+  --text-xs--letter-spacing: var(--cx-small-ls);
+  --text-sm: var(--cx-body);
+  --text-sm--letter-spacing: var(--cx-body-ls);
+  --text-base: var(--cx-lead);
+  --text-base--letter-spacing: var(--cx-lead-ls);
+  --text-lg: var(--cx-h3);
+  --text-lg--letter-spacing: var(--cx-h3-ls);
+  --text-lg--line-height: 1.25;
+  --text-xl: var(--cx-h3);
+  --text-xl--letter-spacing: var(--cx-h3-ls);
+  --text-xl--line-height: 1.25;
+  --text-2xl: var(--cx-h2);
+  --text-2xl--letter-spacing: var(--cx-h2-ls);
+  --text-2xl--line-height: var(--cx-h2-lh);
+  --text-3xl: var(--cx-h2);
+  --text-3xl--letter-spacing: var(--cx-h2-ls);
+  --text-3xl--line-height: var(--cx-h2-lh);
+  --text-4xl: var(--cx-h1);
+  --text-4xl--letter-spacing: var(--cx-h1-ls);
+  --text-4xl--line-height: var(--cx-h1-lh);
+  /* The hero statements run past the ramp's top step on purpose. */
   --text-display-sm: 100px;
+  --text-display-sm--letter-spacing: -4px;
   --text-display: 156px;
-  --text-footer: 14px;
+  --text-display--letter-spacing: -6px;
+  --text-footer: var(--cx-small);
+
+  --font-heading: var(--font-sans);
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-  --font-heading: var(--font-sans);
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
@@ -33,11 +70,6 @@
   --color-sidebar-primary: var(--sidebar-primary);
   --color-sidebar-foreground: var(--sidebar-foreground);
   --color-sidebar: var(--sidebar);
-  --color-chart-5: var(--chart-5);
-  --color-chart-4: var(--chart-4);
-  --color-chart-3: var(--chart-3);
-  --color-chart-2: var(--chart-2);
-  --color-chart-1: var(--chart-1);
   --color-ring: var(--ring);
   --color-input: var(--input);
   --color-border: var(--border);
@@ -45,7 +77,8 @@
   --color-accent-foreground: var(--accent-foreground);
   --color-accent: var(--accent);
   --color-muted-foreground: var(--muted-foreground);
-  --color-muted: var(--muted);
+  /* No --color-muted: the system owns it (text-muted is muted text). Surfaces
+     use bg-surface-2. */
   --color-secondary-foreground: var(--secondary-foreground);
   --color-secondary: var(--secondary);
   --color-primary-foreground: var(--primary-foreground);
@@ -54,83 +87,79 @@
   --color-popover: var(--popover);
   --color-card-foreground: var(--card-foreground);
   --color-card: var(--card);
-  --radius-sm: 4px;
-  --radius-md: 8px;
-  --radius-lg: 16px;
-  --radius-xl: 24px;
-  --radius-2xl: 24px;
-  --radius-3xl: 24px;
-  --radius-4xl: 24px;
+  /* Money direction (emerald in, red out), from the bridge. */
+  --color-credit: var(--credit);
+  --color-debit: var(--debit);
 }
 
+/* shadcn tokens at the document level. Everything inside <body> takes the
+   brand's values; these only colour what sits outside it (the <html> canvas,
+   overscroll), as WorldStreet's own stone and gold so there's no seam. */
 :root {
   --icon-size-min: 20px;
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.205 0 0);
-  --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
-  --chart-1: oklch(0.87 0 0);
-  --chart-2: oklch(0.556 0 0);
-  --chart-3: oklch(0.439 0 0);
-  --chart-4: oklch(0.371 0 0);
-  --chart-5: oklch(0.269 0 0);
-  --radius: 16px;
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: oklch(0.205 0 0);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.97 0 0);
-  --sidebar-accent-foreground: oklch(0.205 0 0);
-  --sidebar-border: oklch(0.922 0 0);
-  --sidebar-ring: oklch(0.708 0 0);
+  --background: #ffffff;
+  --foreground: #0c0a09;
+  --card: #ffffff;
+  --card-foreground: #0c0a09;
+  --popover: #ffffff;
+  --popover-foreground: #0c0a09;
+  --primary: #eab308;
+  --primary-foreground: #1c1917;
+  --secondary: #f5f5f4;
+  --secondary-foreground: #1c1917;
+  --muted: #f5f5f4;
+  --muted-foreground: #78716c;
+  --accent: #f5f5f4;
+  --accent-foreground: #1c1917;
+  --destructive: #b91c1c;
+  --border: rgba(12, 10, 9, 0.1);
+  --input: rgba(12, 10, 9, 0.14);
+  --ring: #ca8a04;
+  --sidebar: #ffffff;
+  --sidebar-foreground: #0c0a09;
+  --sidebar-primary: #eab308;
+  --sidebar-primary-foreground: #1c1917;
+  --sidebar-accent: #f5f5f4;
+  --sidebar-accent-foreground: #1c1917;
+  --sidebar-border: rgba(12, 10, 9, 0.1);
+  --sidebar-ring: #ca8a04;
 }
 
 .dark {
-  --background: #070405;
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.205 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.205 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.922 0 0);
-  --primary-foreground: oklch(0.205 0 0);
-  --secondary: oklch(0.269 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
-  --accent-foreground: oklch(0.985 0 0);
-  --destructive: oklch(0.704 0.191 22.216);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.556 0 0);
-  --chart-1: oklch(0.87 0 0);
-  --chart-2: oklch(0.556 0 0);
-  --chart-3: oklch(0.439 0 0);
-  --chart-4: oklch(0.371 0 0);
-  --chart-5: oklch(0.269 0 0);
-  --sidebar: oklch(0.205 0 0);
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.269 0 0);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.556 0 0);
+  --background: #0c0a09;
+  --foreground: #ffffff;
+  --card: #1c1917;
+  --card-foreground: #ffffff;
+  --popover: #1c1917;
+  --popover-foreground: #ffffff;
+  --primary: #eab308;
+  --primary-foreground: #1c1917;
+  --secondary: rgba(255, 255, 255, 0.06);
+  --secondary-foreground: #ffffff;
+  --muted: rgba(255, 255, 255, 0.06);
+  --muted-foreground: #a8a29e;
+  --accent: rgba(255, 255, 255, 0.06);
+  --accent-foreground: #ffffff;
+  --destructive: #ef4444;
+  --border: rgba(255, 255, 255, 0.1);
+  --input: rgba(255, 255, 255, 0.15);
+  --ring: #ca8a04;
+  --sidebar: #0c0a09;
+  --sidebar-foreground: #ffffff;
+  --sidebar-primary: #eab308;
+  --sidebar-primary-foreground: #1c1917;
+  --sidebar-accent: rgba(255, 255, 255, 0.06);
+  --sidebar-accent-foreground: #ffffff;
+  --sidebar-border: rgba(255, 255, 255, 0.1);
+  --sidebar-ring: #ca8a04;
+}
+
+/* The brand element. Manrope carries the type; Noto Sans only fills the ₦
+   glyph Manrope lacks (next/font hashes family names, so the brand's literal
+   "Noto Sans" is re-pointed at the loaded face). */
+[data-brand="worldstreet"] {
+  --cx-font: var(--font-manrope), var(--font-noto), system-ui, sans-serif;
+  --font-sans: var(--cx-font);
 }
 
 @layer base {
@@ -139,10 +168,13 @@
   }
 
   body {
-    @apply bg-background text-foreground text-sm;
+    @apply bg-background text-foreground;
   }
 
   html {
     @apply font-sans;
+    /* No grey box flashed over a tapped button on a phone: the buttons have
+       their own pressed states */
+    -webkit-tap-highlight-color: transparent;
   }
 }

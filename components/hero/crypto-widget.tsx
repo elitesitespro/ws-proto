@@ -1,8 +1,8 @@
 "use client";
 
 import { useContext, useEffect, useState } from "react";
-import { useReducedMotion } from "motion/react";
-import { ArrowUpRight, ArrowDownRight } from "@phosphor-icons/react";
+import { useReducedMotion } from "@/lib/use-reduced-motion";
+import { Icon } from "@/components/icon";
 import { WidgetCard as Card } from "./widget-card";
 import { WidgetMotionContext } from "./widget-motion-context";
 
@@ -25,7 +25,7 @@ function quoteFor(asset: keyof typeof previousClose, prices: typeof quotes[numbe
   return {
     price: priceFormat.format(prices[asset]),
     change: `${positive ? "+" : "−"}${Math.abs(change).toFixed(1)}%`,
-    color: positive ? "#95D8B8" : "#FFA5B6",
+    tone: positive ? "text-gain" : "text-loss",
     positive,
   };
 }
@@ -80,37 +80,39 @@ export function CryptoWidget() {
     ? undefined
     : prices[asset] >= previousPrices[asset] ? "price-up" : "price-down";
   const bitcoin = quoteFor("bitcoin", prices);
-  const ChangeIcon = bitcoin.positive ? ArrowUpRight : ArrowDownRight;
+  const changeIcon = bitcoin.positive ? "arrow-up-right" : "trending-down";
 
   return (
-    <Card role="group" aria-label="Sample crypto prices over 24 hours" className="w-full gap-2! rounded-[24px]! p-2! text-xs text-white">
+    <Card data-hue="crypto" role="group" aria-label="Sample crypto prices over 24 hours" className="w-full gap-2! p-2! text-xs">
       <div className="flex flex-col gap-1">
         <div className="flex items-center gap-1">
           <AssetIcon asset="bitcoin" />
-          <span className="flex-1 font-semibold">Bitcoin</span>
-          <span className="text-white/60">24h</span>
+          <span className="flex-1 font-medium">Bitcoin</span>
+          <span className="text-muted">24h</span>
         </div>
         <div className="flex items-center gap-1">
-          <span key={quoteTick} data-widget-motion={priceMotion("bitcoin")} className="text-lg leading-4 font-semibold tracking-tight text-white tabular-nums">{bitcoin.price}</span>
-          <span className="flex h-4 items-center gap-1 rounded-full px-1 font-medium tabular-nums" style={{ backgroundColor: bitcoin.positive ? "#203B31" : "#3E242D", color: bitcoin.color }}>
-            <ChangeIcon data-widget-motion="pulse" size={20} weight="bold" aria-hidden="true" />
+          <span key={quoteTick} data-widget-motion={priceMotion("bitcoin")} className="text-lg leading-4 font-light text-foreground tabular-nums">{bitcoin.price}</span>
+          <span className={`flex h-4 items-center gap-1 rounded-pill px-1 font-medium tabular-nums ${bitcoin.positive ? "bg-gain-wash" : "bg-loss-wash"} ${bitcoin.tone}`}>
+            <span data-widget-motion="pulse" className="flex">
+              <Icon name={changeIcon} size={20} tone="current" />
+            </span>
             {bitcoin.change}
           </span>
         </div>
       </div>
-      <div className="grid grid-cols-2 gap-2 border-t border-white/10 pt-2">
+      <div className="grid grid-cols-2 gap-2 border-t border-hairline pt-2">
         {([
           { asset: "ethereum", name: "Ethereum", ...quoteFor("ethereum", prices) },
           { asset: "solana", name: "Solana", ...quoteFor("solana", prices) },
-        ] as const).map(({ asset, name, price, change, color }) => (
+        ] as const).map(({ asset, name, price, change, tone }) => (
           <div key={asset} className="flex flex-col gap-1">
             <div className="flex items-center gap-1">
               <AssetIcon asset={asset} />
-              <span className="font-medium text-white/70">{name}</span>
+              <span className="font-medium text-muted">{name}</span>
             </div>
             <div className="leading-3 tabular-nums">
               <p key={quoteTick} data-widget-motion={priceMotion(asset)} className="font-medium">{price}</p>
-              <p style={{ color }}>{change}</p>
+              <p className={tone}>{change}</p>
             </div>
           </div>
         ))}

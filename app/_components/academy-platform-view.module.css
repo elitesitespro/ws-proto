@@ -1,0 +1,30 @@
+/* The academy's gold W, its name and the morning's slot; "Own your
+   future." in its gold. */
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: var(--text-sm);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+.brand img {
+  width: 36px;
+  height: 21px;
+}
+.when {
+  margin-left: 8px;
+  color: #a8a29e;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+.gold {
+  color: #edb200;
+}
+@media (max-width: 600px) {
+  .when {
+    display: none;
+  }
+}

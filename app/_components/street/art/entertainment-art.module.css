@@ -1,0 +1,790 @@
+/* Entertainment Blvd's billboard art. Every scene stays mounted and
+   data-focus picks the one that shows. The frame lays its words and scrim
+   over the bottom left (the whole bottom on a phone), so each scene keeps
+   its subject top right (top half on a phone) and its bottom left dark. */
+.art {
+  --ease: var(--cx-ease, cubic-bezier(0.22, 1, 0.36, 1));
+  --label: clamp(12px, 1.5cqw, 14px);
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  container-type: size;
+  background: #171412;
+  color: #fbfaf9;
+}
+.art img {
+  max-width: none;
+}
+.photo {
+  object-fit: cover;
+  object-position: var(--at, center);
+}
+
+/* Each scene, faded in when it's the one */
+.layer {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  opacity: 0;
+  visibility: hidden;
+  transition:
+    opacity 450ms var(--ease),
+    visibility 0s linear 450ms;
+}
+.art:not([data-focus]) .night,
+.art[data-focus="XStream"] .xtream,
+.art[data-focus="Vsion"] .vision,
+.art[data-focus="AI Movie"] .movie,
+.art[data-focus="Arcade"] .arcade {
+  opacity: 1;
+  visibility: visible;
+  transform: none;
+  transition-delay: 0s;
+}
+
+/* Light that comes on when the car arrives */
+.glow {
+  opacity: 0;
+  transition: opacity 1200ms var(--ease);
+}
+.art[data-lit] .glow {
+  opacity: 1;
+}
+
+/* A live badge, in Xtream's chili */
+.live {
+  position: absolute;
+  z-index: 1;
+  top: 4%;
+  left: 6%;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45em;
+  padding: 0 0.8em;
+  border-radius: var(--cx-r-pill, 100px);
+  background: #e3122a;
+  color: #fff;
+  font-size: var(--label);
+  font-weight: 500;
+  line-height: 2em;
+  white-space: nowrap;
+  box-shadow: 0 0.4em 1.4em -0.4em rgba(227, 18, 42, 0.8);
+}
+.live::before {
+  content: "";
+  width: 0.45em;
+  height: 0.45em;
+  border-radius: 50%;
+  background: #fff;
+}
+
+/* ---- A night out, in ---- */
+.night {
+  background:
+    radial-gradient(70% 90% at 88% 0%, #3b2617, transparent 70%),
+    #120e0c;
+}
+/* Tonight's wall, kept to the top and the right, away from the words */
+.wallMask {
+  position: absolute;
+  inset: 0;
+  mask-image:
+    linear-gradient(to left, #000 34%, transparent 44%),
+    linear-gradient(to bottom, #000 24%, transparent 46%);
+}
+.wall {
+  --poster: 22cqw;
+  --gap: 1.5cqw;
+  position: absolute;
+  left: 50%;
+  top: -40cqh;
+  display: grid;
+  grid-template-columns: repeat(5, var(--poster));
+  gap: var(--gap);
+  filter: brightness(0.5) saturate(0.85);
+  transform: translateX(-50%) rotate(-7deg);
+}
+.column {
+  display: grid;
+  gap: var(--gap);
+}
+.column:nth-child(even) {
+  transform: translateY(calc(var(--poster) * 0.55));
+}
+.tile {
+  position: relative;
+  display: block;
+  aspect-ratio: 5 / 8;
+  overflow: hidden;
+  border-radius: 1.4cqmin;
+  background: #1c1714;
+}
+/* Warm marquee light over the wall, and round the lightbox */
+.wash {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(55% 75% at 80% 0%, rgba(255, 168, 72, 0.3), transparent 70%),
+    radial-gradient(40% 55% at 100% 75%, rgba(242, 136, 129, 0.16), transparent 70%);
+}
+.halo {
+  position: absolute;
+  left: 52cqw;
+  top: -8cqh;
+  width: 50cqw;
+  height: 100cqh;
+  background: radial-gradient(closest-side, rgba(255, 176, 80, 0.4), transparent);
+}
+
+/* The lightbox */
+.marquee {
+  --rim: 3.2cqmin;
+  --bulb: max(5px, 1.3cqmin);
+  position: absolute;
+  left: 63cqw;
+  top: 7cqh;
+  width: 27cqw;
+  padding: var(--rim);
+  border-radius: calc(var(--rim) * 1.1);
+  background: linear-gradient(160deg, #3a2c22, #1d1612);
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 226, 180, 0.14),
+    0 4cqmin 8cqmin -2cqmin rgba(0, 0, 0, 0.75);
+  transform: rotate(3deg);
+}
+.poster {
+  --at: center 40%;
+  position: relative;
+  display: block;
+  aspect-ratio: 5 / 8;
+  overflow: hidden;
+  border-radius: 1cqmin;
+  background: #1c1714;
+}
+.bulbs {
+  position: absolute;
+  inset: calc(var(--rim) / 2);
+}
+.bulbs i {
+  position: absolute;
+  left: var(--x);
+  top: var(--y);
+  width: var(--bulb);
+  height: var(--bulb);
+  margin: calc(var(--bulb) / -2);
+  border-radius: 50%;
+  background: #6b5338;
+}
+/* Each bulb's light, off until you arrive */
+.bulbs i::after {
+  content: "";
+  position: absolute;
+  inset: -70%;
+  border-radius: 50%;
+  background: radial-gradient(circle, #fff7e0 0 26%, #ffcf7a 38%, rgba(255, 170, 64, 0.4) 55%, transparent 72%);
+  opacity: 0;
+}
+.art[data-lit] .bulbs i::after {
+  opacity: 1;
+}
+
+/* The gamepad, tucked in by the lightbox */
+.pad {
+  position: absolute;
+  right: -1cqw;
+  top: 56cqh;
+  width: 24cqw;
+  aspect-ratio: 1;
+  filter: drop-shadow(0 2cqmin 2.4cqmin rgba(0, 0, 0, 0.65));
+  transform: rotate(-18deg);
+}
+
+/* ---- Xtream: chili and ember on near-black ---- */
+.xtream {
+  --chili: #e3122a;
+  --ember: #f85810;
+  background:
+    radial-gradient(42% 62% at 74% 40%, rgba(227, 18, 42, 0.42), transparent 70%),
+    radial-gradient(34% 46% at 98% 86%, rgba(248, 88, 16, 0.3), transparent 70%),
+    #0b0708;
+}
+.battle {
+  position: absolute;
+  right: 3cqw;
+  top: 6cqh;
+  width: 40cqw;
+  height: 66cqh;
+}
+/* Each creator's room */
+.side {
+  --at: center 28%;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 47%;
+  overflow: hidden;
+  border-radius: var(--cx-r-md, 16px);
+  background: #140c0d;
+}
+.side[data-side="zara"] {
+  left: 0;
+  box-shadow:
+    0 0 0 max(2px, 0.4cqmin) var(--chili),
+    0 3cqmin 8cqmin -2cqmin rgba(227, 18, 42, 0.7);
+  transform: rotate(-3deg);
+}
+.side[data-side="kojo"] {
+  right: 0;
+  box-shadow:
+    0 0 0 max(2px, 0.4cqmin) var(--ember),
+    0 3cqmin 8cqmin -2cqmin rgba(248, 88, 16, 0.7);
+  transform: translateY(4%) rotate(3deg);
+}
+.side::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(11, 7, 8, 0.4), transparent 30%, transparent 62%, rgba(11, 7, 8, 0.75));
+}
+/* The seam between them, white hot, and the VS on it */
+.seam {
+  position: absolute;
+  left: 50%;
+  top: -8%;
+  bottom: -8%;
+  width: max(2px, 0.4cqmin);
+  border-radius: 1px;
+  background: linear-gradient(180deg, transparent, #fff 25%, #fff 75%, transparent);
+  box-shadow: 0 0 2.4cqmin 0.6cqmin rgba(255, 70, 50, 0.85);
+  transform: translateX(-50%) rotate(4deg);
+}
+.vs {
+  position: absolute;
+  left: 50%;
+  top: 44%;
+  font-size: 12cqmin;
+  font-style: italic;
+  font-weight: 500;
+  letter-spacing: -0.04em;
+  line-height: 1;
+  background: linear-gradient(135deg, #fff 10%, #ff5a3c 45%, #f8a008);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  filter: drop-shadow(0 0 1.6cqmin rgba(227, 18, 42, 0.9));
+  transform: translate(-50%, -50%);
+}
+/* The gifts the room's sending */
+.gift {
+  position: absolute;
+  left: var(--x);
+  top: var(--y);
+  width: var(--s);
+  height: var(--s);
+  filter: drop-shadow(0 1cqmin 1.6cqmin rgba(0, 0, 0, 0.5));
+  transform: translate(-50%, -50%) rotate(var(--turn));
+}
+
+/* ---- Vision: gold on near-black ---- */
+.vision {
+  --gold: #edb200;
+  background:
+    radial-gradient(48% 60% at 70% 34%, rgba(237, 178, 0, 0.16), transparent 72%),
+    #070605;
+}
+.cinema {
+  position: absolute;
+  right: 5cqw;
+  top: 8cqh;
+  width: 52cqw;
+  aspect-ratio: 2 / 1;
+}
+/* The projector's light, from the back of the room */
+.beam {
+  position: absolute;
+  left: -43cqw;
+  top: -8cqh;
+  right: 0;
+  bottom: 0;
+  filter: blur(1.2cqmin);
+}
+.beam i {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(110deg, rgba(250, 200, 0, 0.22), rgba(250, 200, 0, 0.05) 60%);
+  clip-path: polygon(0 0, 47% 14%, 47% 100%);
+}
+/* The big screen */
+.screen {
+  --at: center 32%;
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  border-radius: 0.8cqmin;
+  background: #000;
+  box-shadow: 0 0 6cqmin 0.4cqmin rgba(250, 200, 0, 0.22);
+}
+.screen::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(90% 90% at 50% 45%, transparent 60%, rgba(7, 6, 5, 0.4));
+}
+.film {
+  transform: scale(1.04);
+  transform-origin: 54% 36%;
+}
+.together {
+  position: absolute;
+  z-index: 1;
+  top: 6%;
+  left: 3%;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45em;
+  padding: 0 0.8em;
+  border-radius: var(--cx-r-pill, 100px);
+  background: var(--gold);
+  color: #0c0a09;
+  font-size: var(--label);
+  font-weight: 500;
+  line-height: 2em;
+  white-space: nowrap;
+}
+.together::before {
+  content: "";
+  width: 0.45em;
+  height: 0.45em;
+  border-radius: 50%;
+  background: currentColor;
+}
+/* The room, from the back row: heads against the light */
+.seats {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -8%;
+  height: 46%;
+  filter: drop-shadow(0 -0.4cqmin 1cqmin rgba(250, 200, 0, 0.35));
+}
+.seats i {
+  position: absolute;
+  left: var(--x);
+  bottom: calc(var(--drop) * -1);
+  width: var(--w);
+  aspect-ratio: 1 / 1.05;
+  transform: rotate(var(--lean));
+  transform-origin: 50% 100%;
+}
+/* A head, on its shoulders */
+.seats i::before {
+  content: "";
+  position: absolute;
+  left: 27%;
+  top: 0;
+  width: 46%;
+  aspect-ratio: 1 / 1.12;
+  border-radius: 50%;
+  background: #070605;
+}
+.seats i::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 46%;
+  bottom: 0;
+  border-radius: 50% 50% 0 0 / 70% 70% 0 0;
+  background: #070605;
+}
+
+/* ---- AI Movie: night navy and its gold ---- */
+.movie {
+  --gold: #ffcc2d;
+  background:
+    radial-gradient(60% 70% at 85% 10%, #1b2042, transparent 70%),
+    #0b0e1b;
+}
+.spot {
+  position: absolute;
+  right: -6cqw;
+  top: 20cqh;
+  width: 52cqw;
+  height: 84cqh;
+  background: radial-gradient(closest-side, rgba(255, 204, 45, 0.22), transparent);
+}
+/* The cast, on a strip of film */
+.reel {
+  --frame: 12cqw;
+  --band: 3cqmin;
+  position: absolute;
+  left: -8cqw;
+  right: -8cqw;
+  top: 6cqh;
+  overflow: hidden;
+  background: #05060d;
+  box-shadow: 0 3cqmin 6cqmin -2cqmin rgba(0, 0, 0, 0.8);
+  transform: rotate(-4deg);
+}
+.roll {
+  display: flex;
+  width: max-content;
+}
+/* One frame and its sprocket holes, above and below */
+.cell {
+  --holes: linear-gradient(
+    90deg,
+    transparent 16%,
+    rgba(242, 238, 230, 0.75) 16% 36%,
+    transparent 36% 64%,
+    rgba(242, 238, 230, 0.75) 64% 84%,
+    transparent 84%
+  );
+  display: block;
+  padding: var(--band) 0.7cqw;
+  background:
+    var(--holes) 0 0.9cqmin / 100% 1.2cqmin no-repeat,
+    var(--holes) 0 calc(100% - 0.9cqmin) / 100% 1.2cqmin no-repeat;
+}
+.frame {
+  --at: center 22%;
+  position: relative;
+  display: block;
+  width: var(--frame);
+  aspect-ratio: 3 / 4;
+  overflow: hidden;
+  border-radius: 0.6cqmin;
+  background: #1b1f39;
+}
+.frame::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(0deg, rgba(5, 6, 13, 0.5), transparent 50%);
+}
+/* The lead, in gold */
+.frame[data-lead]::after {
+  box-shadow: inset 0 0 0 max(2px, 0.5cqmin) var(--gold);
+}
+/* The slate: its striped arm open, the board under it */
+.slate {
+  position: absolute;
+  right: 6cqw;
+  top: 38cqh;
+  width: 30cqw;
+  aspect-ratio: 5 / 4;
+  filter: drop-shadow(0 3cqmin 3cqmin rgba(0, 0, 0, 0.6));
+  transform: rotate(-5deg);
+}
+.arm,
+.stick {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 15%;
+  border-radius: 0.8cqmin;
+}
+.arm {
+  top: 0;
+  background: repeating-linear-gradient(-60deg, #f2eee6 0 2.4cqmin, #0b0e1b 2.4cqmin 4.8cqmin);
+  transform: rotate(-18deg);
+  transform-origin: 1.5% 100%;
+}
+.art[data-focus="AI Movie"] .arm {
+  transform: none;
+}
+.stick {
+  top: 16%;
+  background: repeating-linear-gradient(60deg, #f2eee6 0 2.4cqmin, #0b0e1b 2.4cqmin 4.8cqmin);
+}
+.board {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 32%;
+  bottom: 0;
+  display: grid;
+  grid-template-columns: 1.5fr 1fr;
+  grid-template-rows: 1fr 1fr;
+  gap: max(1px, 0.25cqmin);
+  overflow: hidden;
+  border-radius: 0 0 1.4cqmin 1.4cqmin;
+  background: rgba(247, 248, 252, 0.24);
+}
+.board > span {
+  display: grid;
+  place-items: center;
+  background: #141832;
+}
+.board > span:first-child {
+  grid-row: span 2;
+}
+.mark {
+  width: 46%;
+  height: auto;
+}
+.take {
+  color: var(--gold);
+  font-size: var(--label);
+  font-weight: 500;
+}
+/* A couple of chalk lines */
+.board > .chalk {
+  background:
+    linear-gradient(rgba(247, 248, 252, 0.2), rgba(247, 248, 252, 0.2)) 50% 42% / 52% 1px no-repeat,
+    linear-gradient(rgba(247, 248, 252, 0.2), rgba(247, 248, 252, 0.2)) 50% 60% / 34% 1px no-repeat,
+    #141832;
+}
+
+/* ---- Arcade: cream and ink, its lime and olive, a yellow streak ---- */
+.arcade {
+  --cream: #f6f3ec;
+  --ink: #150f26;
+  --lime: #b5c478;
+  --olive: #556300;
+  --yellow: #ffcc2d;
+  background:
+    radial-gradient(50% 60% at 30% 10%, rgba(181, 196, 120, 0.1), transparent 70%),
+    var(--ink);
+}
+/* A cream sun in the corner, and the lime ring of its controllers */
+.paper {
+  position: absolute;
+  left: 55cqw;
+  top: calc(20cqh - 27cqw);
+  width: 54cqw;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: var(--cream);
+}
+.ring {
+  position: absolute;
+  left: 57cqw;
+  top: calc(30cqh - 15cqw);
+  width: 30cqw;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: var(--lime);
+  outline: max(2px, 0.4cqmin) solid var(--olive);
+  outline-offset: 1.6cqmin;
+}
+.padBig {
+  position: absolute;
+  left: 59cqw;
+  top: calc(28cqh - 21cqw);
+  width: 42cqw;
+  aspect-ratio: 1;
+  filter: drop-shadow(0 3cqmin 3cqmin rgba(21, 15, 38, 0.45));
+  transform: rotate(-12deg);
+}
+/* The streak: a coin with its flame */
+.streak {
+  position: absolute;
+  right: 6cqw;
+  top: 66cqh;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6em;
+  padding: 0.3em 1em 0.3em 0.3em;
+  border-radius: var(--cx-r-pill, 100px);
+  background: var(--cream);
+  color: var(--ink);
+  font-size: var(--label);
+  font-weight: 500;
+  white-space: nowrap;
+  box-shadow: 0 1.4cqmin 3cqmin -1cqmin rgba(0, 0, 0, 0.5);
+  transform: rotate(-4deg);
+}
+.coin {
+  display: grid;
+  place-items: center;
+  width: max(36px, 9cqmin);
+  height: max(36px, 9cqmin);
+  border-radius: 50%;
+  background: var(--yellow);
+  box-shadow: inset 0 -0.2em 0 rgba(21, 15, 38, 0.16);
+  color: var(--ink);
+}
+.coin svg {
+  width: 60%;
+  height: 60%;
+}
+
+/* ---- A phone: everything in the top half ---- */
+@container (aspect-ratio < 1) {
+  .wall {
+    --poster: 26cqw;
+    top: -42cqh;
+  }
+  .wallMask {
+    mask-image: linear-gradient(to bottom, #000 28%, transparent 50%);
+  }
+  .halo {
+    left: -1cqw;
+    top: -11cqh;
+    width: 80cqw;
+    height: 70cqh;
+  }
+  .marquee {
+    left: 22cqw;
+    top: 4cqh;
+    width: 34cqw;
+  }
+  .pad {
+    right: 4cqw;
+    top: 20cqh;
+    width: 34cqw;
+  }
+
+  .xtream {
+    background:
+      radial-gradient(70% 45% at 50% 24%, rgba(227, 18, 42, 0.42), transparent 70%),
+      radial-gradient(50% 30% at 90% 40%, rgba(248, 88, 16, 0.3), transparent 70%),
+      #0b0708;
+  }
+  .battle {
+    left: 9cqw;
+    right: 9cqw;
+    top: 6cqh;
+    width: auto;
+    height: 37cqh;
+  }
+
+  .vision {
+    background:
+      radial-gradient(70% 45% at 50% 22%, rgba(237, 178, 0, 0.16), transparent 72%),
+      #070605;
+  }
+  .cinema {
+    left: 7cqw;
+    right: 7cqw;
+    top: 6cqh;
+    width: auto;
+  }
+  .beam {
+    display: none;
+  }
+
+  .spot {
+    right: -10cqw;
+    top: 0;
+    width: 80cqw;
+    height: 60cqh;
+  }
+  .reel {
+    --frame: 20cqw;
+    top: 4cqh;
+  }
+  .slate {
+    right: 6cqw;
+    top: 17cqh;
+    width: 42cqw;
+  }
+
+  .paper {
+    left: 28cqw;
+    top: calc(14cqh - 38cqw);
+    width: 76cqw;
+  }
+  .ring {
+    left: 20cqw;
+    top: calc(24cqh - 20cqw);
+    width: 40cqw;
+  }
+  .padBig {
+    left: 24cqw;
+    top: calc(22cqh - 32cqw);
+    width: 64cqw;
+  }
+  .streak {
+    right: auto;
+    left: 6cqw;
+    top: 33cqh;
+  }
+}
+
+/* ---- Motion, for those who want it ---- */
+@media (prefers-reduced-motion: no-preference) {
+  /* A touch of scale as a scene comes in */
+  .layer {
+    transform: scale(1.04);
+    transition:
+      opacity 450ms var(--ease),
+      transform 450ms var(--ease),
+      visibility 0s linear 450ms;
+  }
+
+  /* The bulbs come on one after another, then every third one breathes */
+  .bulbs i::after {
+    transition: opacity 240ms ease calc(var(--i) * 32ms);
+  }
+  .art[data-lit] .bulbs i:nth-child(3n)::after {
+    animation: twinkle 2.4s ease-in-out calc(1.4s + var(--i) * 70ms) infinite alternate;
+    animation-play-state: paused;
+  }
+  .art[data-lit]:not([data-focus]) .bulbs i:nth-child(3n)::after {
+    animation-play-state: running;
+  }
+
+  /* The film plays on, slowly pushing in */
+  .film {
+    animation: push 16s ease-in-out infinite alternate paused;
+  }
+  .art[data-focus="Vsion"] .film {
+    animation-play-state: running;
+  }
+
+  /* The cast rolls by; the slate claps shut as you look */
+  .roll {
+    animation: roll 80s linear infinite paused;
+  }
+  .art[data-focus="AI Movie"] .roll {
+    animation-play-state: running;
+  }
+  .arm {
+    transition: transform 360ms cubic-bezier(0.34, 1.4, 0.64, 1) 280ms;
+  }
+
+  /* The gamepad floats */
+  .padBig {
+    animation: float 4s ease-in-out infinite alternate paused;
+  }
+  .art[data-focus="Arcade"] .padBig {
+    animation-play-state: running;
+  }
+}
+
+/* Xtream's gifts are animated images that can't be stilled, so they go */
+@media (prefers-reduced-motion: reduce) {
+  .gift {
+    display: none;
+  }
+}
+
+@keyframes twinkle {
+  to {
+    transform: scale(0.7);
+  }
+}
+@keyframes push {
+  from {
+    transform: scale(1.04);
+  }
+  to {
+    transform: scale(1.12);
+  }
+}
+@keyframes roll {
+  to {
+    transform: translateX(-50%);
+  }
+}
+@keyframes float {
+  from {
+    transform: rotate(-12deg);
+  }
+  to {
+    transform: rotate(-12deg) translateY(-2cqh);
+  }
+}

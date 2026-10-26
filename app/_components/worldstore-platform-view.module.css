@@ -1,0 +1,70 @@
+/* WorldStore's mark (the W in ink on its gold tile), its name and the
+   moment; "Safely." underlined with a drawn zigzag in lime, the colour of
+   money held safe. */
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: var(--text-sm);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+.mark {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  background: #facc15;
+  color: #1c1917;
+}
+.mark svg {
+  width: 18px;
+  fill: currentColor;
+  height: auto;
+}
+.when {
+  margin-left: 8px;
+  color: #a8a29e;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+.marked {
+  position: relative;
+  display: inline-block;
+}
+.stroke {
+  position: absolute;
+  left: -2%;
+  bottom: -0.3em;
+  width: 104%;
+  height: 0.32em;
+  overflow: visible;
+}
+.stroke path {
+  fill: none;
+  stroke: #c9dd25;
+  stroke-width: 5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-dasharray: 1;
+  stroke-dashoffset: 0;
+  animation: draw 900ms 300ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+@keyframes draw {
+  from {
+    stroke-dashoffset: 1;
+  }
+}
+@media (max-width: 600px) {
+  .when {
+    display: none;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .stroke path {
+    animation: none;
+  }
+}

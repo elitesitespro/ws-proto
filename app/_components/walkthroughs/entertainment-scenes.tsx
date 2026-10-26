@@ -1,12 +1,5 @@
 "use client";
-import {
-  Camera,
-  Clapperboard,
-  Gamepad2,
-  Heart,
-  Radio,
-  WandSparkles,
-} from "lucide-react";
+import { Icon } from "@/components/icon";
 import { Photo, Status, Walkthrough } from "./walkthrough";
 import s from "./walkthrough.module.css";
 
@@ -55,7 +48,7 @@ export function EntertainmentScene({ step }: { step: number }) {
       brand={["Xtream", "Xtream studio", "Vsion", "AI Movie", "Arcade"][step]}
       captions={captions[step]}
       actions={actions[step]}
-      tone="entertainment"
+      hue={["xtreme", "xtreme", "vision", "watch", "arcade"][step]}
     >
       {({ stage, progress }) => (
         <>
@@ -63,23 +56,25 @@ export function EntertainmentScene({ step }: { step: number }) {
             <div className={s.broadcast}>
               <Photo src="xtream-live.webp" alt="Creator hosting a live room" />
               <div className={s.broadcastTop}>
-                <span className={s.redPill}>
-                  <Radio size={20} />
+                <span className={`${s.mediaChip} cx-chip--glass`}>
+                  <Icon name="live" tone="current" />
                   {stage ? "Live" : "For you"}
                 </span>
-                <span>{stage > 1 ? "2.4k watching" : "Creator spotlight"}</span>
+                <span className={`${s.mediaChip} cx-chip--glass`}>
+                  {stage > 1 ? "2.4k watching" : "Creator spotlight"}
+                </span>
               </div>
               <div className={s.broadcastBottom}>
                 <h3>Inside the creative process.</h3>
                 <span>@amara · Art & conversation</span>
-                <div className={s.chat} data-show={stage >= 1}>
+                <div className={`${s.chat} cx-liquid`} data-show={stage >= 1}>
                   Jay: How did you get started?
                 </div>
-                <div className={s.chat} data-show={stage >= 2}>
-                  <Heart size={20} />
+                <div className={`${s.chat} cx-liquid`} data-show={stage >= 2}>
+                  <Icon name="heart" tone="current" />
                   You sent some love
                 </div>
-                <div className={s.chat} data-show={stage >= 3}>
+                <div className={`${s.chat} cx-liquid`} data-show={stage >= 3}>
                   Amara: Thanks for being here!
                 </div>
               </div>
@@ -89,8 +84,8 @@ export function EntertainmentScene({ step }: { step: number }) {
             <div className={s.studio}>
               <div className={s.camera}>
                 <Photo src="active-meeting-1.jpg" alt="Host camera preview" />
-                <span className={s.redPill}>
-                  <Camera size={20} />
+                <span className={`${s.mediaChip} cx-chip--glass cx-glass-light`}>
+                  <Icon name="camera" tone="current" />
                   {stage >= 2 ? "On air" : "Preview"}
                 </span>
                 {stage === 2 && (
@@ -134,8 +129,8 @@ export function EntertainmentScene({ step }: { step: number }) {
                 <h3>Dune: Part Two</h3>
                 <p className={s.detail}>A journey beyond the familiar.</p>
                 {stage >= 1 && (
-                  <span className={s.status}>
-                    <Clapperboard size={20} />
+                  <span className={`${s.mediaChip} cx-chip--glass`}>
+                    <Icon name="clapperboard" tone="current" />
                     Sci-fi · Adventure
                   </span>
                 )}
@@ -159,7 +154,7 @@ export function EntertainmentScene({ step }: { step: number }) {
           {step === 3 && (
             <div className={s.filmEditor}>
               <div className={s.prompt}>
-                <WandSparkles size={24} />
+                <Icon name="wand" size={24} tone="current" />
                 <p>
                   {stage === 0
                     ? "A quiet city wakes up in golden light.".slice(
@@ -173,7 +168,9 @@ export function EntertainmentScene({ step }: { step: number }) {
                 {["The city", "First light", "A new day"].map((label, i) => (
                   <div key={label} data-show={stage >= 1}>
                     <div className={`${s.storyArt} ${s[`art${i}`]}`}>
-                      <span>0{i + 1}</span>
+                      <span className={`${s.mediaChip} cx-chip--glass cx-glass-light`}>
+                        0{i + 1}
+                      </span>
                     </div>
                     <span>{label}</span>
                   </div>
@@ -195,7 +192,7 @@ export function EntertainmentScene({ step }: { step: number }) {
           {step === 4 && (
             <div className={s.game}>
               <div className={s.gameScore}>
-                <Gamepad2 size={28} />
+                <Icon name="gamepad" size={28} tone="current" />
                 <span>
                   You <b>{stage === 3 ? "120" : "0"}</b>
                 </span>

@@ -1,0 +1,85 @@
+/* The footer's last line: the name in gold dots, sized to the content width
+   (cqi) and sunk a little into the bottom edge, like the planet above. */
+.mark {
+  container-type: inline-size;
+  position: relative;
+  margin-top: 32px;
+  user-select: none;
+}
+/* The planet's air, behind the name */
+.mark::before {
+  content: "";
+  position: absolute;
+  inset: -40% -10% -10%;
+  z-index: -1;
+  background: radial-gradient(50% 60% at 50% 100%, rgba(234, 179, 8, 0.14), transparent 75%);
+  pointer-events: none;
+}
+/* The dots only paint inside the box, so the name stays clear of its edges
+   (at 20.5cqi the last t's bar ran off the right and read as an l) */
+.word {
+  position: relative;
+  margin-bottom: -0.1em;
+  font-size: 19cqi;
+  font-weight: 500;
+  line-height: 0.9;
+  letter-spacing: -0.06em;
+  text-align: center;
+  white-space: nowrap;
+}
+.dots,
+.lit {
+  display: block;
+  color: transparent;
+  background-size: 7px 7px;
+  -webkit-background-clip: text;
+  background-clip: text;
+}
+.dots {
+  background-image: radial-gradient(circle, #eab308 1.6px, transparent 2.1px);
+  -webkit-mask-image: linear-gradient(to bottom, #000 25%, rgba(0, 0, 0, 0.3));
+  mask-image: linear-gradient(to bottom, #000 25%, rgba(0, 0, 0, 0.3));
+}
+/* The same dots, bright, seen only round the pointer */
+.lit {
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(circle, #fef3c7 1.8px, transparent 2.3px);
+  -webkit-mask-image: radial-gradient(240px circle at var(--mx, 50%) var(--my, 50%), #000, transparent 70%);
+  mask-image: radial-gradient(240px circle at var(--mx, 50%) var(--my, 50%), #000, transparent 70%);
+  opacity: 0;
+  transition: opacity 0.4s ease;
+}
+.mark[data-lit] .lit {
+  opacity: 1;
+}
+
+/* A phone: the name whole, clear of the edge, in dots big enough to read
+   it by, on strokes heavy enough to catch them (at medium, the t's bar
+   fell between two rows of dots and read as an l); a drag along it with a
+   finger lights it as the pointer does */
+@media (max-width: 639px) {
+  .mark {
+    touch-action: pan-y;
+  }
+  .word {
+    margin-bottom: 0.06em;
+    font-size: 18cqi;
+    font-weight: 700;
+    letter-spacing: -0.055em;
+  }
+  .dots,
+  .lit {
+    background-size: 4px 4px;
+  }
+  .dots {
+    background-image: radial-gradient(circle, #eab308 1.15px, transparent 1.55px);
+    -webkit-mask-image: linear-gradient(to bottom, #000 40%, rgba(0, 0, 0, 0.6));
+    mask-image: linear-gradient(to bottom, #000 40%, rgba(0, 0, 0, 0.6));
+  }
+  .lit {
+    background-image: radial-gradient(circle, #fef3c7 1.3px, transparent 1.75px);
+    -webkit-mask-image: radial-gradient(120px circle at var(--mx, 50%) var(--my, 50%), #000, transparent 70%);
+    mask-image: radial-gradient(120px circle at var(--mx, 50%) var(--my, 50%), #000, transparent 70%);
+  }
+}

@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import { motion, useAnimationControls, useInView, useReducedMotion } from "motion/react";
+import { motion, useAnimationControls, useInView } from "motion/react";
+import { useReducedMotion } from "@/lib/use-reduced-motion";
 
 export function HeroGradientBackground() {
   const backgroundRef = useRef<HTMLDivElement>(null);
@@ -41,7 +42,7 @@ export function HeroGradientBackground() {
         className="absolute inset-0"
         style={{ backgroundImage: "linear-gradient(180deg, #FFF08C 0%, #FFE278 60%, #E87631 100%)" }}
       />
-      <div className="absolute inset-0 bg-[linear-gradient(180deg,transparent_60%,rgba(7,4,5,0.12)_70%,rgba(7,4,5,0.5)_82%,rgba(7,4,5,0.86)_92%,#070405_100%)]" />
+      <div className="absolute inset-0 bg-[linear-gradient(180deg,transparent_60%,rgba(12,10,9,0.12)_70%,rgba(12,10,9,0.5)_82%,rgba(12,10,9,0.86)_92%,#0C0A09_100%)]" />
     </motion.div>
   );
 }

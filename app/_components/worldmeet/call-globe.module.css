@@ -1,0 +1,42 @@
+/* The dotted world in WorldMeet's white and gold, as on its own hero: a white
+   planet warming to cream, a gold halo, its land in ink dots, the calls in
+   gold. The canvas reads these colours (call-globe.tsx). */
+.globe {
+  --globe-hi: #ffffff;
+  --globe-lo: #f6efe2;
+  --globe-rim: rgba(161, 98, 7, 0.18);
+  --globe-halo: rgba(234, 179, 8, 0.35);
+  --globe-dot: rgba(28, 25, 23, 0.5);
+  --globe-dot-limb: rgba(28, 25, 23, 0.2);
+  --globe-arc: #eab308;
+  --globe-voice: #a16207;
+  position: relative;
+  width: 100%;
+  height: 100%;
+  container-type: size;
+  pointer-events: none;
+}
+/* The world is as big as the box's shorter side, in the middle of it */
+.square {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: min(100cqw, 100cqh);
+  height: min(100cqw, 100cqh);
+  transform: translate(-50%, -50%);
+}
+.square canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+/* A pin's point is its city; what's in it centres on that point. Hidden
+   until the globe has placed it. */
+.pin {
+  position: absolute;
+  width: 0;
+  height: 0;
+  opacity: 0;
+}

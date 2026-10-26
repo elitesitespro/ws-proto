@@ -1,9 +1,7 @@
+/* A wallet scene on the shared corner-lit Card: stone surfaces, gold glyphs,
+   gold only on the one action, emerald only on money coming in. */
 .demo {
-  --accent: #e6c1a4;
-  background: #191619;
-  color: #fff;
-  border: 1px solid #ffffff12;
-  border-radius: 24px;
+  color: var(--cx-text);
   padding: 16px;
   min-width: 0;
   min-height: 536px;
@@ -11,26 +9,11 @@
   display: grid;
   grid-template-rows: 32px minmax(0, 1fr) 56px;
   gap: 16px;
-  overflow: hidden;
   font-size: var(--text-xs);
   line-height: 1.5;
 }
-.demo[data-kind="Receive"] {
-  --accent: #c2e7a0;
-}
-.demo[data-kind="Track"] {
-  --accent: #b7a5ed;
-}
-.demo[data-kind="Move"] {
-  --accent: #a5d8ed;
-}
-.demo svg {
-  width: 20px;
-  height: 20px;
-  flex-shrink: 0;
-}
 .demo strong {
-  font-weight: 600;
+  font-weight: 500;
 }
 .header,
 .header > span,
@@ -42,7 +25,7 @@
 }
 .header {
   justify-content: space-between;
-  color: #ffffff80;
+  color: var(--cx-text-muted);
 }
 .header > div {
   gap: 0;
@@ -66,16 +49,11 @@
   justify-content: center;
   gap: 8px;
   height: 112px;
-  border-radius: 16px;
-  background: #302721;
-  color: var(--accent);
-}
-.product svg {
-  width: 64px;
-  height: 64px;
+  border-radius: var(--cx-r-md);
+  background: var(--cx-surface-2);
 }
 .product span {
-  color: #ffffffa6;
+  color: var(--cx-text-muted);
 }
 .row {
   justify-content: space-between;
@@ -89,34 +67,33 @@
   gap: 8px;
   align-items: center;
   padding: 8px;
-  border-radius: 16px;
-  background: #ffffff06;
+  border-radius: var(--cx-r-md);
+  background: var(--cx-surface-2);
 }
 .balance > svg,
 .account > svg:first-child {
   width: 40px;
   height: 40px;
   padding: 8px;
-  background: #ffffff0a;
-  border-radius: 8px;
-  color: var(--accent);
+  background: var(--cx-surface-3);
+  border-radius: var(--cx-r-icon);
 }
 .balance span,
 .account span {
   display: grid;
-  color: #ffffff99;
+  color: var(--cx-text-muted);
   flex: 1;
 }
 .balance strong,
 .account strong {
-  color: #fff;
+  color: var(--cx-text);
+  font-variant-numeric: tabular-nums;
+}
+.account > svg:last-child:not(:first-child) {
+  color: var(--cx-text-2);
 }
 .demo .action {
   width: 100%;
-  background: var(--accent);
-  color: #171318;
-  height: 40px;
-  gap: 8px;
 }
 .demo .action[data-pressed="true"] {
   transform: scale(0.96);
@@ -129,25 +106,22 @@
   gap: 8px;
 }
 .receive > span {
-  color: #ffffff99;
+  color: var(--cx-text-muted);
 }
+/* Money coming in: the emerald chip. */
 .signal {
   width: 64px;
   height: 64px;
   border-radius: 50%;
   display: grid;
   place-items: center;
-  background: #c2e7a012;
-  color: var(--accent);
-  box-shadow: 0 0 0 8px #c2e7a006;
+  background: var(--cx-gain-wash);
+  color: var(--cx-gain);
   margin-bottom: 8px;
-}
-.signal svg {
-  width: 32px;
-  height: 32px;
 }
 .total {
   font-size: var(--text-xl);
+  font-weight: 300;
   line-height: 1.1;
   letter-spacing: -0.04em;
   font-variant-numeric: tabular-nums;
@@ -160,35 +134,35 @@
   gap: 8px;
   align-items: center;
   padding: 16px 8px;
-  border-radius: 16px;
-  background: #232b20;
+  border-radius: var(--cx-r-md);
+  background: var(--cx-surface-2);
 }
 .receipt > div {
   flex: 1;
   display: grid;
 }
 .receipt strong {
-  color: var(--accent);
+  color: var(--cx-gain);
   font-size: var(--text-base);
+  font-variant-numeric: tabular-nums;
 }
 .receipt span {
-  color: #ffffff99;
+  color: var(--cx-text-muted);
 }
-.receipt > svg {
-  color: var(--accent);
+.receipt > svg:last-child {
+  color: var(--cx-text-2);
 }
 .bars {
   height: 80px;
   display: flex;
   align-items: end;
   gap: 8px;
-  border-bottom: 1px solid #ffffff20;
+  border-bottom: 1px solid var(--cx-hairline);
 }
 .bars i {
   flex: 1;
-  border-radius: 4px 4px 0 0;
-  background: var(--accent);
-  opacity: 0.7;
+  border-radius: var(--cx-r-xs) var(--cx-r-xs) 0 0;
+  background: var(--cx-surface-3);
   transition: height 1.2s ease;
 }
 .transaction {
@@ -204,14 +178,15 @@
 .transaction small {
   display: block;
   font-size: inherit;
-  color: #ffffff80;
+  color: var(--cx-text-muted);
 }
 .transaction strong {
   font-size: inherit;
   white-space: nowrap;
+  font-variant-numeric: tabular-nums;
 }
-.transaction > svg {
-  color: var(--accent);
+.transaction strong[data-incoming="true"] {
+  color: var(--cx-gain);
 }
 .demo [data-visible] {
   transition:
@@ -233,18 +208,20 @@
   content: "";
   position: absolute;
   inset: 0 auto;
-  border-left: 2px dashed #a5d8ed40;
+  border-left: 2px dashed var(--cx-field-border);
 }
 .packet {
   z-index: 1;
-  background: var(--accent);
-  color: #15191a;
+  background: var(--cx-elevated);
+  color: var(--cx-text);
+  box-shadow: var(--cx-shadow-md);
   height: 40px;
   padding: 8px 16px;
-  border-radius: 999px;
+  border-radius: var(--cx-r-pill);
   display: flex;
   gap: 8px;
   align-items: center;
+  font-variant-numeric: tabular-nums;
   transition: transform 0.1s linear;
 }
 .account {
@@ -252,10 +229,9 @@
 }
 .account strong {
   font-size: var(--text-base);
-  font-variant-numeric: tabular-nums;
 }
 .note {
-  color: #ffffff99;
+  color: var(--cx-text-muted);
   text-align: center;
 }
 .footer {
@@ -264,19 +240,19 @@
 }
 .footer p {
   margin: 8px 0 0;
-  color: #ffffff99;
+  color: var(--cx-text-muted);
   line-height: 24px;
 }
 .progress {
   height: 4px;
-  border-radius: 4px;
-  background: #ffffff10;
+  border-radius: var(--cx-r-pill);
+  background: var(--cx-surface-3);
   overflow: hidden;
 }
 .progress i {
   display: block;
   height: 100%;
-  background: var(--accent);
+  background: var(--cx-text-2);
   transform-origin: left;
   transition: transform 0.1s linear;
 }

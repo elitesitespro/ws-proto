@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 import { HeroWidgetPlaceholder } from "./hero-widget-placeholder";
 import { WorldSpaceWidget } from "./worldspace-widget";
-import { WorldCallWidget } from "./worldcall-widget";
+import { IncomingCallWidget } from "./incoming-call-widget";
 import { ForexWidget } from "./forex-widget";
 import { CryptoWidget } from "./crypto-widget";
 import { AcademyWidget } from "./academy-widget";
@@ -16,7 +16,7 @@ export const heroWidgetContent: Readonly<Record<string, ReactNode>> = {
   "slot-01": <WorldSpaceWidget />,
   "slot-02": <HeroWidgetPlaceholder slotId="slot-02" platform="Wallet" recommendedSize="96 × auto" aspectRatio="4 / 5" />,
   "slot-03": <AcademyWidget />,
-  "slot-04": <WorldCallWidget />,
+  "slot-04": <IncomingCallWidget />,
   "slot-05": <CryptoWidget />,
   "slot-06": <ActiveMeetingWidget />,
   "slot-07": <XStreamWidget />,

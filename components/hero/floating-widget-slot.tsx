@@ -5,10 +5,10 @@ import { cn } from "cn";
 import {
   motion,
   useMotionValue,
-  useReducedMotion,
   useTransform,
   type MotionValue,
 } from "motion/react";
+import { useReducedMotion } from "@/lib/use-reduced-motion";
 import { gentleGlideCubicEase } from "@/lib/motion-presets";
 import type { FloatingSlotConfig, SlotPlacement } from "./hero-widget-layout";
 import styles from "./floating-widget-slot.module.css";

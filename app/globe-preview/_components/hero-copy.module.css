@@ -1,0 +1,123 @@
+/* The hero's entrance, as the loader opens onto it. Each part of the copy
+   rises a short way out of a soft blur into full solidity, a beat after the
+   one before (--rise is its place in the order), and the last is in about
+   1.3s later. Plain CSS, so it's held hidden from the first paint, before
+   the page hydrates, and the server and the browser render the same markup.
+   `backwards` holds each part hidden through its delay and lets go at the
+   end, so nothing is left blurred or moved: the buttons' hover and the
+   headline's gradient behave as usual afterwards. */
+.rise,
+.cue > * {
+  animation: rise-in 700ms var(--cx-ease) backwards;
+  animation-delay: calc(120ms + var(--rise, 0) * 85ms);
+}
+
+@keyframes rise-in {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 18px, 0);
+    filter: blur(8px);
+  }
+}
+
+/* Held at the start while the page's loader is up (hero-loader.tsx, which
+   marks the hero data-loading), and let go as it opens onto the hero */
+:global([data-loading]) .rise,
+:global([data-loading]) .cue > * {
+  animation-play-state: paused;
+}
+
+/* (.cue: the scroll cue places itself against the section, so it rises on
+   its own box; a transform or filter on its wrapper would pull it out of place.) */
+
+/* How to play with the planet (a phone's) */
+.hint {
+  display: none;
+}
+
+/* A phone: the copy centred, the words and Explore at the top, the planet
+   and its cards under them, and the hint at the foot over a dark floor the
+   planet sinks into */
+@media (max-width: 767px) {
+  .copy {
+    align-self: stretch;
+    justify-content: flex-start;
+    align-items: stretch;
+    gap: 0;
+    padding: 44px 16px 0;
+    text-align: center;
+  }
+  .lead {
+    align-items: center;
+    gap: 8px;
+  }
+  .lead h1 {
+    font-size: clamp(40px, 11.5vw, 52px);
+    line-height: 1.04;
+  }
+  .actions {
+    flex-direction: column;
+    align-items: center;
+    margin-top: 20px;
+    padding: 0;
+  }
+  /* Explore, at the system's own size; the menu has the account */
+  .actions > a {
+    padding-inline: 40px;
+  }
+  .actions > .second {
+    display: none;
+  }
+  .hint {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    margin: auto -16px 0;
+    padding: 40px 16px max(16px, env(safe-area-inset-bottom));
+    background: linear-gradient(to top, var(--color-background) 35%, transparent);
+    color: var(--cx-text-2);
+    font-size: 13px;
+    line-height: 20px;
+  }
+  /* A finger's touch, going round */
+  .hint::before {
+    content: "";
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--cx-ember);
+    box-shadow: 0 0 0 4px rgba(var(--cx-accent-rgb), 0.18);
+    animation: swipe 2.4s var(--cx-ease-in-out) infinite;
+  }
+}
+/* Shorter: the line under the headline steps aside for the planet and its
+   cards, and shorter still, the welcome too */
+@media (max-width: 767px) and (max-height: 860px) {
+  .line {
+    display: none;
+  }
+}
+@media (max-width: 767px) and (max-height: 660px) {
+  .welcome {
+    display: none;
+  }
+}
+@keyframes swipe {
+  0%,
+  100% {
+    translate: -6px 0;
+  }
+  50% {
+    translate: 6px 0;
+  }
+}
+
+/* Under reduced motion the copy is simply there */
+@media (prefers-reduced-motion: reduce) {
+  .rise,
+  .cue > *,
+  .hint::before {
+    animation: none;
+  }
+}

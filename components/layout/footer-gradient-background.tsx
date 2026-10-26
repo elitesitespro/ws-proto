@@ -1,7 +1,8 @@
 "use client";
 
 import { useRef } from "react";
-import { motion, useInView, useReducedMotion } from "motion/react";
+import { motion, useInView } from "motion/react";
+import { useReducedMotion } from "@/lib/use-reduced-motion";
 import { GrainyGradient } from "@/components/ui/grainy-gradient";
 
 export function FooterGradientBackground() {
@@ -27,7 +28,7 @@ export function FooterGradientBackground() {
         seed="worldstreet-footer"
         className="h-full w-full rounded-none"
       />
-      <div className="absolute inset-0 bg-[linear-gradient(180deg,#070405_0%,rgba(7,4,5,0.86)_25%,rgba(7,4,5,0.5)_60%,transparent_100%)]" />
+      <div className="absolute inset-0 bg-[linear-gradient(180deg,#0C0A09_0%,rgba(12,10,9,0.86)_25%,rgba(12,10,9,0.5)_60%,transparent_100%)]" />
     </motion.div>
   );
 }

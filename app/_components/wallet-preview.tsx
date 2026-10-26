@@ -1,28 +1,32 @@
 "use client";
 import { useState } from "react";
-import {
-  ArrowDownLeft,
-  ArrowUpRight,
-  ArrowLeftRight,
-  Wallet,
-  BriefcaseBusiness,
-  Headphones,
-  Radio,
-  Check,
-  X,
-  Copy,
-  ArrowLeft,
-} from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import { Icon, type IconName } from "@/components/icon";
 import s from "./wallet-preview.module.css";
-const transactions = [
+// Each service's glyph wears its platform hue (app/hues.css). WorkWorld has
+// no hue id, so its softened sage is set in the module.
+const hues: Record<string, string> = {
+  lime: "workworld",
+  peach: "shop",
+  purple: "xtreme",
+};
+const transactions: {
+  name: string;
+  service: string;
+  date: string;
+  amount: string;
+  type: string;
+  icon: IconName;
+  color: string;
+}[] = [
   {
     name: "Project payment",
     service: "WorkWorld",
     date: "Today, 10:42",
     amount: "+$250.00",
     type: "Received",
-    icon: BriefcaseBusiness,
+    icon: "briefcase",
     color: "lime",
   },
   {
@@ -31,7 +35,7 @@ const transactions = [
     date: "Today, 09:18",
     amount: "−$129.00",
     type: "Paid",
-    icon: Headphones,
+    icon: "headphones",
     color: "peach",
   },
   {
@@ -40,7 +44,7 @@ const transactions = [
     date: "Yesterday, 18:06",
     amount: "−$50.00",
     type: "Moved",
-    icon: Radio,
+    icon: "radio",
     color: "purple",
   },
   {
@@ -49,7 +53,7 @@ const transactions = [
     date: "Yesterday, 14:30",
     amount: "+$180.00",
     type: "Received",
-    icon: Radio,
+    icon: "radio",
     color: "purple",
   },
 ];
@@ -64,7 +68,7 @@ export function WalletPreview() {
     <div className={s.screen} aria-label="Universal wallet product preview">
       <header className={s.topbar}>
         <span className={s.brand}>
-          <Wallet /> WorldStreet <span> / Wallet</span>
+          <Icon name="wallet" size={20} /> WorldStreet <span> / Wallet</span>
         </span>
         <span className={s.preview}>Product preview</span>
         <span className={s.avatar}>JD</span>
@@ -74,10 +78,10 @@ export function WalletPreview() {
           <div>
             <span className={s.caption}>Your workspace</span>
             <p className={s.active}>
-              <Wallet /> Overview
+              <Icon name="wallet" size={20} /> Overview
             </p>
             <a href="#wallet-activity">
-              <ArrowLeftRight /> Activity
+              <Icon name="arrows-left-right" size={20} tone="current" /> Activity
             </a>
           </div>
           <div className={s.profile}>
@@ -98,7 +102,7 @@ export function WalletPreview() {
             </span>
           </div>
           <div className={s.overview}>
-            <div className={s.balance}>
+            <Card className={s.balance}>
               {panel ? (
                 <div className={s.panel}>
                   <div className={s.panelHeading}>
@@ -111,7 +115,7 @@ export function WalletPreview() {
                       aria-label="Close wallet action"
                       onClick={() => setPanel(null)}
                     >
-                      <X />
+                      <Icon name="close" size={20} tone="current" />
                     </Button>
                   </div>
                   {panel === "Pay" ? (
@@ -124,13 +128,15 @@ export function WalletPreview() {
                           : "Paid from your available wallet balance."}
                       </span>
                       <Button
+                        size="sm"
                         className={s.primary}
                         onClick={() => setConfirmed(true)}
                         disabled={confirmed}
                       >
                         {confirmed ? (
                           <>
-                            <Check /> Confirmed
+                            <Icon name="check" size={20} tone="current" />{" "}
+                            Confirmed
                           </>
                         ) : (
                           "Confirm demo payment"
@@ -145,6 +151,7 @@ export function WalletPreview() {
                         Share your handle to receive supported payments.
                       </span>
                       <Button
+                        size="sm"
                         className={s.primary}
                         onClick={async () => {
                           try {
@@ -157,7 +164,8 @@ export function WalletPreview() {
                           }
                         }}
                       >
-                        <Copy /> {copied ? "Handle copied" : "Copy handle"}
+                        <Icon name="copy" size={20} tone="current" />{" "}
+                        {copied ? "Handle copied" : "Copy handle"}
                       </Button>
                     </>
                   )}
@@ -166,7 +174,7 @@ export function WalletPreview() {
                 <>
                   <div className={s.balanceLabel}>
                     <span>Available balance</span>
-                    <span>USD</span>
+                    <span className={s.currency}>USD</span>
                   </div>
                   <strong className={s.amount}>
                     $1,450<span>.00</span>
@@ -174,40 +182,42 @@ export function WalletPreview() {
                   <p>Ready for what’s next.</p>
                   <div className={s.actions}>
                     <Button
-                      className={s.primary}
+                      size="sm"
                       onClick={() => {
                         setConfirmed(false);
                         setPanel("Pay");
                       }}
                     >
-                      <ArrowUpRight /> Pay
+                      <Icon name="arrow-up-right" size={20} tone="current" /> Pay
                     </Button>
                     <Button
-                      className={s.secondary}
+                      variant="outline"
+                      size="sm"
                       onClick={() => {
                         setCopied(false);
                         setPanel("Receive");
                       }}
                     >
-                      <ArrowDownLeft /> Receive
+                      <Icon name="arrow-down-left" size={20} tone="current" />{" "}
+                      Receive
                     </Button>
                   </div>
                 </>
               )}
-            </div>
+            </Card>
             <div className={s.summary}>
               <span className={s.caption}>This month</span>
               <div>
-                <span className={s.flowIcon}>
-                  <ArrowDownLeft />
+                <span className={s.flowIcon} data-direction="in">
+                  <Icon name="arrow-down-left" size={20} tone="current" />
                 </span>
                 <span>
                   Money in<strong>$2,480.00</strong>
                 </span>
               </div>
               <div>
-                <span className={s.flowIcon}>
-                  <ArrowUpRight />
+                <span className={s.flowIcon} data-direction="out">
+                  <Icon name="arrow-up-right" size={20} tone="current" />
                 </span>
                 <span>
                   Money out<strong>$1,030.00</strong>
@@ -227,20 +237,31 @@ export function WalletPreview() {
             </div>
             {detail ? (
               <div className={s.detail}>
-                <Button variant="ghost" onClick={() => setSelected(null)}>
-                  <ArrowLeft /> All activity
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setSelected(null)}
+                >
+                  <Icon name="arrow-left" size={20} tone="current" /> All
+                  activity
                 </Button>
                 <div className={s.detailBody}>
-                  <span className={s.serviceIcon} data-color={detail.color}>
-                    <detail.icon />
+                  <span
+                    className={s.serviceIcon}
+                    data-color={detail.color}
+                    data-hue={hues[detail.color]}
+                  >
+                    <Icon name={detail.icon} size={24} tone="current" />
                   </span>
                   <h4>{detail.name}</h4>
-                  <strong>{detail.amount}</strong>
+                  <strong data-incoming={detail.type === "Received"}>
+                    {detail.amount}
+                  </strong>
                   <p>
                     {detail.service} · {detail.date}
                   </p>
                   <span>
-                    <Check /> Completed
+                    <Icon name="check" size={20} tone="current" /> Completed
                   </span>
                 </div>
               </div>
@@ -256,6 +277,7 @@ export function WalletPreview() {
                       <Button
                         key={label}
                         variant="ghost"
+                        size="sm"
                         aria-pressed={filter === label}
                         onClick={() => setFilter(label)}
                       >
@@ -283,8 +305,12 @@ export function WalletPreview() {
                         aria-label={`View ${t.name}, ${t.amount}`}
                       >
                         <span className={s.transaction}>
-                          <span className={s.serviceIcon} data-color={t.color}>
-                            <t.icon />
+                          <span
+                            className={s.serviceIcon}
+                            data-color={t.color}
+                            data-hue={hues[t.color]}
+                          >
+                            <Icon name={t.icon} size={20} tone="current" />
                           </span>
                           <span>
                             {t.name}
@@ -293,7 +319,8 @@ export function WalletPreview() {
                         </span>
                         <span className={s.date}>{t.date}</span>
                         <span className={s.status}>
-                          <Check /> Completed
+                          <Icon name="check" size={20} tone="current" />{" "}
+                          Completed
                         </span>
                         <strong data-incoming={t.type === "Received"}>
                           {t.amount}
@@ -305,7 +332,7 @@ export function WalletPreview() {
             )}
           </section>
           <footer className={s.footer}>
-            <Wallet />
+            <Icon name="wallet" size={20} tone="current" />
             <span>One wallet across supported WorldStreet services.</span>
           </footer>
         </div>

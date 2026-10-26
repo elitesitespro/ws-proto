@@ -1,0 +1,552 @@
+/* Worldwork in its own black and white (work.worldstreetgold.com and its
+   block on worldstreetgold.com): a trade's photograph, monochrome, beside
+   the directory. White is the way to act (pick, call); grey is the rest. */
+.stage {
+  --ink: #0a0a0a;
+  --card: #171717;
+  --raised: #262626;
+  --hair: rgba(255, 255, 255, 0.1);
+  --muted: #a1a1a1;
+  height: 100%;
+  display: grid;
+  grid-template-columns: minmax(0, 0.78fr) minmax(0, 1.22fr);
+  grid-template-rows: minmax(0, 1fr);
+  gap: 24px;
+  color: #fafafa;
+  text-align: left;
+}
+
+/* The trade's photograph, with a review on it */
+.photo {
+  position: relative;
+  margin: 0;
+  min-height: 0;
+  overflow: hidden;
+  border-radius: 24px;
+  background: var(--card);
+  box-shadow: 0 0 0 1px var(--hair);
+}
+.photo img {
+  object-fit: cover;
+  filter: grayscale(1) contrast(1.1) brightness(0.85);
+  animation: develop 700ms ease-out both;
+}
+.photo::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, transparent 35%, rgba(10, 10, 10, 0.92));
+}
+.photo figcaption {
+  position: absolute;
+  z-index: 1;
+  inset: auto 20px 20px;
+  display: grid;
+  gap: 8px;
+}
+.stars {
+  display: flex;
+  gap: 2px;
+}
+.photo q {
+  font-size: var(--text-sm);
+  font-weight: 600;
+  line-height: 1.35;
+  letter-spacing: -0.01em;
+}
+.photo small {
+  color: var(--muted);
+  font-size: 11px;
+}
+
+/* The directory */
+.finder {
+  display: grid;
+  grid-template-rows: auto auto auto auto minmax(0, 1fr);
+  gap: 12px;
+  min-height: 0;
+  align-content: start;
+}
+.ask {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 4px 4px 16px;
+  border-radius: var(--cx-r-pill);
+  background: var(--card);
+  box-shadow: inset 0 0 0 1px var(--hair);
+  color: var(--muted);
+}
+.ask:focus-within {
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.45);
+}
+.ask input {
+  flex: 1;
+  min-width: 0;
+  height: 36px;
+  border: 0;
+  background: none;
+  color: #fafafa;
+  font: inherit;
+  font-size: var(--text-xs);
+  outline: none;
+}
+.ask input::placeholder {
+  color: #737373;
+}
+/* On a touch screen, 16px: any smaller and iOS zooms the page in on a tap */
+@media (pointer: coarse) {
+  .ask input {
+    font-size: 16px;
+  }
+}
+.ask button {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 36px;
+  height: 36px;
+  border: 0;
+  border-radius: 50%;
+  background: #fafafa;
+  color: var(--ink);
+  cursor: pointer;
+}
+.ask button:disabled {
+  background: var(--raised);
+  color: #737373;
+  cursor: default;
+}
+.trades {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.trades button {
+  padding: 0 12px;
+  border: 0;
+  border-radius: var(--cx-r-pill);
+  background: var(--raised);
+  color: #d4d4d4;
+  font: inherit;
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 28px;
+  cursor: pointer;
+  transition:
+    background 160ms ease,
+    color 160ms ease;
+}
+.trades button:hover {
+  background: #333;
+  color: #fafafa;
+}
+.trades button[aria-pressed="true"] {
+  background: #fafafa;
+  color: var(--ink);
+}
+.label {
+  color: var(--muted);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+/* A ruler out from you: who's where, the one you've picked raised */
+.ruler {
+  position: relative;
+  height: 52px;
+  margin-inline: 12px 16px;
+}
+.track {
+  position: absolute;
+  inset: 26px 0 auto;
+  height: 8px;
+  background:
+    repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.28) 0 1px, transparent 1px 5%) 0 0 / 100% 100% no-repeat;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.28);
+}
+.mark,
+.you {
+  position: absolute;
+  top: 40px;
+  color: #737373;
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+.mark {
+  left: var(--at);
+  transform: translateX(-50%);
+}
+.mark:last-of-type {
+  transform: translateX(-100%);
+}
+.you {
+  left: 0;
+  color: #fafafa;
+}
+.you::before {
+  content: "";
+  position: absolute;
+  left: -3px;
+  top: -10px;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #fafafa;
+  box-shadow: 0 0 0 4px rgba(250, 250, 250, 0.15);
+}
+.pin {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  transition: transform 600ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+.pin b {
+  position: absolute;
+  left: 0;
+  top: 0;
+  display: grid;
+  place-items: center;
+  min-width: 28px;
+  height: 22px;
+  padding: 0 6px;
+  border-radius: 6px;
+  background: var(--raised);
+  color: #d4d4d4;
+  font-size: 10px;
+  font-weight: 700;
+  transform: translateX(-50%);
+  transition:
+    background 200ms ease,
+    color 200ms ease,
+    transform 300ms cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.pin b::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 100%;
+  width: 2px;
+  height: 8px;
+  background: inherit;
+  transform: translateX(-50%);
+}
+.pin[data-picked] {
+  z-index: 1;
+}
+.pin[data-picked] b {
+  background: #fafafa;
+  color: var(--ink);
+  transform: translateX(-50%) translateY(-2px) scale(1.1);
+}
+
+/* The providers, closest first: the distance big, as on worldstreetgold.com */
+.rows {
+  display: grid;
+  align-content: start;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border-top: 1px solid var(--hair);
+}
+.rows li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 8px 8px 0;
+  border-bottom: 1px solid var(--hair);
+  animation: row 480ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+.rows li:nth-child(2) {
+  animation-delay: 60ms;
+}
+.rows li:nth-child(3) {
+  animation-delay: 120ms;
+}
+.who {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 4px 8px;
+  border: 0;
+  border-radius: 14px;
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: background 160ms ease;
+}
+.who:hover,
+.who[aria-pressed="true"] {
+  background: rgba(255, 255, 255, 0.05);
+}
+.km {
+  display: flex;
+  align-items: baseline;
+  gap: 2px;
+  min-width: 2.6em;
+  color: #fafafa;
+  font-size: var(--text-3xl);
+  font-weight: 800;
+  letter-spacing: -0.06em;
+  line-height: 1;
+}
+.rows li:not([data-picked]) .km {
+  color: #525252;
+}
+.km small {
+  color: var(--muted);
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+.name {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+.name strong {
+  overflow: hidden;
+  font-size: var(--text-sm);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.name > span {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--muted);
+  font-size: 11px;
+}
+.dial {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+  padding: 0 16px;
+  border: 0;
+  border-radius: var(--cx-r-pill);
+  background: #fafafa;
+  color: var(--ink);
+  font: inherit;
+  font-size: var(--text-xs);
+  font-weight: 700;
+  line-height: 40px;
+  cursor: pointer;
+  transition: transform 160ms ease;
+}
+.rows li:not([data-picked]) .dial {
+  background: none;
+  color: #fafafa;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.3);
+}
+.dial:hover {
+  transform: translateY(-1px);
+}
+.dial:active {
+  transform: scale(0.96);
+}
+
+/* The call: ringing, then on the line */
+.call {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto auto;
+  align-items: center;
+  align-self: start;
+  gap: 12px;
+  padding: 16px;
+  border-radius: 20px;
+  background: var(--card);
+  box-shadow: inset 0 0 0 1px var(--hair);
+  animation: row 420ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+.call > div {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+.call strong {
+  overflow: hidden;
+  font-size: var(--text-sm);
+  font-weight: 700;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.call > div > span {
+  color: var(--muted);
+  font-size: 11px;
+}
+.avatar {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: #fafafa;
+  color: var(--ink);
+  font-size: var(--text-xs);
+  font-weight: 800;
+}
+.avatar[data-ringing]::before,
+.avatar[data-ringing]::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border: 1px solid rgba(250, 250, 250, 0.6);
+  border-radius: 50%;
+  animation: ring 1.4s ease-out infinite;
+}
+.avatar[data-ringing]::after {
+  animation-delay: 0.7s;
+}
+.save,
+.hang {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  border: 0;
+  border-radius: var(--cx-r-pill);
+  font: inherit;
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+}
+.save {
+  padding: 0 12px;
+  background: var(--raised);
+  color: #fafafa;
+  line-height: 36px;
+}
+.save[aria-pressed="true"] {
+  background: #fafafa;
+  color: var(--ink);
+}
+.hang {
+  width: 40px;
+  height: 40px;
+  background: var(--cx-loss);
+  color: #fff;
+}
+.direct {
+  grid-column: 1 / -1;
+  padding-top: 12px;
+  border-top: 1px solid var(--hair);
+  color: var(--muted);
+  font-size: 11px;
+}
+.ask button:focus-visible,
+.trades button:focus-visible,
+.who:focus-visible,
+.dial:focus-visible,
+.save:focus-visible,
+.hang:focus-visible {
+  outline: 2px solid #fafafa;
+  outline-offset: 2px;
+}
+
+@keyframes develop {
+  from {
+    opacity: 0;
+    transform: scale(1.04);
+  }
+}
+@keyframes row {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
+@keyframes ring {
+  from {
+    opacity: 1;
+    transform: scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: scale(1.7);
+  }
+}
+
+/* A shorter laptop: two providers, a smaller distance */
+@media (min-width: 1024px) and (max-height: 850px) {
+  .rows li:nth-child(3) {
+    display: none;
+  }
+  .km {
+    font-size: var(--text-2xl);
+  }
+  .finder {
+    gap: 10px;
+  }
+}
+/* A tablet or a phone: the directory alone */
+@media (max-width: 1023px) {
+  .stage {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .photo {
+    display: none;
+  }
+}
+@media (max-width: 600px) {
+  .trades {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    scrollbar-width: none;
+    mask-image: linear-gradient(90deg, #000 85%, transparent);
+  }
+  .trades button {
+    flex-shrink: 0;
+  }
+  .km {
+    min-width: 2.2em;
+    font-size: var(--text-2xl);
+  }
+  .who {
+    gap: 10px;
+    padding: 4px;
+  }
+  .dial {
+    padding: 0 12px;
+  }
+  .call {
+    grid-template-columns: auto minmax(0, 1fr) auto;
+  }
+  .save {
+    grid-column: 1 / -1;
+    grid-row: 2;
+  }
+}
+@media (max-width: 600px) and (max-height: 740px) {
+  .rows li:nth-child(3),
+  .label {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .photo img,
+  .rows li,
+  .call,
+  .avatar[data-ringing]::before,
+  .avatar[data-ringing]::after {
+    animation: none;
+  }
+  .pin,
+  .pin b {
+    transition: none;
+  }
+}

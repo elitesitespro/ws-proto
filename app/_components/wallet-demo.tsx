@@ -1,19 +1,9 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import {
-  ArrowDownLeft,
-  ArrowRight,
-  Check,
-  Headphones,
-  Pause,
-  Play,
-  Radio,
-  RotateCcw,
-  Wallet,
-  BriefcaseBusiness,
-} from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import { Icon } from "@/components/icon";
 import s from "./wallet-demo.module.css";
 
 type Kind = "Pay" | "Receive" | "Track" | "Move";
@@ -92,7 +82,7 @@ function Demo({ kind, replay }: { kind: Kind; replay: () => void }) {
   );
   const move = Math.min(1, Math.max(0, (time - 2200) / 2200));
   return (
-    <div
+    <Card
       ref={root}
       className={s.demo}
       data-kind={kind}
@@ -101,7 +91,7 @@ function Demo({ kind, replay }: { kind: Kind; replay: () => void }) {
     >
       <header className={s.header}>
         <span>
-          <Wallet /> Demo
+          <Icon name="wallet" size={20} /> Demo
         </span>
         <div>
           <Button
@@ -111,7 +101,11 @@ function Demo({ kind, replay }: { kind: Kind; replay: () => void }) {
             disabled={done}
             onClick={() => setPaused((v) => !v)}
           >
-            {paused ? <Play /> : <Pause />}
+            {paused ? (
+              <Icon name="play" size={20} tone="current" />
+            ) : (
+              <Icon name="pause" size={20} tone="current" />
+            )}
           </Button>
           <Button
             variant="ghost"
@@ -119,7 +113,7 @@ function Demo({ kind, replay }: { kind: Kind; replay: () => void }) {
             aria-label={`Replay ${kind} demo`}
             onClick={replay}
           >
-            <RotateCcw />
+            <Icon name="rotate-ccw" size={20} tone="current" />
           </Button>
         </div>
       </header>
@@ -127,7 +121,7 @@ function Demo({ kind, replay }: { kind: Kind; replay: () => void }) {
         {kind === "Pay" && (
           <div className={s.checkout}>
             <div className={s.product}>
-              <Headphones aria-hidden="true" />
+              <Icon name="headphones" size={64} />
               <span>WorldStreet shop</span>
             </div>
             <div className={s.row}>
@@ -135,7 +129,7 @@ function Demo({ kind, replay }: { kind: Kind; replay: () => void }) {
               <strong>$129</strong>
             </div>
             <div className={s.balance}>
-              <Wallet />
+              <Icon name="wallet" size={24} />
               <span>
                 Wallet balance
                 <strong>${stage === 2 ? "1,071" : "1,200"}.00</strong>
@@ -151,11 +145,11 @@ function Demo({ kind, replay }: { kind: Kind; replay: () => void }) {
             >
               {stage === 2 ? (
                 <>
-                  <Check /> Paid
+                  <Icon name="check" size={20} tone="current" /> Paid
                 </>
               ) : (
                 <>
-                  Pay $129 <ArrowRight />
+                  Pay $129 <Icon name="arrow-right" size={20} tone="current" />
                 </>
               )}
             </Button>
@@ -164,19 +158,19 @@ function Demo({ kind, replay }: { kind: Kind; replay: () => void }) {
         {kind === "Receive" && (
           <div className={s.receive}>
             <div className={s.signal}>
-              <ArrowDownLeft />
+              <Icon name="arrow-down-left" size={32} tone="current" />
             </div>
             <span>Available balance</span>
             <strong className={s.total}>
               ${amount.toLocaleString("en-US")}
             </strong>
             <div className={s.receipt} data-visible={stage > 0}>
-              <BriefcaseBusiness />
+              <Icon name="briefcase" size={20} />
               <div>
                 Project payment<strong>+$250.00</strong>
                 <span>From WorkWorld</span>
               </div>
-              <Check />
+              <Icon name="check" size={20} tone="current" />
             </div>
           </div>
         )}
@@ -195,21 +189,21 @@ function Demo({ kind, replay }: { kind: Kind; replay: () => void }) {
               ))}
             </div>
             <div className={s.transaction}>
-              <BriefcaseBusiness />
+              <Icon name="briefcase" size={20} />
               <span>
                 WorkWorld<small>Project earnings</small>
               </span>
-              <strong>+$250</strong>
+              <strong data-incoming="true">+$250</strong>
             </div>
             <div className={s.transaction} data-visible={stage > 0}>
-              <Headphones />
+              <Icon name="headphones" size={20} />
               <span>
                 Shop<small>Headphones</small>
               </span>
               <strong>−$129</strong>
             </div>
             <div className={s.transaction} data-visible={stage === 2}>
-              <Radio />
+              <Icon name="radio" size={20} />
               <span>
                 Xtream<small>Balance transfer</small>
               </span>
@@ -220,7 +214,7 @@ function Demo({ kind, replay }: { kind: Kind; replay: () => void }) {
         {kind === "Move" && (
           <div className={s.move}>
             <div className={s.account}>
-              <Wallet />
+              <Icon name="wallet" size={24} />
               <span>
                 Universal wallet
                 <strong>
@@ -233,15 +227,17 @@ function Demo({ kind, replay }: { kind: Kind; replay: () => void }) {
                 className={s.packet}
                 style={{ transform: `translateY(${move * 64}px)` }}
               >
-                $50 <ArrowDownLeft />
+                $50 <Icon name="arrow-down-left" size={20} tone="current" />
               </span>
             </div>
             <div className={s.account}>
-              <Radio />
+              <Icon name="radio" size={24} />
               <span>
                 Xtream<strong>${Math.round(move * 50)}.00</strong>
               </span>
-              {stage === 2 && <Check />}
+              {stage === 2 && (
+                <Icon name="check" size={20} tone="current" />
+              )}
             </div>
             <span className={s.note}>
               {stage === 2
@@ -257,6 +253,6 @@ function Demo({ kind, replay }: { kind: Kind; replay: () => void }) {
         </div>
         <p aria-live="polite">{captions[kind][stage]}</p>
       </footer>
-    </div>
+    </Card>
   );
 }

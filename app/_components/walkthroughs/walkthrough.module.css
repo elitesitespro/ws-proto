@@ -1,5 +1,9 @@
+/* A WorldStreet product screen: the scene is the kit's corner-lit card
+   (<Card>), panels inside it are raised fills, and the platform's hue
+   (data-hue on the scene, app/hues.css) marks its glyphs, rings, bars and
+   art. Gold is the next-step action and the step you're on; green only
+   marks a price going up. */
 .scene {
-  --accent: #c0a8ff;
   height: 100%;
   min-width: 0;
   min-height: 0;
@@ -7,22 +11,29 @@
   display: grid;
   grid-template-rows: auto minmax(0, 1fr) auto;
   gap: 24px;
-  background: #151214;
-  color: #f7f3f5;
+  color: var(--cx-text);
   font-size: var(--text-xs);
   overflow: hidden;
 }
 .scene * {
   min-width: 0;
 }
-.entertainment {
-  --accent: #f6ba86;
+/* Product screens sit on plain stone: the card's corner light stays, its
+   gold wash doesn't (gold is for the action, not the screen). */
+.scene::before {
+  display: none;
 }
-.lifestyle {
-  --accent: #d4ef92;
+/* WorkWorld and WorldHealth have no hue in the hub: their own sage and
+   mint, softened to the family's one lightness and low saturation. */
+.scene[data-hue="work"] {
+  --hue: #a9c3a0;
+  --hue-rgb: 169, 195, 160;
+  --hue-ink: #c6dbbf;
 }
-.markets {
-  --accent: #bbafff;
+.scene[data-hue="health"] {
+  --hue: #a3c9bb;
+  --hue-rgb: 163, 201, 187;
+  --hue-ink: #c3e2d7;
 }
 .header,
 .row,
@@ -45,16 +56,7 @@
 }
 .demo,
 .muted {
-  opacity: 0.65;
-}
-.iconButton {
-  width: 32px;
-  height: 32px;
-  min-height: 32px;
-  padding: 0;
-  flex-shrink: 0;
-  color: inherit;
-  background: #ffffff0d;
+  color: var(--cx-text-muted);
 }
 .body {
   min-height: 0;
@@ -82,49 +84,46 @@
   display: flex;
   gap: 8px;
 }
+/* The kit's stepper: done steps light, the one you're on gold. */
 .steps i {
   height: 4px;
   flex: 1;
-  border-radius: 4px;
-  background: #ffffff18;
+  border-radius: var(--cx-r-pill);
+  background: var(--cx-surface-3);
   transition: background 300ms;
 }
 .steps i[data-done="true"] {
-  background: var(--accent);
+  background: var(--cx-text-2);
 }
-.action {
-  background: var(--accent);
-  color: #19131c;
-  min-height: 40px;
-  padding: 8px 16px;
-  transition: transform 180ms;
-}
-.action:hover {
-  background: var(--accent);
-  filter: brightness(1.1);
+.steps i[data-current="true"] {
+  background: var(--cx-ember);
 }
 .action[data-pressing="true"] {
   transform: scale(0.94);
-  box-shadow: 0 0 0 8px #ffffff10;
+  box-shadow: 0 0 0 8px var(--cx-brand-wash);
 }
 .scene h3 {
   font-size: var(--text-xl);
-  font-weight: 600;
+  font-weight: 500;
   line-height: 1.05;
-  letter-spacing: -0.04em;
+  letter-spacing: var(--cx-h3-ls);
 }
 .scene strong,
 .scene b {
-  font-weight: 600;
+  font-weight: 500;
 }
 .accent {
-  color: var(--accent);
+  color: var(--hue-ink);
+}
+.gain {
+  color: var(--cx-gain);
+  font-variant-numeric: tabular-nums;
 }
 .row {
   justify-content: space-between;
 }
 .status,
-.redPill {
+.mediaChip {
   display: inline-flex;
   align-items: center;
   gap: 8px;
@@ -132,19 +131,26 @@
   line-height: 1.3;
 }
 .status {
-  color: var(--accent);
+  color: var(--hue-ink);
 }
-.redPill {
-  background: #e7294d;
-  color: #fff;
-  border-radius: 24px;
+/* Labels over a photo or film still (Live, On air, a genre, a scene
+   number) are glass chips: the kit material comes from cx-chip--glass in
+   the TSX, so no fill or colour here. The platform hue marks the glyph
+   (Xstream's coral is the hub's colour for live). */
+.mediaChip {
+  width: fit-content;
+  border-radius: var(--cx-r-pill);
   padding: 8px 16px;
+  font-weight: 500;
+}
+.mediaChip > svg {
+  color: var(--hue);
 }
 .photo {
   position: relative;
   min-height: 0;
   overflow: hidden;
-  border-radius: 16px;
+  border-radius: var(--cx-r-md);
 }
 .photo img {
   object-fit: cover;
@@ -154,7 +160,7 @@
   position: relative;
   height: 100%;
   overflow: hidden;
-  border-radius: 16px;
+  border-radius: var(--cx-r-md);
   isolation: isolate;
 }
 .broadcast > .photo,
@@ -169,7 +175,10 @@
   position: absolute;
   inset: 0;
   z-index: -1;
-  background: linear-gradient(transparent, #100c12e8);
+  background: linear-gradient(
+    transparent,
+    color-mix(in srgb, var(--cx-bg) 91%, transparent)
+  );
 }
 .broadcast > .photo img {
   object-position: center 30%;
@@ -192,14 +201,17 @@
 .broadcastBottom h3 {
   max-width: 560px;
 }
+/* Chat messages float over the stream as glass (cx-liquid in the TSX). */
 .chat {
   display: flex;
   gap: 8px;
   align-items: center;
   padding: 8px 16px;
-  background: #282327;
   width: fit-content;
-  border-radius: 16px;
+  border-radius: var(--cx-r-md);
+}
+.chat > svg {
+  color: var(--hue);
 }
 .scene [data-show="false"] {
   opacity: 0;
@@ -230,7 +242,7 @@
 .camera .photo {
   height: 100%;
 }
-.camera > .redPill {
+.camera > .mediaChip {
   position: absolute;
   top: 16px;
   left: 16px;
@@ -254,14 +266,14 @@
 }
 .progress {
   height: 8px;
-  background: #ffffff30;
-  border-radius: 8px;
+  background: rgba(var(--cx-fg-rgb), 0.16);
+  border-radius: var(--cx-r-pill);
   overflow: hidden;
 }
 .progress i {
   display: block;
   height: 100%;
-  background: var(--accent);
+  background: var(--hue);
   transition: width 100ms linear;
 }
 .filmEditor {
@@ -275,12 +287,12 @@
   gap: 16px;
   align-items: center;
   padding: 24px;
-  border-radius: 16px;
-  background: #2d2436;
+  border-radius: var(--cx-r-md);
+  background: var(--cx-surface-2);
 }
 .prompt svg {
   flex-shrink: 0;
-  color: var(--accent);
+  color: var(--hue);
 }
 .storyboard {
   display: grid;
@@ -293,9 +305,10 @@
   grid-template-rows: minmax(0, 1fr) auto;
   gap: 8px;
 }
+/* The storyboard frames are artwork: their own skies stay. */
 .storyArt {
   position: relative;
-  border-radius: 16px;
+  border-radius: var(--cx-r-icon);
   background: linear-gradient(160deg, #b29bd2, #3d355c);
   overflow: hidden;
 }
@@ -322,10 +335,12 @@
     100% 100%
   );
 }
+/* The scene number is a light glass chip over the frame's pastel sky. */
 .storyArt span {
   position: absolute;
   top: 16px;
   left: 16px;
+  padding: 4px 12px;
 }
 .art1 {
   background: linear-gradient(150deg, #f6bb7c, #ba687c);
@@ -339,20 +354,20 @@
   gap: 8px;
   position: relative;
   padding: 8px;
-  background: #282327;
-  border-radius: 8px;
+  background: var(--cx-surface-2);
+  border-radius: var(--cx-r-icon);
 }
 .editTrack i {
   flex: 1;
-  background: #ad94c8;
-  border-radius: 4px;
+  background: rgba(var(--hue-rgb), 0.5);
+  border-radius: var(--cx-r-xs);
 }
 .editTrack b {
   position: absolute;
   top: 0;
   bottom: 0;
   width: 4px;
-  background: #fff;
+  background: var(--cx-text);
   transition: left 100ms;
 }
 .game {
@@ -367,8 +382,12 @@
   justify-content: space-between;
 }
 .gameScore b {
-  color: var(--accent);
+  color: var(--hue-ink);
   margin-left: 8px;
+  font-variant-numeric: tabular-nums;
+}
+.gameScore > svg {
+  color: var(--hue);
 }
 .gameBoard {
   display: grid;
@@ -378,31 +397,33 @@
 }
 .gameBoard > div {
   height: 112px;
-  border-radius: 16px;
+  border-radius: var(--cx-r-md);
   display: grid;
   place-items: center;
-  background: #31243f;
-  color: #cdb2f1;
+  background: var(--cx-surface-2);
+  color: var(--cx-text-muted);
   font-size: var(--text-xl);
   transition:
     transform 500ms,
     background 500ms;
 }
 .gameBoard > div[data-flipped="true"] {
-  background: #dded9c;
-  color: #222c14;
+  background: var(--hue);
+  color: var(--hue-on);
   transform: rotateY(360deg);
 }
+/* The product shot: WorldStore's brass as the backdrop, the headphones
+   in the finish you pick (Midnight, then Sage). */
 .productArt {
   height: 100%;
-  border-radius: 24px;
+  border-radius: var(--cx-r-md);
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
   gap: 32px;
-  background: #ddd1b5;
-  color: #302f34;
+  background: var(--hue);
+  color: var(--hue-on);
   transition:
     background 800ms,
     color 800ms;
@@ -411,20 +432,26 @@
   width: 64%;
   height: 50%;
 }
+.productArt > svg :global(.f) {
+  stroke-width: 1;
+}
 .productArt[data-finish="true"] {
-  background: #dce6cc;
-  color: #6d8064;
+  background: var(--hue-ink);
+  color: #4f5e48;
 }
 .productArt > span {
   font-size: var(--text-lg);
 }
 .price {
   font-size: var(--text-2xl);
+  font-weight: 300;
+  letter-spacing: -2px;
+  font-variant-numeric: tabular-nums;
 }
 .swatches i {
   height: 32px;
   width: 32px;
-  background: #514d56;
+  background: #57534e;
   border-radius: 50%;
   border: 4px solid transparent;
 }
@@ -432,17 +459,17 @@
   background: #96a48a;
 }
 .swatches i[data-selected="true"] {
-  border-color: var(--accent);
+  border-color: var(--cx-text);
 }
 .receipt {
   max-width: 480px;
   padding: 32px;
-  background: #eee8dc;
-  color: #30291f;
-  border-radius: 16px;
+  background: var(--cx-surface-2);
+  border-radius: var(--cx-r-card);
   display: flex;
   flex-direction: column;
   gap: 24px;
+  font-variant-numeric: tabular-nums;
 }
 .receiptIcon {
   width: 64px;
@@ -450,15 +477,16 @@
   display: grid;
   place-items: center;
   border-radius: 50%;
-  background: #d1ddb8;
+  background: var(--hue-soft);
+  color: var(--hue-ink);
 }
 .receipt .row {
   padding-bottom: 8px;
-  border-bottom: 1px dashed #30291f40;
+  border-bottom: 1px dashed var(--cx-hairline);
 }
 .receiptNote {
-  background: #dadfc8;
-  border-radius: 8px;
+  background: var(--cx-surface-3);
+  border-radius: var(--cx-r-icon);
   padding: 16px;
 }
 .work {
@@ -467,16 +495,17 @@
   align-items: end;
   padding: 32px;
   isolation: isolate;
-  border-radius: 24px;
+  border-radius: var(--cx-r-md);
   overflow: hidden;
 }
+/* The map is artwork in WorkWorld's sage. */
 .map {
   position: absolute;
   inset: 0;
-  background: #ced6be;
+  background: var(--hue);
   z-index: -1;
   overflow: hidden;
-  color: #27372e;
+  color: var(--hue-on);
 }
 .map i {
   position: absolute;
@@ -484,7 +513,7 @@
   width: 32px;
   top: -30%;
   left: 20%;
-  background: #eaf0e0;
+  background: rgba(255, 255, 255, 0.4);
   transform: rotate(30deg);
 }
 .map i:nth-child(2) {
@@ -509,12 +538,16 @@
   left: 32px;
   font-size: var(--text-lg);
 }
+/* The role floats over the map as light glass (cx-liquid cx-glass-light in
+   the TSX): ink text, and its labels in the glass's secondary ink. */
 .job {
   width: 100%;
   padding: 24px;
-  border-radius: 16px;
-  background: #20372d;
+  border-radius: var(--cx-r-md);
   gap: 16px;
+}
+.job .status {
+  color: var(--cx-glass-text-2);
 }
 .course {
   display: grid;
@@ -535,11 +568,11 @@
   width: 280px;
   height: 280px;
   border-radius: 50%;
-  background: #cdddc0;
-  color: #294434;
+  background: var(--hue);
+  color: var(--hue-on);
   box-shadow:
-    0 0 0 16px #cdddc014,
-    0 0 0 32px #cdddc009;
+    0 0 0 16px rgba(var(--hue-rgb), 0.08),
+    0 0 0 32px rgba(var(--hue-rgb), 0.04);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -563,6 +596,9 @@
   align-items: center;
   gap: 8px;
 }
+.routine > span > svg {
+  color: var(--hue);
+}
 .days {
   display: flex;
   gap: 8px;
@@ -574,11 +610,11 @@
   display: grid;
   place-items: center;
   border-radius: 50%;
-  background: #ffffff10;
+  background: var(--cx-surface-3);
 }
 .days span[data-done="true"] {
-  background: var(--accent);
-  color: #20372d;
+  background: var(--hue);
+  color: var(--hue-on);
 }
 .market,
 .prediction {
@@ -590,7 +626,8 @@
 }
 .quote {
   font-size: var(--text-4xl);
-  letter-spacing: -0.05em;
+  font-weight: 300;
+  letter-spacing: -2px;
   line-height: 1;
   font-variant-numeric: tabular-nums;
 }
@@ -602,12 +639,12 @@
   overflow: visible;
 }
 .gridLine {
-  stroke: #ffffff16;
+  stroke: var(--cx-chart-grid);
   stroke-width: 1;
   fill: none;
 }
 .chartLine {
-  stroke: var(--accent);
+  stroke: var(--hue);
   stroke-width: 4;
   fill: none;
   vector-effect: non-scaling-stroke;
@@ -615,9 +652,9 @@
 }
 .marketFoot {
   min-height: 48px;
-  background: #282327;
+  background: var(--cx-surface-2);
   padding: 16px;
-  border-radius: 16px;
+  border-radius: var(--cx-r-md);
 }
 .orders {
   display: flex;
@@ -626,9 +663,12 @@
 }
 .orderRow {
   padding: 24px;
-  background: #282327;
-  border-radius: 16px;
+  background: var(--cx-surface-2);
+  border-radius: var(--cx-r-md);
   border: 1px solid transparent;
+}
+.orderRow > svg {
+  color: var(--hue);
 }
 .orderRow > div {
   flex: 1;
@@ -637,15 +677,16 @@
   gap: 8px;
 }
 .orderRow[data-active="true"] {
-  border-color: var(--accent);
+  border-color: var(--hue);
 }
 .orderDetail {
   padding: 24px;
-  border-radius: 16px;
-  background: #221e29;
+  border-radius: var(--cx-r-md);
+  background: var(--cx-surface);
   display: flex;
   flex-direction: column;
   gap: 16px;
+  font-variant-numeric: tabular-nums;
 }
 .orderSteps {
   justify-content: space-between;
@@ -658,7 +699,7 @@
 }
 .orderSteps > span[data-done="true"] {
   opacity: 1;
-  color: var(--accent);
+  color: var(--hue-ink);
 }
 .crypto {
   height: 100%;
@@ -673,12 +714,13 @@
 }
 .assetRail > span {
   padding: 16px;
-  border-radius: 16px;
-  background: #282327;
+  border-radius: var(--cx-r-md);
+  background: var(--cx-surface-2);
 }
 .assetRail > span[data-active="true"] {
-  background: var(--accent);
-  color: #241e2e;
+  background: var(--hue-soft);
+  color: var(--hue-ink);
+  box-shadow: inset 0 0 0 1px var(--hue-line);
 }
 .assetDetail {
   display: flex;
@@ -688,12 +730,12 @@
   gap: 16px;
 }
 .assetDetail > svg:first-child {
-  color: #f5c66b;
+  color: var(--hue);
 }
 .calendarDate {
-  background: #c6b8e5;
-  color: #312044;
-  border-radius: 24px;
+  background: var(--hue);
+  color: var(--hue-on);
+  border-radius: var(--cx-r-md);
   height: 100%;
   display: flex;
   flex-direction: column;
@@ -704,6 +746,7 @@
 }
 .calendarDate > strong {
   font-size: var(--text-display);
+  font-weight: 400;
   line-height: 1;
   letter-spacing: -0.06em;
 }
@@ -712,32 +755,36 @@
   grid-template-columns: 1fr 1fr;
   gap: 16px;
 }
+/* Yes leads in Prediction's teal; No stays neutral. Odds aren't money, so
+   no green or red. */
 .odds > div {
   padding: 32px;
   display: flex;
   flex-direction: column;
-  border-radius: 24px;
-  background: #d5e99b;
-  color: #233326;
+  border-radius: var(--cx-r-md);
+  background: var(--hue);
+  color: var(--hue-on);
 }
 .odds > div:nth-child(2) {
-  background: #e7c4d3;
-  color: #442234;
+  background: var(--cx-surface-3);
+  color: var(--cx-text);
 }
 .odds strong {
   font-size: var(--text-3xl);
-  letter-spacing: -0.05em;
+  font-weight: 300;
+  letter-spacing: -2px;
+  font-variant-numeric: tabular-nums;
 }
 .oddsBar {
   height: 16px;
-  border-radius: 16px;
-  background: #e7c4d3;
+  border-radius: var(--cx-r-pill);
+  background: var(--cx-surface-3);
   overflow: hidden;
 }
 .oddsBar i {
   display: block;
   height: 100%;
-  background: #d5e99b;
+  background: var(--hue);
   transition: width 800ms;
 }
 @media (max-width: 1023px) {
@@ -975,7 +1022,7 @@
   }
   .odds > div {
     padding: 16px;
-    border-radius: 16px;
+    border-radius: var(--cx-r-icon);
   }
   .odds strong {
     font-size: var(--text-lg);
@@ -1014,7 +1061,7 @@
     padding: 16px;
   }
   .cinemaCopy > span:first-child,
-  .cinemaCopy .status {
+  .cinemaCopy .mediaChip {
     display: none;
   }
   .panel {
@@ -1076,7 +1123,7 @@
     width: 144px;
     height: 144px;
     flex-shrink: 0;
-    box-shadow: 0 0 0 8px #cdddc014;
+    box-shadow: 0 0 0 8px rgba(var(--hue-rgb), 0.08);
   }
   .breathe strong {
     font-size: var(--text-base);
@@ -1097,7 +1144,7 @@
     min-height: 0;
     padding: 8px;
   }
-  .market > .accent {
+  .market > .gain {
     display: none;
   }
   .orderDetail {
@@ -1118,9 +1165,7 @@
     padding: 0 8px;
   }
   .footer .action {
-    min-height: 32px;
-    height: 32px;
-    padding: 0 8px;
+    padding: 0 12px;
   }
   .broadcastBottom {
     padding: 8px;
@@ -1131,7 +1176,7 @@
   .broadcastBottom h3 {
     font-size: var(--text-base);
   }
-  .redPill {
+  .mediaChip {
     padding: 0 8px;
   }
   .studio,
@@ -1144,7 +1189,7 @@
     grid-template-columns: 1fr 1fr;
     grid-template-rows: 1fr;
   }
-  .camera > .redPill {
+  .camera > .mediaChip {
     display: none;
   }
   .panel .muted {
@@ -1252,7 +1297,7 @@
   .assetRail > span:last-child {
     display: none;
   }
-  .assetDetail > .accent,
+  .assetDetail > .gain,
   .assetDetail > h3 {
     display: none;
   }

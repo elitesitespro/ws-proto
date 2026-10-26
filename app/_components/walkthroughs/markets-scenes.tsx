@@ -1,5 +1,5 @@
 "use client";
-import { ArrowDownUp, Bitcoin, Check, Globe2, TrendingUp } from "lucide-react";
+import { Icon } from "@/components/icon";
 import { Chart, Status, Walkthrough } from "./walkthrough";
 import s from "./walkthrough.module.css";
 const captions = [
@@ -51,7 +51,7 @@ export function MarketsScene({ step }: { step: number }) {
       }
       captions={captions[step]}
       actions={actions[step]}
-      tone="markets"
+      hue={["forex", "trade", "crypto", "trade", "prediction"][step]}
     >
       {({ stage, progress }) => (
         <>
@@ -59,7 +59,7 @@ export function MarketsScene({ step }: { step: number }) {
             <div className={s.market}>
               <div className={s.row}>
                 <span className={s.status}>
-                  <Globe2 size={20} />
+                  <Icon name="globe" tone="current" />
                   EUR / USD
                 </span>
                 <span>24h</span>
@@ -67,7 +67,7 @@ export function MarketsScene({ step }: { step: number }) {
               <strong className={s.quote}>
                 {(1.0842 + Math.min(progress, 0.7) * 0.002).toFixed(4)}
               </strong>
-              <span className={s.accent}>+0.18% · Illustrative</span>
+              <span className={s.gain}>+0.18% · Illustrative</span>
               <Chart progress={Math.min(1, progress * 2)} />
               <div className={s.marketFoot}>
                 {stage < 2 ? (
@@ -84,7 +84,7 @@ export function MarketsScene({ step }: { step: number }) {
             <div className={s.orders}>
               <h3>Your order book</h3>
               <div className={s.orderRow} data-active={stage >= 1}>
-                <ArrowDownUp size={24} />
+                <Icon name="arrows-up-down" size={24} tone="current" />
                 <div>
                   <strong>EUR / USD</strong>
                   <span className={s.muted}>Limit · Buy · Demo</span>
@@ -92,7 +92,7 @@ export function MarketsScene({ step }: { step: number }) {
                 <span>{stage >= 2 ? "Filled" : "Open"}</span>
               </div>
               <div className={`${s.orderRow} ${s.detail}`}>
-                <Bitcoin size={24} />
+                <Icon name="bitcoin" size={24} tone="current" />
                 <div>
                   <strong>BTC / USD</strong>
                   <span className={s.muted}>Limit · Demo</span>
@@ -111,7 +111,7 @@ export function MarketsScene({ step }: { step: number }) {
                 <div className={s.orderSteps}>
                   {["Placed", "Processing", "Recorded"].map((label, i) => (
                     <span key={label} data-done={stage >= i + 1}>
-                      <Check size={20} />
+                      <Icon name="check" tone="current" />
                       {label}
                     </span>
                   ))}
@@ -129,7 +129,7 @@ export function MarketsScene({ step }: { step: number }) {
                 ))}
               </div>
               <div className={s.assetDetail}>
-                <Bitcoin size={40} />
+                <Icon name="bitcoin" size={40} tone="current" />
                 <h3>Bitcoin</h3>
                 <strong className={s.quote}>
                   $
@@ -137,7 +137,7 @@ export function MarketsScene({ step }: { step: number }) {
                     67240 + Math.min(progress, 0.7) * 210,
                   ).toLocaleString("en-US")}
                 </strong>
-                <span className={s.accent}>+2.8% today</span>
+                <span className={s.gain}>+2.8% today</span>
                 <Chart progress={Math.min(1, progress * 2)} />
                 {stage === 3 ? (
                   <Status>On your watchlist</Status>
@@ -150,7 +150,7 @@ export function MarketsScene({ step }: { step: number }) {
           {step === 3 && (
             <div className={s.calendar}>
               <div className={s.calendarDate}>
-                <Globe2 size={32} />
+                <Icon name="globe" size={32} tone="current" />
                 <span>Economic calendar</span>
                 <strong>24</strong>
                 <span>October · Sample event</span>
@@ -176,7 +176,7 @@ export function MarketsScene({ step }: { step: number }) {
           {step === 4 && (
             <div className={s.prediction}>
               <span className={s.status}>
-                <TrendingUp size={20} />
+                <Icon name="trending-up" tone="current" />
                 Crypto · Sample event
               </span>
               <h3>Will Bitcoin reach $100k this year?</h3>

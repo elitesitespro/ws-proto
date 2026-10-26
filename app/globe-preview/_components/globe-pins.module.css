@@ -1,0 +1,237 @@
+/* A pin is three pieces at one point on the globe: a beacon on the city, a
+   stem rising from it, and a glass card at the top of the stem. The globe
+   moves .anchor onto its point every frame and sets --facing, 1 to 0 as the
+   point turns to the limb (see NightGlobe's `pins`); everything else here
+   is laid out from that point.
+   The fade is on the pieces, never an ancestor of the card: opacity on a
+   parent would cut the card's glass off from the globe behind it. */
+
+.anchor {
+  position: absolute;
+  top: 0;
+  left: 0;
+  visibility: hidden; /* until the globe has placed it */
+  will-change: transform;
+}
+
+/* --layer-shown and --layer-pointer come from the hero: the cards fade out as
+   it scrolls away (on the pieces, never the layer: see above) */
+.pin {
+  --stem: 40px;
+  --shown: var(--layer-shown, 1);
+}
+/* Another card has focus (or a city's card is open): this one steps back */
+.pin[data-dimmed="true"] {
+  --shown: calc(var(--layer-shown, 1) * 0.3);
+}
+/* Leaving: the pieces fade out before the next set comes in */
+.pin[data-leaving="true"] {
+  --shown: 0;
+}
+.dot,
+.stem,
+.card {
+  opacity: calc(var(--facing, 0) * var(--shown));
+}
+.dot,
+.stem {
+  transition: opacity 0.2s var(--cx-ease);
+}
+
+.dot {
+  position: absolute;
+  top: -4px;
+  left: -4px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--hue);
+  box-shadow: 0 0 0 3px rgba(var(--hue-rgb), 0.22);
+  animation: dot-in 0.4s var(--cx-ease) backwards;
+  animation-delay: var(--delay);
+}
+/* The beacon: a thin ring that keeps opening out from the city */
+.dot::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border: 1px solid var(--hue);
+  border-radius: inherit;
+  animation: beacon 2.4s var(--cx-ease) infinite;
+}
+
+.stem {
+  position: absolute;
+  bottom: 4px;
+  left: -0.5px;
+  width: 1px;
+  height: calc(var(--stem) - 4px);
+  background: linear-gradient(to top, var(--hue), rgba(var(--hue-rgb), 0.2));
+  transform-origin: bottom;
+  animation: stem-in 0.45s var(--cx-ease) backwards;
+  animation-delay: calc(var(--delay) + 0.1s);
+}
+
+/* The card: the glass made denser than the system's regular, so its photos and
+   figures hold their contrast over the city lights (the public token, on the
+   card only). Each kind lays out its own body (globe-pin-cards.tsx). */
+.card {
+  --cx-glass-alpha: 0.72;
+  position: absolute;
+  bottom: var(--stem);
+  left: -14px;
+  display: block;
+  overflow: hidden;
+  border-radius: var(--cx-r-md);
+  white-space: nowrap;
+  pointer-events: var(--layer-pointer, auto);
+  /* The fade, plus the glass's own press and hover transform */
+  transition: opacity 0.2s var(--cx-ease), transform var(--cx-dur) var(--cx-spring-snappy);
+  /* backwards: the card holds its first frame through the delay, then lets go,
+     so the glass's own press and hover transforms still work after */
+  animation: card-in 0.5s var(--cx-ease) backwards;
+  animation-delay: calc(var(--delay) + 0.2s);
+}
+
+/* On a phone the card is smaller, on a shorter stem, and sits centred over
+   its city as far as the screen's edges allow, keeping so as the globe
+   carries the city across (--x is the city's place across the screen;
+   --card-w the card's width) */
+@media (max-width: 767px) {
+  .pin {
+    --stem: 28px;
+  }
+  /* A little smaller, from its foot (PHONE_SCALE in globe-pins.tsx) */
+  .card {
+    left: clamp(calc(16px - var(--x, 0px)), calc(var(--card-w) / -2), calc(100vw - 16px - var(--card-w) - var(--x, 0px)));
+    scale: 0.84;
+    transform-origin: 50% 100%;
+  }
+}
+
+/* A short rule in the platform's colour along the card's top edge */
+.accent {
+  position: absolute;
+  top: 0;
+  right: 20px;
+  left: 20px;
+  height: 2px;
+  border-radius: 0 0 2px 2px;
+  background: linear-gradient(90deg, transparent, var(--hue) 30%, var(--hue) 70%, transparent);
+  pointer-events: none;
+}
+
+.go {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  color: var(--cx-glass-text-2);
+  transition: color var(--cx-dur) var(--cx-ease), transform var(--cx-dur) var(--cx-ease);
+}
+
+/* Live: the badge's dot breathes */
+.liveDot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+  animation: breathe 1.6s var(--cx-ease-in-out) infinite;
+}
+
+/* "is typing": three dots rising in turn */
+.typing {
+  display: inline-flex;
+  gap: 3px;
+  margin-left: 2px;
+}
+.typing span {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--hue-ink);
+  animation: typing 1.2s var(--cx-ease-in-out) infinite;
+}
+.typing span:nth-child(2) {
+  animation-delay: 0.15s;
+}
+.typing span:nth-child(3) {
+  animation-delay: 0.3s;
+}
+.card:hover .go,
+.card:focus-visible .go {
+  color: var(--hue-ink);
+  transform: translate(2px, -2px);
+}
+
+/* A value that just ticked flashes, then settles back to the card's text */
+.flashUp {
+  animation: flash 1s var(--cx-ease) backwards;
+  --_flash: var(--cx-gain);
+}
+.flashDown {
+  animation: flash 1s var(--cx-ease) backwards;
+  --_flash: var(--cx-loss);
+}
+.flashCount {
+  animation: flash 1s var(--cx-ease) backwards;
+  --_flash: var(--hue-ink);
+}
+
+@keyframes dot-in {
+  from { transform: scale(0); }
+}
+@keyframes stem-in {
+  from { transform: scaleY(0); }
+}
+@keyframes card-in {
+  from { opacity: 0; transform: translateY(6px); }
+}
+@keyframes beacon {
+  from { transform: scale(1); opacity: 0.7; }
+  to { transform: scale(3.2); opacity: 0; }
+}
+@keyframes flash {
+  from { color: var(--_flash); }
+}
+/* Points just scored float up beside the score and fade */
+.gain {
+  position: absolute;
+  top: 0;
+  right: 100%;
+  margin-right: 6px;
+  color: var(--hue-ink);
+  font-weight: 500;
+  white-space: nowrap;
+  pointer-events: none;
+  animation: gain 1.1s var(--cx-ease) forwards;
+}
+@keyframes gain {
+  0% { opacity: 0; transform: translateY(6px); }
+  25% { opacity: 1; transform: none; }
+  100% { opacity: 0; transform: translateY(-10px); }
+}
+
+@keyframes breathe {
+  50% { opacity: 0.35; }
+}
+@keyframes typing {
+  0%, 60%, 100% { transform: none; opacity: 0.45; }
+  30% { transform: translateY(-3px); opacity: 1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dot,
+  .stem,
+  .card,
+  .flashUp,
+  .flashDown,
+  .flashCount,
+  .liveDot,
+  .typing span {
+    animation: none;
+  }
+  .dot::after,
+  .gain {
+    display: none;
+  }
+}

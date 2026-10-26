@@ -1,3 +1,7 @@
+/* A WorldStreet product screen: the scene is the kit's corner-lit card
+   (<Card>), panels inside it are raised fills, and the platform's hue
+   (data-hue on the scene, app/hues.css) marks its glyphs, rings and art.
+   Gold stays for the primary action; red only ends a call. */
 .scene {
   height: 100%;
   min-height: 0;
@@ -5,9 +9,16 @@
   grid-template-rows: auto minmax(0, 1fr) auto;
   gap: 24px;
   padding: 32px;
-  background: #151214;
-  color: #f7f3f5;
+  color: var(--cx-text);
   font-size: var(--text-xs);
+}
+/* Product screens sit on plain stone: the card's corner light stays, its
+   gold wash doesn't (gold is for the action, not the screen). */
+.scene::before {
+  display: none;
+}
+.scene strong {
+  font-weight: 500;
 }
 .scene * {
   min-width: 0;
@@ -30,7 +41,7 @@
   justify-content: space-between;
 }
 .muted {
-  opacity: 0.65;
+  color: var(--cx-text-muted);
 }
 .visual {
   min-height: 0;
@@ -44,21 +55,20 @@
 }
 .scene h4 {
   font-size: var(--text-xl);
-  font-weight: 600;
+  font-weight: 500;
   line-height: 1.05;
-  letter-spacing: -0.04em;
+  letter-spacing: var(--cx-h3-ls);
 }
 .footer h3 {
   font-size: var(--text-lg);
   font-weight: 500;
   line-height: 1.15;
-  letter-spacing: -0.03em;
+  letter-spacing: var(--cx-h3-ls);
   margin-top: 8px;
 }
 .surface {
-  background: #282327;
-  border: 1px solid #ffffff16;
-  border-radius: 24px;
+  background: var(--cx-surface-2);
+  border-radius: var(--cx-r-card);
   padding: 24px;
 }
 .avatar {
@@ -72,9 +82,14 @@
 }
 .identity .status {
   margin-left: auto;
-  padding: 8px;
-  border-radius: 8px;
-  background: #39313a;
+  padding: 4px 12px;
+  border-radius: var(--cx-r-pill);
+  background: var(--cx-surface-3);
+  font-weight: 500;
+}
+.post[data-published="true"] .status {
+  background: var(--hue-soft);
+  color: var(--hue-ink);
 }
 .post {
   max-width: 560px;
@@ -87,7 +102,7 @@
   position: relative;
   min-height: 0;
   overflow: hidden;
-  border-radius: 16px;
+  border-radius: var(--cx-r-md);
 }
 .postImage img {
   object-fit: cover;
@@ -95,37 +110,19 @@
 .actions {
   justify-content: space-between;
 }
-.primary {
-  background: #d4ef92;
-  color: #182216;
-  min-height: 40px;
-  padding: 8px 16px;
-}
-.primary:hover {
-  background: #e2ffa4;
-}
-.secondary {
-  background: #393239;
-  color: #fff;
-  min-height: 40px;
-  padding: 8px 16px;
-}
-.secondary:hover {
-  background: #514650;
-  color: #fff;
-}
 .community {
   display: grid;
   grid-template-columns: 1fr 1.1fr;
   align-items: center;
   gap: 16px;
 }
+/* The club's poster wears the platform hue: the one place it fills. */
 .clubArt {
   min-height: 320px;
   padding: 32px;
-  border-radius: 24px;
-  color: #282019;
-  background: #edbb67;
+  border-radius: var(--cx-r-card);
+  color: var(--hue-on);
+  background: var(--hue);
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -134,9 +131,9 @@
 }
 .clubArt > span {
   font-size: var(--text-3xl);
-  font-weight: 600;
+  font-weight: 400;
   line-height: 1;
-  letter-spacing: -0.05em;
+  letter-spacing: -0.04em;
 }
 .clubDetails {
   display: flex;
@@ -149,7 +146,7 @@
   flex-wrap: wrap;
 }
 .eyebrow {
-  opacity: 0.65;
+  color: var(--cx-text-muted);
 }
 .call {
   display: flex;
@@ -163,7 +160,7 @@
 .callPortrait > img {
   width: 144px;
   height: 144px;
-  border: 8px solid #332c38;
+  border: 8px solid var(--hue-line);
 }
 .callBadge {
   position: absolute;
@@ -174,15 +171,15 @@
   width: 48px;
   height: 48px;
   border-radius: 50%;
-  background: #d4ef92;
-  color: #182216;
+  background: var(--hue);
+  color: var(--hue-on);
 }
 .wave {
   height: 56px;
   display: flex;
   align-items: center;
   gap: 8px;
-  color: #c0a8ff;
+  color: var(--hue);
 }
 .wave i {
   display: block;
@@ -205,10 +202,11 @@
   font-size: var(--text-lg);
 }
 .live {
-  background: #263f32;
-  color: #b4edc7;
-  border-radius: 24px;
+  background: var(--hue-soft);
+  color: var(--hue-ink);
+  border-radius: var(--cx-r-pill);
   padding: 8px 16px;
+  font-weight: 500;
 }
 .participants {
   display: grid;
@@ -221,21 +219,25 @@
   min-height: 0;
   position: relative;
   overflow: hidden;
-  border-radius: 16px;
+  border-radius: var(--cx-r-md);
   border: 3px solid transparent;
   animation: speaker 8s step-end infinite;
-  background: #282327;
+  background: var(--cx-surface-2);
 }
 .participant img {
   object-fit: cover;
 }
+/* The name tag is a glass chip over the video (cx-chip--glass in the TSX).
+   Light glass: the tiles are bright daylit rooms, where dark glass turns
+   muddy. No fill of its own here, so the material shows. */
 .participant > span {
   position: absolute;
   bottom: 8px;
   left: 8px;
-  background: #211c20;
-  padding: 8px;
-  border-radius: 8px;
+  padding: 8px 12px;
+  border-radius: var(--cx-r-pill);
+  font-weight: 500;
+  line-height: 1.2;
 }
 .participant > svg {
   position: absolute;
@@ -256,8 +258,10 @@
   gap: 16px;
 }
 .screenHeader {
-  color: #d4ef92;
+  color: var(--hue-ink);
 }
+/* The slide being shared is the presenter's own paper, so it stays light:
+   stone-100 with ink, its notes in the hue and two stone tints. */
 .sharedCanvas {
   position: relative;
   display: flex;
@@ -265,13 +269,18 @@
   justify-content: center;
   gap: 24px;
   padding: 32px;
-  border-radius: 16px;
-  background: #ebe2ce;
-  color: #342822;
+  border-radius: var(--cx-r-md);
+  background: #f5f5f4;
+  color: var(--cx-on-primary);
   overflow: hidden;
 }
 .sharedCanvas h4 {
   font-size: var(--text-2xl);
+  font-weight: 400;
+  letter-spacing: var(--cx-h2-ls);
+}
+.sharedCanvas .eyebrow {
+  color: #57534e;
 }
 .notes {
   display: flex;
@@ -279,23 +288,23 @@
 }
 .notes > span {
   padding: 16px;
-  background: #e5be7d;
-  border-radius: 8px;
+  background: rgba(var(--hue-rgb), 0.45);
+  border-radius: var(--cx-r-sm);
 }
 .notes > span:nth-child(2) {
-  background: #c9d8b4;
+  background: #e7e5e4;
 }
 .notes > span:nth-child(3) {
-  background: #d7c2dc;
+  background: #d6d3d1;
 }
 .cursor {
   position: absolute;
   right: 16px;
   top: 24px;
-  background: #5d3a8d;
-  color: white;
+  background: var(--hue);
+  color: var(--hue-on);
   padding: 8px;
-  border-radius: 8px;
+  border-radius: var(--cx-r-sm);
 }
 @keyframes talk {
   to {
@@ -305,7 +314,7 @@
 @keyframes speaker {
   0%,
   24% {
-    border-color: #a7e5b7;
+    border-color: var(--hue);
   }
   25%,
   100% {
@@ -338,8 +347,6 @@
   }
   .clubDetails {
     gap: 16px;
-    background: #edbb67;
-    color: #282019;
   }
   .scene h4 {
     font-size: var(--text-lg);
@@ -374,7 +381,7 @@
     gap: 8px;
   }
   .participant > span {
-    padding: 0 8px;
+    padding: 4px 10px;
   }
   .participant > svg {
     bottom: 8px;
@@ -482,10 +489,10 @@
 }
 @media (max-width: 600px) {
   .post .actions .primary {
-    padding: 8px;
+    padding: 0 12px;
   }
   .post .actions .secondary {
-    padding: 8px;
+    padding: 0 12px;
   }
   .likeCount {
     display: none;
@@ -541,7 +548,7 @@
   display: inline;
 }
 .caret {
-  color: #d4ef92;
+  color: var(--hue);
   animation: blink 800ms steps(2, end) infinite;
 }
 .post > p {
@@ -557,11 +564,10 @@
 }
 .primary[data-pressing="true"] {
   transform: scale(0.94);
-  background: #efffce;
-  box-shadow: 0 0 0 8px #d4ef9220;
+  box-shadow: 0 0 0 8px var(--cx-brand-wash);
   transition:
     transform 180ms,
-    background 180ms;
+    box-shadow 180ms;
 }
 .clubDetails[data-joined="true"] {
   animation: publish 650ms ease-out both;
@@ -582,7 +588,7 @@
   transform: scale(0.92);
 }
 .participant[data-speaking="true"] {
-  border-color: #a7e5b7;
+  border-color: var(--hue);
 }
 .participants[data-paused="false"] .participant[data-speaking="true"] > svg {
   animation: talk 600ms ease-in-out infinite alternate;
@@ -602,8 +608,12 @@
   flex-direction: column;
   gap: 8px;
   padding: 8px;
-  background: #282327;
-  color: #f7f3f5;
+  background: var(--cx-elevated);
+  box-shadow: inset 0 0 0 1px var(--cx-hairline);
+  color: var(--cx-text);
+}
+.shareChooser > svg {
+  color: var(--hue);
 }
 .sharedCanvas .notes > span {
   opacity: 0;
@@ -653,10 +663,10 @@
 }
 @keyframes ring {
   from {
-    box-shadow: 0 0 0 0 #d4ef9250;
+    box-shadow: 0 0 0 0 rgba(var(--hue-rgb), 0.32);
   }
   to {
-    box-shadow: 0 0 0 24px #d4ef9200;
+    box-shadow: 0 0 0 24px rgba(var(--hue-rgb), 0);
   }
 }
 @keyframes present {
@@ -694,15 +704,6 @@
     animation: none !important;
     transition: none !important;
   }
-}
-.replay {
-  width: 32px;
-  height: 32px;
-  min-height: 32px;
-  padding: 0;
-  flex-shrink: 0;
-  color: inherit;
-  background: #ffffff0d;
 }
 .header > .muted {
   margin-left: auto;
@@ -757,6 +758,6 @@
 }
 .secondary[data-pressing="true"] {
   transform: scale(0.94);
-  background: #514650;
+  background: var(--cx-surface-3);
   transition: transform 180ms;
 }

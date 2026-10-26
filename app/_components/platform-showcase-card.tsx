@@ -1,17 +1,19 @@
 "use client";
 
 import { useRef, useState } from "react";
-import { useInView, useReducedMotion } from "motion/react";
-import { ArrowUpRight, Pause, Play } from "lucide-react";
+import { useInView } from "motion/react";
+import { useReducedMotion } from "@/lib/use-reduced-motion";
 import { cn } from "cn";
+import { Icon } from "@/components/icon";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { WidgetMotionContext } from "@/components/hero/widget-motion-context";
 import activity from "@/components/hero/widget-activity.module.css";
-import { platformDetails, type ShowcasePlatformName } from "./platform-showcase-content";
+import { hueAttrs, platformDetails, type ShowcasePlatformName } from "./platform-showcase-content";
 import { PlatformProductPreview } from "./platform-product-preview";
 
 export function PlatformShowcaseCard({ name, category }: { name: ShowcasePlatformName; category: string }) {
   const detail = platformDetails[name];
+  const hue = hueAttrs(name);
   const ref = useRef<HTMLElement>(null);
   const inView = useInView(ref, { amount: 0.3 });
   const reducedMotion = useReducedMotion();
@@ -27,21 +29,22 @@ export function PlatformShowcaseCard({ name, category }: { name: ShowcasePlatfor
         <p className="mt-1 max-w-[560px] text-xs leading-3 opacity-80">{detail.description}</p>
       </header>
       <ul className="flex flex-wrap gap-1 text-xs leading-3" aria-label={`${name} features`}>
-        {detail.features.map((feature) => <li key={feature} className="rounded-lg border border-current/20 bg-white/10 px-1">{feature}</li>)}
+        {detail.features.map((feature) => <li key={feature} className="rounded-pill bg-current/10 px-cx-3">{feature}</li>)}
       </ul>
       <WidgetMotionContext.Provider value={Boolean(playing)}>
-        <div className={`${activity.activity} w-full max-w-[480px]`} data-playing={Boolean(playing)}>
+        <div data-hue={hue["data-hue"]} style={hue.style} className={`${activity.activity} w-full max-w-[480px]`} data-playing={Boolean(playing)}>
           <PlatformProductPreview kind={detail.preview} />
         </div>
       </WidgetMotionContext.Provider>
       <div className="flex items-center justify-between gap-1 text-xs">
         <p className="opacity-70">Sample preview</p>
-        {hasAnimation && <Button variant="ghost" size="sm" className="text-inherit hover:bg-white/15 hover:text-inherit motion-reduce:hidden" onClick={() => setPaused(!paused)} aria-pressed={paused} aria-label={`${paused ? "Resume" : "Pause"} ${name} preview animations`}>
-          {paused ? <Play size={20} /> : <Pause size={20} />} {paused ? "Resume" : "Pause"}
+        {/* Sits on the platform's colour, so it takes its text colour rather than the kit's light-on-stone. */}
+        {hasAnimation && <Button variant="ghost" size="sm" className="text-inherit hover:bg-current/10 hover:text-inherit motion-reduce:hidden" onClick={() => setPaused(!paused)} aria-pressed={paused} aria-label={`${paused ? "Resume" : "Pause"} ${name} preview animations`}>
+          <Icon name={paused ? "play" : "pause"} size={18} tone="current" /> {paused ? "Resume" : "Pause"}
         </Button>}
       </div>
-      <a href={detail.href} className={cn(buttonVariants({ size: "lg" }), "self-start bg-[#211C20] text-white hover:bg-[#211C20]/85")}>
-        {detail.action}<ArrowUpRight size={20} aria-hidden="true" />
+      <a href={detail.href} className={cn(buttonVariants({ size: "lg" }), "self-start")}>
+        {detail.action}<Icon name="arrow-up-right" size={18} tone="current" />
       </a>
     </article>
   );

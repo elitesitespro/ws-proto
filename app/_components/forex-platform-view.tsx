@@ -1,57 +1,37 @@
-"use client";
-import { useState } from "react";
-import { Button } from "@/components/ui/button";
+import { Icon } from "@/components/icon";
 import { PlatformViewShell } from "./platform-view-shell";
-import styles from "./platform-views.module.css";
+import { ForexDesk } from "./forex/forex-desk";
+import styles from "./forex-platform-view.module.css";
 
+/**
+ * Forex (portal.worldstreetgold.com), as worldstreetgold.com dresses it:
+ * warm paper, ink and yellow, its line, and a desk to try: a moving chart,
+ * the sessions on the real clock, and an order ticket with take-profit and
+ * stop-loss. Sample figures only.
+ */
 export function ForexPlatformView() {
-  const [pair, setPair] = useState(0);
-  const pairs = ["EUR / USD", "GBP / USD", "AUD / USD"];
   return (
     <PlatformViewShell
       name="Forex"
+      glass="light"
+      eyebrow={
+        <span className={styles.brand}>
+          <span className={styles.mark}>
+            <Icon name="candlestick-chart" size={16} tone="current" />
+          </span>
+          Forex
+          <span className={styles.when}>Mon 08:00 · London opens</span>
+        </span>
+      }
       title={
         <>
-          A world in motion.
+          Trade the pairs
           <br />
-          <span>See the bigger picture.</span>
-        </>
-      }
-      controls={
-        <>
-          {pairs.map((n, i) => (
-            <Button
-              key={n}
-              variant="ghost"
-              aria-pressed={pair === i}
-              onClick={() => setPair(i)}
-            >
-              {n.replaceAll(" ", "")}
-            </Button>
-          ))}
+          that move <span className={styles.world}>the world.</span>
         </>
       }
     >
-      <div className={styles.panel}>
-        <div className={styles.row}>
-          <strong>{pairs[pair]}</strong>
-          <span className={styles.muted}>24H · Sample</span>
-        </div>
-        <div className={styles.row}>
-          <strong className={styles.large}>
-            {["1.0846", "1.2732", "0.6581"][pair]}
-          </strong>
-          <span className={styles.accent}>
-            +{["0.24", "0.18", "0.32"][pair]}%
-          </span>
-        </div>
-        <div className={styles.marketChart} aria-hidden="true" />
-        <div className={styles.sessions}>
-          <span>Tokyo</span>
-          <span>London</span>
-          <span>New York</span>
-        </div>
-      </div>
+      <ForexDesk />
     </PlatformViewShell>
   );
 }

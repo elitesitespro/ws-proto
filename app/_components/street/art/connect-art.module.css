@@ -1,0 +1,597 @@
+/* Connect Ave's billboard: three pictures in one face, crossfading on
+   data-focus. Nobody's far away (people on a night map, joined by gold
+   arcs), WorldSpace (the helmet in its orbit of faces) and WorldMeet (a
+   London to Lagos call on one gold link). The frame sets its words over the
+   bottom left, so each keeps its subject top right, or in the top half when
+   the face is tall. */
+
+.art {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  container-type: size;
+  background: #171412;
+}
+
+/* The three pictures, one showing at a time */
+.layer {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  opacity: 0;
+  scale: 1.03;
+  transition:
+    opacity 450ms var(--cx-ease),
+    scale 450ms var(--cx-ease);
+}
+.art:not([data-focus="WorldSpace"]):not([data-focus="WorldMeet"]) .people,
+.art[data-focus="WorldSpace"] .space,
+.art[data-focus="WorldMeet"] .meet {
+  opacity: 1;
+  scale: 1;
+}
+
+/* ---------------------------------------------------------------------- */
+/* Nobody's far away: a warm night map, its cities lit, the people on it
+   joined by gold arcs; London and Lagos lead */
+
+.people {
+  --glow-at: 64% 30%;
+  background:
+    radial-gradient(ellipse 38% 48% at var(--glow-at), rgba(234, 179, 8, 0.1), transparent 70%),
+    linear-gradient(180deg, #100e0c, #1a1613);
+}
+
+/* The map: London is pinned to a point on the face (--ax, --ay), and the
+   world, --w wide, hangs from it (held by the height too, so a very wide
+   face doesn't stretch it down into the words). --fx and --fy are London
+   on the map */
+.world {
+  --w: min(130cqw, 222cqh);
+  --ax: 62cqw;
+  --ay: 16cqh;
+  position: absolute;
+  left: calc(var(--ax) - var(--w) * var(--fx));
+  top: calc(var(--ay) - var(--w) * var(--fy) / 2);
+  width: var(--w);
+  aspect-ratio: 2;
+}
+.map,
+.arcs {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+/* The land fades toward the edges, so the eye stays on the people */
+.map {
+  mask-image: radial-gradient(ellipse 48% 62% at 56% 38%, #000 30%, transparent 100%);
+}
+.land {
+  fill: none;
+  stroke: rgba(255, 240, 214, 0.22);
+  stroke-width: 0.6;
+  stroke-linecap: round;
+}
+
+/* Other cities' lights, coming on as the car arrives */
+.lights {
+  opacity: 0.25;
+  transition: opacity 800ms var(--cx-ease);
+}
+.lights circle {
+  fill: #facc15;
+}
+.lights .glow {
+  fill: rgba(250, 204, 21, 0.14);
+}
+.art[data-lit] .lights {
+  opacity: 1;
+  transition-delay: 100ms;
+}
+
+/* The arcs, each over a wide soft stroke of its own glow; they come in
+   once the people have */
+.arc {
+  opacity: 0;
+  transition: opacity 700ms var(--cx-ease);
+}
+.art[data-lit] .arc {
+  opacity: 1;
+  transition-delay: calc(600ms + var(--i) * 120ms);
+}
+.arc path {
+  fill: none;
+  stroke: rgba(250, 204, 21, 0.5);
+  stroke-width: 1.25;
+  stroke-linecap: round;
+  vector-effect: non-scaling-stroke;
+}
+.arc .glow {
+  stroke: rgba(250, 204, 21, 0.1);
+  stroke-width: 6;
+}
+.arc[data-lead] path {
+  stroke: #facc15;
+  stroke-width: 2;
+}
+.arc[data-lead] .glow {
+  stroke: rgba(250, 204, 21, 0.25);
+  stroke-width: 10;
+}
+
+/* The people, each on their city: grey and waiting until the car arrives,
+   then in colour, one after another */
+.pin {
+  --size: clamp(40px, 10cqh, 56px);
+  position: absolute;
+  width: var(--size);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  translate: -50% -50%;
+  opacity: 0.45;
+  scale: 0.88;
+  filter: grayscale(1) brightness(0.8);
+  transition:
+    opacity 600ms var(--cx-ease),
+    scale 700ms var(--cx-spring-bouncy),
+    filter 600ms var(--cx-ease);
+}
+.pin[data-lead] {
+  --size: clamp(56px, 15cqh, 80px);
+}
+.art[data-lit] .pin {
+  opacity: 1;
+  scale: 1;
+  filter: none;
+  transition-delay: calc(150ms + var(--i) * 90ms);
+}
+.pin img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  border-radius: 50%;
+  object-fit: cover;
+  box-shadow:
+    0 0 0 2px rgba(255, 252, 245, 0.85),
+    0 8px 24px rgba(0, 0, 0, 0.55);
+}
+.pin[data-lead] img {
+  box-shadow:
+    0 0 0 2px #facc15,
+    0 0 24px rgba(250, 204, 21, 0.35),
+    0 8px 24px rgba(0, 0, 0, 0.55);
+}
+/* London and Lagos ring out to each other, in gold (the loop is at the end) */
+.pin[data-lead]::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border: 1.5px solid rgba(250, 204, 21, 0.7);
+  border-radius: 50%;
+  opacity: 0;
+  pointer-events: none;
+}
+/* The place, on the open sea to its left */
+.tag {
+  position: absolute;
+  right: calc(100% + 8px);
+  top: 50%;
+  translate: 0 -50%;
+  padding: 0 8px;
+  border-radius: var(--cx-r-pill);
+  background: rgba(23, 20, 18, 0.78);
+  color: #fffcf5;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 20px;
+  white-space: nowrap;
+}
+
+/* ---------------------------------------------------------------------- */
+/* WorldSpace: its helmet afloat in deep space, ringed by its room's faces,
+   in its own cyan */
+
+.space {
+  --x: 70%;
+  --y: 36%;
+  background:
+    radial-gradient(ellipse 36% 52% at var(--x) var(--y), rgba(34, 184, 214, 0.18), transparent 70%),
+    radial-gradient(ellipse 30% 40% at 14% 88%, rgba(34, 184, 214, 0.06), transparent 70%),
+    #05080d;
+}
+.stars {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+.stars circle {
+  fill: #fff;
+}
+
+/* The orbit's box, square; everything in it is placed in % of it */
+.orbit {
+  --s: min(96cqh, 58cqw);
+  position: absolute;
+  left: var(--x);
+  top: var(--y);
+  width: var(--s);
+  aspect-ratio: 1;
+  translate: -50% -50%;
+}
+.halo {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 80%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(34, 184, 214, 0.3), rgba(34, 184, 214, 0) 62%);
+  translate: -50% -50%;
+}
+.rings {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+.rings path {
+  fill: none;
+  stroke: rgba(34, 184, 214, 0.55);
+  stroke-width: 2;
+  vector-effect: non-scaling-stroke;
+}
+.rings .outer {
+  stroke: rgba(255, 255, 255, 0.16);
+  stroke-width: 1.5;
+}
+
+/* The helmet rises into place as you look at the exit, then floats */
+.float {
+  position: absolute;
+  left: 27%;
+  top: 27%;
+  width: 46%;
+  aspect-ratio: 1;
+  translate: 0 6%;
+  scale: 0.92;
+  transition:
+    translate 700ms var(--cx-spring),
+    scale 700ms var(--cx-spring);
+}
+.art[data-focus="WorldSpace"] .float {
+  translate: 0 0;
+  scale: 1;
+}
+.bob {
+  width: 100%;
+  height: 100%;
+}
+.bob img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  object-fit: contain;
+  rotate: -8deg;
+  filter: drop-shadow(0 0 32px rgba(34, 184, 214, 0.35));
+}
+
+/* The room's faces pop onto the orbit one after another; the far ones
+   are smaller and in shadow; whoever's talking has the cyan ring */
+.seat {
+  position: absolute;
+  width: 12%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  translate: -50% -50%;
+  opacity: 0;
+  scale: 0.5;
+  transition:
+    opacity 400ms var(--cx-ease),
+    scale 600ms var(--cx-spring-bouncy);
+}
+.art[data-focus="WorldSpace"] .seat {
+  opacity: 1;
+  scale: 1;
+  transition-delay: calc(150ms + var(--i) * 60ms);
+}
+.seat[data-far] {
+  width: 9.5%;
+  filter: brightness(0.65) saturate(0.8);
+}
+.seat img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  border-radius: 50%;
+  object-fit: cover;
+  box-shadow:
+    0 0 0 2px rgba(5, 8, 13, 0.9),
+    0 8px 24px rgba(0, 0, 0, 0.5);
+}
+.seat[data-talking]::before {
+  content: "";
+  position: absolute;
+  inset: -6px;
+  border: 2px solid #22b8d6;
+  border-radius: 50%;
+  box-shadow: 0 0 16px rgba(34, 184, 214, 0.6);
+}
+
+/* ---------------------------------------------------------------------- */
+/* WorldMeet, in its own white and gold: two on a call, London and Lagos,
+   on one gold link with WorldMeet's mark at its peak. The paper warms to
+   gold toward the bottom left, where the frame's shade sits */
+
+.meet {
+  background:
+    radial-gradient(ellipse 55% 70% at 70% 20%, #fffcf5 30%, rgba(255, 252, 245, 0) 100%),
+    linear-gradient(210deg, #fffcf5 0%, #fef3c7 42%, #f6c445 76%, #a16207 100%);
+}
+
+/* The link, one shape for a wide face and one for a tall one */
+.link {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  opacity: 0;
+  transition: opacity 500ms var(--cx-ease);
+}
+.art[data-focus="WorldMeet"] .link {
+  opacity: 1;
+  transition-delay: 250ms;
+}
+.link path {
+  fill: none;
+  stroke: #eab308;
+  stroke-width: 3;
+  stroke-linecap: round;
+  vector-effect: non-scaling-stroke;
+}
+.link .glow {
+  stroke: rgba(250, 204, 21, 0.4);
+  stroke-width: 12;
+}
+.link g[data-shape="tall"] {
+  display: none;
+}
+
+/* WorldMeet's mark, at the link's peak */
+.mark {
+  position: absolute;
+  left: var(--peak-x);
+  top: var(--peak-y);
+  width: clamp(32px, 9cqh, 48px);
+  aspect-ratio: 1;
+  translate: -50% -50%;
+  opacity: 0;
+  scale: 0.4;
+  transition:
+    opacity 400ms var(--cx-ease),
+    scale 600ms var(--cx-spring-bouncy);
+}
+.art[data-focus="WorldMeet"] .mark {
+  opacity: 1;
+  scale: 1;
+  transition-delay: 300ms;
+}
+.mark img {
+  position: relative;
+  display: block;
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  border-radius: 28%;
+  box-shadow:
+    0 0 0 4px #fff,
+    0 12px 28px -6px rgba(161, 98, 7, 0.55);
+}
+.waves i {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 320%;
+  aspect-ratio: 1;
+  border: 1.5px solid rgba(234, 179, 8, 0.55);
+  border-radius: 50%;
+  opacity: 0;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+}
+
+/* The two on the call, each on a white tile, slid in from either side;
+   Lagos is talking, ringed in gold */
+.tile {
+  --from: 0px;
+  position: absolute;
+  aspect-ratio: 4 / 5;
+  padding: 4px;
+  border-radius: var(--cx-r-card);
+  background: #fff;
+  box-shadow:
+    0 0 0 1px rgba(28, 25, 23, 0.06),
+    0 24px 48px -16px rgba(161, 98, 7, 0.45);
+  translate: calc(-50% + var(--from)) -50%;
+  opacity: 0;
+  transition:
+    opacity 450ms var(--cx-ease),
+    translate 700ms var(--cx-spring);
+}
+.london {
+  --from: -32px;
+  left: 49%;
+  top: 27%;
+  height: 38cqh;
+  rotate: -4deg;
+}
+.lagos {
+  --from: 32px;
+  left: 81%;
+  top: 47%;
+  height: 48cqh;
+  rotate: 3deg;
+}
+.art[data-focus="WorldMeet"] .tile {
+  --from: 0px;
+  opacity: 1;
+}
+.art[data-focus="WorldMeet"] .lagos {
+  transition-delay: 80ms;
+}
+.tile img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  border-radius: var(--cx-r-md);
+  object-fit: cover;
+}
+.tile[data-talking]::after {
+  content: "";
+  position: absolute;
+  inset: 4px;
+  border-radius: var(--cx-r-md);
+  box-shadow: inset 0 0 0 3px #eab308;
+}
+.plate {
+  position: absolute;
+  left: 12px;
+  bottom: 12px;
+  padding: 0 8px;
+  border-radius: var(--cx-r-pill);
+  background: rgba(12, 10, 9, 0.6);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 20px;
+}
+
+/* ---------------------------------------------------------------------- */
+/* A tall face (a phone): each picture keeps to the top half, over the
+   frame's words */
+@container (aspect-ratio < 1) {
+  .people {
+    --glow-at: 55% 22%;
+  }
+  .world {
+    --w: 190cqw;
+    --ax: 52cqw;
+    --ay: 12cqh;
+  }
+  .land {
+    stroke-width: 0.8;
+  }
+  .pin {
+    --size: clamp(32px, 11cqw, 44px);
+  }
+  .pin[data-lead] {
+    --size: clamp(44px, 16cqw, 60px);
+  }
+  .pin[data-only="wide"],
+  .arc[data-only="wide"] {
+    display: none;
+  }
+
+  .space {
+    --x: 50%;
+    --y: 22%;
+  }
+  .orbit {
+    --s: min(100cqw, 82cqh);
+  }
+
+  .link g[data-shape="wide"] {
+    display: none;
+  }
+  .link g[data-shape="tall"] {
+    display: inline;
+  }
+  .mark {
+    left: var(--peak-x-tall);
+    top: var(--peak-y-tall);
+    width: 32px;
+  }
+  .london {
+    left: 27%;
+    top: 25%;
+    height: 26cqh;
+  }
+  .lagos {
+    left: 72%;
+    top: 28%;
+    height: 30cqh;
+  }
+  .plate {
+    left: 8px;
+    bottom: 8px;
+  }
+}
+
+/* ---------------------------------------------------------------------- */
+/* The one loop in each picture, running only while it shows: London and
+   Lagos ringing out, the helmet floating, the call's gold rings */
+@media (prefers-reduced-motion: no-preference) {
+  .art[data-lit]:not([data-focus="WorldSpace"]):not([data-focus="WorldMeet"]) .pin[data-lead]::after {
+    animation: ripple 3.2s var(--cx-ease) calc(1.2s + var(--i) * 1.6s) infinite;
+  }
+  .art[data-focus="WorldSpace"] .bob {
+    animation: bob 7s ease-in-out infinite;
+  }
+  .art[data-focus="WorldMeet"] .waves i {
+    animation: wave 4.8s ease-out infinite;
+  }
+  .art[data-focus="WorldMeet"] .waves i:nth-child(2) {
+    animation-delay: 1.6s;
+  }
+  .art[data-focus="WorldMeet"] .waves i:nth-child(3) {
+    animation-delay: 3.2s;
+  }
+}
+
+@keyframes ripple {
+  from {
+    opacity: 0.7;
+    transform: scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: scale(1.9);
+  }
+}
+@keyframes bob {
+  50% {
+    transform: translateY(-3%);
+  }
+}
+@keyframes wave {
+  from {
+    opacity: 0.8;
+    transform: translate(-50%, -50%) scale(0.3);
+  }
+  to {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .layer,
+  .lights,
+  .arc,
+  .pin,
+  .float,
+  .seat,
+  .link,
+  .mark,
+  .tile {
+    transition: none;
+  }
+}

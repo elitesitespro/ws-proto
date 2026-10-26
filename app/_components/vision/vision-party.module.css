@@ -1,0 +1,573 @@
+/* A Vision watch party in Vision's own gold on near-black: your screen and
+   its controls, your friends' screens under it, and tonight's posters on a
+   tilted wall beside them, drifting. Gold is the party (in sync, the time
+   gone, what's on); text on gold is ink. */
+.stage {
+  --gold: #edb200;
+  --gold-hi: #fac800;
+  --ink: #0c0a09;
+  --card: #1c1917;
+  --raised: #292524;
+  --hair: rgba(255, 255, 255, 0.1);
+  --muted: #a8a29e;
+  height: 100%;
+  display: grid;
+  grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
+  grid-template-rows: minmax(0, 1fr);
+  gap: 24px;
+  color: #fbfaf9;
+  text-align: left;
+}
+.party {
+  min-width: 0;
+  display: grid;
+  grid-template-rows: minmax(0, 1fr) auto auto auto;
+  gap: 12px;
+  min-height: 0;
+  align-content: center;
+}
+
+/* Your screen */
+/* It takes the height the controls and friends leave it */
+.frame {
+  position: relative;
+  height: 100%;
+  min-height: 120px;
+  max-height: 320px;
+  overflow: hidden;
+  border-radius: 20px;
+  background: #070605;
+  box-shadow:
+    0 0 0 1px var(--hair),
+    0 32px 64px -24px rgba(0, 0, 0, 0.8);
+}
+.art {
+  object-fit: cover;
+  transform: scale(calc(1.06 + var(--drift, 0) * 0.1)) translateY(calc(var(--drift, 0) * -3%));
+  transition:
+    transform 1s linear,
+    filter 400ms ease;
+  animation: arrive 700ms ease-out both;
+}
+.frame[data-paused] .art,
+.mini[data-paused] .art {
+  filter: brightness(0.55);
+}
+.frame::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(10, 9, 8, 0.65), transparent 32%, transparent 45%, rgba(10, 9, 8, 0.92));
+  pointer-events: none;
+}
+.top,
+.now {
+  position: absolute;
+  z-index: 1;
+  inset-inline: 16px;
+}
+.top {
+  top: 12px;
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  font-size: 11px;
+  color: var(--muted);
+}
+.sync {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--gold-hi);
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-size: 10px;
+}
+.sync::before {
+  content: "";
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--gold-hi);
+  animation: beat 2s ease-out infinite;
+}
+.frame[data-paused] .sync::before {
+  animation: none;
+  opacity: 0.5;
+}
+.now {
+  bottom: 14px;
+  display: grid;
+  gap: 2px;
+}
+.now strong {
+  font-size: var(--text-xl);
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  line-height: 1.1;
+}
+.now > span:last-child {
+  color: var(--muted);
+  font-size: 11px;
+  white-space: pre;
+}
+.tag {
+  color: var(--gold-hi);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+.paused {
+  position: absolute;
+  z-index: 1;
+  left: 50%;
+  top: 50%;
+  display: grid;
+  place-items: center;
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: rgba(10, 9, 8, 0.6);
+  backdrop-filter: blur(8px);
+  transform: translate(-50%, -50%);
+  animation: pop 360ms cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+.news {
+  position: absolute;
+  z-index: 2;
+  left: 50%;
+  top: 40px;
+  padding: 0 12px;
+  border-radius: var(--cx-r-pill);
+  background: var(--gold);
+  color: var(--ink);
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 26px;
+  white-space: nowrap;
+  transform: translateX(-50%);
+  animation: news 2.6s ease both;
+}
+
+/* The controls, for everyone */
+.controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+.tool,
+.play {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  border: 0;
+  border-radius: 50%;
+  cursor: pointer;
+  transition:
+    background 160ms ease,
+    transform 160ms ease;
+}
+.tool {
+  width: 36px;
+  height: 36px;
+  background: var(--raised);
+  color: #fbfaf9;
+}
+.tool:hover {
+  background: #3a3532;
+}
+.play {
+  width: 44px;
+  height: 44px;
+  background: var(--gold);
+  color: var(--ink);
+  box-shadow: 0 8px 24px -8px rgba(237, 178, 0, 0.7);
+}
+.play:hover {
+  background: var(--gold-hi);
+}
+.tool:active,
+.play:active {
+  transform: scale(0.92);
+}
+.tool:focus-visible,
+.play:focus-visible,
+.invite:focus-visible,
+.poster:focus-visible {
+  outline: 2px solid var(--gold-hi);
+  outline-offset: 2px;
+}
+.progress {
+  flex: 1;
+  min-width: 48px;
+  height: 4px;
+  overflow: hidden;
+  border-radius: var(--cx-r-pill);
+  background: var(--raised);
+}
+.progress i {
+  display: block;
+  height: 100%;
+  background: var(--gold);
+  transform-origin: left;
+  transition: transform 1s linear;
+}
+.time {
+  flex-shrink: 0;
+  color: var(--muted);
+  font-size: 11px;
+}
+
+/* Everyone's screens */
+.screens {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(0, 1fr);
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.screens li {
+  display: grid;
+  gap: 6px;
+  min-width: 0;
+  animation: pop 500ms cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+.mini {
+  position: relative;
+  display: grid;
+  place-items: center;
+  aspect-ratio: 16 / 10;
+  overflow: hidden;
+  border-radius: 10px;
+  background: #070605;
+  box-shadow: 0 0 0 1px var(--hair);
+}
+.mini svg {
+  position: relative;
+  z-index: 1;
+}
+.who {
+  display: flex;
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1.15;
+}
+.who img,
+.me {
+  flex-shrink: 0;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+}
+.me {
+  display: grid;
+  place-items: center;
+  background: var(--gold);
+  color: var(--ink);
+  font-size: 10px;
+  font-style: normal;
+  font-weight: 700;
+}
+.who > span {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.who small {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: var(--muted);
+  font-size: 10px;
+  font-weight: 400;
+}
+.invite {
+  display: grid;
+  place-items: center;
+  align-content: center;
+  gap: 4px;
+  aspect-ratio: 16 / 10;
+  border: 1px dashed rgba(250, 200, 0, 0.45);
+  border-radius: 10px;
+  background: rgba(237, 178, 0, 0.06);
+  color: var(--gold-hi);
+  font: inherit;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.invite:hover:not(:disabled) {
+  background: rgba(237, 178, 0, 0.14);
+}
+.invite:disabled {
+  border-style: solid;
+  border-color: var(--hair);
+  background: none;
+  color: var(--muted);
+  cursor: default;
+}
+.chat {
+  min-height: 20px;
+  font-size: 12px;
+  animation: line 400ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+.chat b {
+  margin-right: 4px;
+  color: var(--gold-hi);
+  font-weight: 600;
+}
+
+/* Tonight's wall, tilted, each column drifting its own way */
+.wall {
+  position: relative;
+  min-height: 0;
+  overflow: hidden;
+  border-radius: 24px;
+  mask-image: linear-gradient(180deg, transparent, #000 14%, #000 86%, transparent);
+}
+.tilt {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  display: grid;
+  grid-template-columns: repeat(3, 150px);
+  gap: 12px;
+  transform: translate(-50%, -50%) rotate(8deg);
+}
+.column {
+  display: grid;
+  gap: 12px;
+  animation: drift-up 48s linear infinite;
+}
+.column[data-column="1"] {
+  animation-name: drift-down;
+  animation-duration: 56s;
+}
+.column[data-column="2"] {
+  animation-duration: 42s;
+}
+.wall:hover .column,
+.wall:focus-within .column {
+  animation-play-state: paused;
+}
+.poster {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  gap: 2px;
+  aspect-ratio: 2 / 3;
+  padding: 12px;
+  overflow: hidden;
+  border: 0;
+  border-radius: 16px;
+  background: #070605;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+  color: #fbfaf9;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: transform 300ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+.poster img {
+  object-fit: cover;
+  transition: transform 600ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+.poster::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(0deg, rgba(12, 10, 9, 0.9), transparent 55%);
+  box-shadow: inset 0 0 0 0 var(--gold);
+  transition: box-shadow 240ms ease;
+}
+.poster > span,
+.poster > strong {
+  position: relative;
+  z-index: 1;
+}
+.poster strong {
+  font-size: var(--text-sm);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+}
+.poster:hover {
+  transform: translateY(-4px);
+}
+.poster:hover img {
+  transform: scale(1.06);
+}
+.poster[aria-pressed="true"]::after {
+  box-shadow: inset 0 0 0 3px var(--gold);
+}
+.watching {
+  position: absolute !important;
+  top: 10px;
+  left: 10px;
+  padding: 0 8px;
+  border-radius: var(--cx-r-pill);
+  background: var(--gold);
+  color: var(--ink);
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 20px;
+}
+
+@keyframes drift-up {
+  to {
+    transform: translateY(calc(-50% - 6px));
+  }
+}
+@keyframes drift-down {
+  from {
+    transform: translateY(calc(-50% - 6px));
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+@keyframes arrive {
+  from {
+    opacity: 0;
+  }
+}
+@keyframes beat {
+  0% {
+    box-shadow: 0 0 0 0 rgba(250, 200, 0, 0.7);
+  }
+  100% {
+    box-shadow: 0 0 0 8px rgba(250, 200, 0, 0);
+  }
+}
+@keyframes pop {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.6);
+  }
+}
+.screens li {
+  animation-name: pop-in;
+}
+@keyframes pop-in {
+  from {
+    opacity: 0;
+    transform: scale(0.7);
+  }
+}
+@keyframes news {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -6px);
+  }
+  12%,
+  80% {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, 0);
+  }
+}
+@keyframes line {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+}
+
+/* A tablet or a phone: the party takes the width; tonight's wall becomes a
+   shelf you scroll along under it */
+@media (max-width: 1023px) {
+  .stage {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: minmax(0, 1fr) auto;
+    gap: 12px;
+  }
+  .frame {
+    max-height: none;
+  }
+  .wall {
+    overflow-x: auto;
+    border-radius: 0;
+    mask-image: linear-gradient(90deg, #000 85%, transparent);
+    scrollbar-width: none;
+  }
+  .tilt {
+    position: static;
+    display: flex;
+    transform: none;
+  }
+  .column {
+    display: contents;
+    animation: none;
+  }
+  .poster {
+    width: 80px;
+    flex-shrink: 0;
+    padding: 8px;
+    border-radius: 12px;
+  }
+  .poster[data-copy] {
+    display: none;
+  }
+  .poster strong {
+    font-size: 11px;
+  }
+  .poster .tag {
+    display: none;
+  }
+}
+@media (max-width: 600px) {
+  .chat {
+    display: none;
+  }
+  .poster {
+    width: 64px;
+  }
+  .who small {
+    display: none;
+  }
+  .now strong {
+    font-size: var(--text-lg);
+  }
+}
+@media (max-width: 1023px) and (max-height: 740px) {
+  .screens,
+  .chat {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .art,
+  .progress i {
+    transition: none;
+  }
+  .art {
+    transform: scale(1.06);
+  }
+  .column {
+    animation: none;
+  }
+  .sync::before,
+  .paused,
+  .news,
+  .screens li,
+  .chat,
+  .art {
+    animation: none;
+  }
+}

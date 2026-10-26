@@ -134,8 +134,9 @@ export function CurrencyCarousel({
                 className="group/currency basis-20! px-1!"
               >
                 <Card
+                  lit={false}
                   data-currency-type={currency.type}
-                  className="relative isolate aspect-square w-full items-center justify-end gap-0! overflow-hidden rounded-full! border-0! p-2! ring-0! transition-[translate,box-shadow] duration-[600ms] hover:-translate-y-1 hover:shadow-xl motion-reduce:transition-none"
+                  className="relative isolate aspect-square w-full items-center justify-end gap-0! overflow-hidden rounded-full! p-2! transition-[translate,box-shadow] duration-[600ms] hover:-translate-y-1 hover:shadow-xl motion-reduce:transition-none"
                   style={{ backgroundColor: currency.color, transitionTimingFunction: cardTransitionEase }}
                 >
                   {currency.artwork.kind === "flag-group" ? (
@@ -162,14 +163,14 @@ export function CurrencyCarousel({
                     />
                   )}
                   <span
-                    className="relative z-10 inline-flex h-4 w-8 translate-y-1 items-center justify-center rounded-full border border-white/30 bg-black/55 text-[14px] leading-none font-medium text-white opacity-0 backdrop-blur-sm transition-[opacity,translate] duration-[600ms] group-hover/card:translate-y-0 group-hover/card:opacity-100 motion-reduce:transition-none"
+                    className="cx-liquid cx-liquid--pill cx-liquid--clear relative z-10 inline-flex h-4 w-8 translate-y-1 items-center justify-center text-xs leading-none font-medium tabular-nums opacity-0 transition-[opacity,translate] duration-[600ms] group-hover/card:translate-y-0 group-hover/card:opacity-100 motion-reduce:transition-none"
                     style={{ transitionTimingFunction: cardTransitionEase }}
                   >
                     {currency.code}
                   </span>
                 </Card>
                 <p
-                  className="mt-2 translate-y-1 text-center text-[14px] leading-[24px] font-medium text-white opacity-0 transition-[opacity,translate] duration-[600ms] group-hover/currency:translate-y-0 group-hover/currency:opacity-100 motion-reduce:transition-none"
+                  className="mt-2 translate-y-1 text-center text-xs leading-[24px] font-medium text-foreground opacity-0 transition-[opacity,translate] duration-[600ms] group-hover/currency:translate-y-0 group-hover/currency:opacity-100 motion-reduce:transition-none"
                   style={{ transitionTimingFunction: cardTransitionEase }}
                 >
                   {currency.name}

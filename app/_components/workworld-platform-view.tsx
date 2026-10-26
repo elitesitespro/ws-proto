@@ -1,74 +1,43 @@
-"use client";
-import { useState } from "react";
-import Image from "next/image";
-import { Button } from "@/components/ui/button";
+import { Icon } from "@/components/icon";
 import { PlatformViewShell } from "./platform-view-shell";
-import styles from "./platform-views.module.css";
-import { MapPin, Wrench } from "lucide-react";
+import { WorldworkFinder } from "./workworld/worldwork-finder";
+import styles from "./workworld-platform-view.module.css";
 
+/**
+ * WorkWorld, which the product calls Worldwork (work.worldstreetgold.com):
+ * its black and white, its line, and the directory you can use, a trade's
+ * providers closest first, to call yourself.
+ */
 export function WorkworldPlatformView() {
-  const [service, setService] = useState(0);
   return (
     <PlatformViewShell
       name="WorkWorld"
+      glass="dark"
+      eyebrow={
+        <span className={styles.brand}>
+          <span className={styles.mark}>
+            <Icon name="wrench" size={16} tone="current" />
+          </span>
+          Worldwork
+          <span className={styles.when}>Mon 07:25 · The gate hinge snapped</span>
+        </span>
+      }
       title={
         <>
-          Good people.
+          Find someone who
           <br />
-          <span>Great work.</span>
-        </>
-      }
-      controls={
-        <>
-          {["Repairs", "Design", "Install"].map((n, i) => (
-            <Button
-              key={n}
-              variant="ghost"
-              aria-pressed={service === i}
-              onClick={() => setService(i)}
-            >
-              {n}
-            </Button>
-          ))}
+          does the thing you{" "}
+          <span className={styles.marked}>
+            need.
+            {/* The white zigzag under it, as on worldstreetgold.com */}
+            <svg aria-hidden="true" viewBox="0 0 120 24" preserveAspectRatio="none" className={styles.stroke}>
+              <path d="M4 8 L36 19 L60 9 L84 19 L116 6" pathLength={1} />
+            </svg>
+          </span>
         </>
       }
     >
-      <div className={styles.map}>
-        <span className={styles.mapLabel}>Your neighbourhood</span>
-        <div className={styles.nearbyPin}>
-          <Wrench size={20} />
-          <span>Local skills</span>
-        </div>
-        <div className={styles.pin}>
-          <MapPin size={24} />
-        </div>
-        <div className={`${styles.panel} ${styles.provider}`}>
-          <div className={styles.row}>
-            <div className={styles.identity}>
-              <Image
-                src="/assets/images/amara-avatar.jpg"
-                alt="Sample service provider"
-                width={40}
-                height={40}
-              />
-              <div>
-                <strong>
-                  {
-                    ["Home repairs", "Interior design", "Electrical setup"][
-                      service
-                    ]
-                  }
-                </strong>
-                <p className={styles.muted}>Find the right person</p>
-              </div>
-            </div>
-            <Wrench size={24} />
-          </div>
-          <p className={styles.compactHide}>
-            Local skills. Real possibilities.
-          </p>
-        </div>
-      </div>
+      <WorldworkFinder />
     </PlatformViewShell>
   );
 }

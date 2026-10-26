@@ -1,0 +1,32 @@
+/* A quiet pull to keep going: a hairline with a gold pulse running down it,
+   the same light as the arcs on the globe. */
+
+.line {
+  position: relative;
+  width: 1px;
+  height: 48px;
+  overflow: hidden;
+  background: color-mix(in oklab, var(--cx-text) 14%, transparent);
+}
+.line::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 1px;
+  height: 16px;
+  background: linear-gradient(to bottom, transparent, var(--cx-ember));
+  animation: run 2.4s var(--cx-ease-in-out) infinite;
+}
+
+@keyframes run {
+  from { transform: translateY(-16px); }
+  to { transform: translateY(48px); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .line::after {
+    animation: none;
+    transform: translateY(16px);
+  }
+}

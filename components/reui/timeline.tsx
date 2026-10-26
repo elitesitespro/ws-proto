@@ -88,7 +88,7 @@ function TimelineContent({
   ...props
 }: useRender.ComponentProps<"div">) {
   const defaultProps = {
-    className: cn("text-muted-foreground text-sm", className),
+    className: cn("text-muted text-sm", className),
     "data-slot": "timeline-content",
     children,
   }
@@ -111,7 +111,7 @@ function TimelineDate({
 }: TimelineDateProps) {
   const defaultProps = {
     className: cn(
-      "mb-1 block font-medium text-muted-foreground text-xs group-data-[orientation=vertical]/timeline:max-sm:h-4",
+      "mb-1 block font-medium text-muted text-xs group-data-[orientation=vertical]/timeline:max-sm:h-4",
       className
     ),
     "data-slot": "timeline-date",

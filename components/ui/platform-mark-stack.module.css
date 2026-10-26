@@ -1,0 +1,110 @@
+/* The platforms' app icons beside "platforms" in the statement: a small fanned
+   stack of squircle tiles, each in its platform's own look. Everything is in
+   em, so the stack is sized to the line at every width (about 0.86 of the
+   letters' size) and sits in the text without opening the line up.
+   --step (the gap from one tile to the next) and --gaps come from the TSX. */
+.stack {
+  --tile: 0.86em;
+  position: relative;
+  display: inline-block;
+  flex: none;
+  width: calc(var(--tile) + var(--gaps) * var(--step));
+  height: var(--tile);
+  margin-left: 0.24em;
+}
+
+/* Where a tile sits in the fan. The tile inside it pops in and out. */
+.slot {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: var(--tile);
+  height: var(--tile);
+}
+
+/* A tile: its platform's fill, lit along the top edge and shaded along the
+   bottom, casting a soft shadow on the one behind it */
+.tile {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  border-radius: 27%;
+  background: var(--tile-fill);
+  color: var(--tile-ink);
+  box-shadow:
+    inset 0 0.03em 0 rgba(255, 255, 255, 0.42),
+    inset 0 -0.04em 0.08em rgba(0, 0, 0, 0.22),
+    0 0.06em 0.16em rgba(0, 0, 0, 0.5),
+    0 0.01em 0.03em rgba(0, 0, 0, 0.35);
+}
+/* A soft sheen over its top half and a hairline rim, as on a real app icon */
+.tile::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.24), rgba(255, 255, 255, 0.04) 46%, transparent 54%);
+  box-shadow: inset 0 0 0 0.02em var(--tile-rim, rgba(255, 255, 255, 0.16));
+  pointer-events: none;
+}
+/* Where the browser can draw true squircle corners, use them */
+@supports (corner-shape: squircle) {
+  .tile,
+  .tile::after {
+    border-radius: 36%;
+    corner-shape: squircle;
+  }
+}
+
+/* WorldSpace: its cloud and W, in cream, on its own cyan */
+.worldspace {
+  --tile-fill: linear-gradient(160deg, #66d8ee 0%, #22b8d6 50%, #1390ad 100%);
+}
+/* Xtream: its chilli on the dark of a live room, the heat coming up from below */
+.xtream {
+  --tile-fill:
+    radial-gradient(95% 70% at 50% 108%, rgba(248, 88, 16, 0.6), rgba(227, 18, 42, 0.28) 48%, transparent 76%), #0b0708;
+  --tile-rim: rgba(227, 18, 42, 0.45);
+}
+/* WorldMeet: its app icon's ink globe on gold, lit white at the top */
+.worldmeet {
+  --tile-fill: linear-gradient(160deg, #fff3b0 0%, #facc15 40%, #eab308 100%);
+}
+/* Vision: a gold play on near-black, with a gold rim */
+.vision {
+  --tile-fill: linear-gradient(160deg, #26200f 0%, #070605 72%);
+  --tile-ink: #fac800;
+  --tile-rim: rgba(237, 178, 0, 0.5);
+}
+/* Arcade: an ink gamepad on its lime */
+.arcade {
+  --tile-fill: linear-gradient(160deg, #d8e4aa 0%, #b5c478 52%, #97a858 100%);
+  --tile-ink: #150f26;
+}
+
+/* The marks inside: the two picture marks sized to the tile, the globe drawn
+   on the app icon's own 32-unit grid */
+.cloud {
+  width: 76%;
+  height: auto;
+  margin-top: 6%;
+}
+.chilli {
+  width: 78%;
+  height: auto;
+}
+.globe {
+  width: 100%;
+  height: 100%;
+}
+
+/* Under reduced motion the tiles are simply there, still fanned */
+@media (prefers-reduced-motion: reduce) {
+  .tile {
+    opacity: 1 !important;
+    transform: none !important;
+    filter: none !important;
+  }
+}

@@ -2,8 +2,9 @@
 
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import Image from "next/image";
-import { ArrowRight, Check, Pause, Play, RotateCcw } from "lucide-react";
+import { Icon } from "@/components/icon";
 import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
 import s from "./walkthrough.module.css";
 
 export type Playback = { stage: number; progress: number };
@@ -11,7 +12,9 @@ type Props = {
   brand: string;
   captions: readonly string[];
   actions: readonly string[];
-  tone: "entertainment" | "lifestyle" | "markets";
+  /** The platform's hue (app/hues.css), or "work" / "health" for the two
+   *  platforms the hub has no hue for (walkthrough.module.css). */
+  hue: string;
   children: (state: Playback) => ReactNode;
 };
 
@@ -25,7 +28,7 @@ function PlaybackScene({
   brand,
   captions,
   actions,
-  tone,
+  hue,
   children,
   replay,
 }: Props & { replay: () => void }) {
@@ -86,9 +89,10 @@ function PlaybackScene({
     setTime(nextTime);
   };
   return (
-    <div
+    <Card
       ref={root}
-      className={`${s.scene} ${s[tone]}`}
+      className={s.scene}
+      data-hue={hue}
       data-stage={stage}
       data-complete={time === 9000}
       data-paused={paused}
@@ -97,34 +101,33 @@ function PlaybackScene({
         <span>{brand}</span>
         <span className={s.demo}>Demo</span>
         <Button
-          variant="ghost"
-          size="icon"
-          className={s.iconButton}
+          variant="secondary"
+          size="icon-sm"
           aria-label={paused ? "Play walkthrough" : "Pause walkthrough"}
           aria-pressed={paused}
           onClick={() => setPaused(!paused)}
         >
-          {paused ? <Play size={20} /> : <Pause size={20} />}
+          <Icon name={paused ? "play" : "pause"} tone="current" />
         </Button>
         <Button
-          variant="ghost"
-          size="icon"
-          className={s.iconButton}
+          variant="secondary"
+          size="icon-sm"
           aria-label="Replay walkthrough"
           onClick={replay}
         >
-          <RotateCcw size={20} />
+          <Icon name="rotate-ccw" tone="current" />
         </Button>
       </header>
       <div className={s.body}>{children({ stage, progress: time / 9000 })}</div>
       <footer className={s.footer}>
         <div className={s.steps} aria-hidden="true">
           {[0, 1, 2, 3].map((i) => (
-            <i key={i} data-done={stage >= i} />
+            <i key={i} data-done={stage >= i} data-current={stage === i} />
           ))}
         </div>
         <p aria-live="polite">{captions[stage]}</p>
         <Button
+          size="sm"
           className={s.action}
           onClick={next}
           data-pressing={
@@ -135,10 +138,13 @@ function PlaybackScene({
           }
         >
           {actions[stage]}
-          {stage === 3 ? <RotateCcw size={20} /> : <ArrowRight size={20} />}
+          <Icon
+            name={stage === 3 ? "rotate-ccw" : "arrow-right"}
+            tone="current"
+          />
         </Button>
       </footer>
-    </div>
+    </Card>
   );
 }
 export function Photo({
@@ -164,7 +170,7 @@ export function Photo({
 export function Status({ children }: { children: ReactNode }) {
   return (
     <span className={s.status}>
-      <Check size={20} />
+      <Icon name="check" tone="current" />
       {children}
     </span>
   );

@@ -1,77 +1,61 @@
-import Image from "next/image";
+import type { CSSProperties } from "react";
 import { WorkworldMapBackground } from "./workworld-map-background";
 import styles from "./platform-backdrop.module.css";
 
+// WorldSpace's sky: the same stars on every visit (a seeded sequence), in
+// three depths, faint and small to near and bright; the nearest twinkle,
+// each on its own beat
+const STARS = (() => {
+  let seed = 7;
+  const next = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
+  return Array.from({ length: 180 }, (_, index) => {
+    const depth = index < 120 ? 0 : index < 162 ? 1 : 2;
+    return {
+      x: `${(next() * 100).toFixed(2)}%`,
+      y: `${(next() * 100).toFixed(2)}%`,
+      r: [0.6, 1, 1.6][depth],
+      opacity: [0.35, 0.65, 1][depth],
+      beat:
+        depth === 2
+          ? ({ "--t": `${(3 + next() * 2.5).toFixed(2)}s`, "--d": `${(next() * -4).toFixed(2)}s` } as CSSProperties)
+          : undefined,
+    };
+  });
+})();
+
 export function PlatformBackdrop({ name }: { name: string }) {
   if (name === "WorkWorld") return <WorkworldMapBackground />;
-  if (!["Vsion", "Forex", "Arcade", "WorldSpace"].includes(name)) return null;
+  // Every platform has one; a platform without its own class in the CSS
+  // shows the section's fill
   return (
     <div
       key={name}
       aria-hidden="true"
-      className={`${styles.backdrop} ${styles[name]}`}
+      className={`${styles.backdrop} ${styles[name.replaceAll(" ", "")] ?? ""}`}
     >
-      {name === "Vsion" && (
-        <Image
-          src="/assets/images/dune-0.jpg"
-          alt=""
-          fill
-          sizes="100vw"
-          className={styles.film}
-        />
-      )}
       {name === "WorldSpace" && (
-        <div className={styles.collage}>
-          {[
-            "academy-course.jpg",
-            "active-meeting-1.jpg",
-            "elena-avatar.jpg",
-          ].map((src) => (
-            <div key={src}>
-              <Image
-                src={`/assets/images/${src}`}
-                alt=""
-                fill
-                sizes="(max-width: 1023px) 60vw, 40vw"
-              />
-            </div>
+        <svg className={styles.sky}>
+          {STARS.map((star, index) => (
+            <circle
+              key={index}
+              cx={star.x}
+              cy={star.y}
+              r={star.r}
+              opacity={star.opacity}
+              className={star.beat ? styles.twinkle : undefined}
+              style={star.beat}
+            />
           ))}
-        </div>
-      )}
-      {name === "Forex" && (
-        <svg
-          className={styles.chart}
-          viewBox="0 0 1200 800"
-          preserveAspectRatio="none"
-        >
-          <path
-            d="M0 160H1200M0 320H1200M0 480H1200M0 640H1200M200 0V800M400 0V800M600 0V800M800 0V800M1000 0V800"
-            fill="none"
-            stroke="currentColor"
-            opacity=".12"
-          />
-          <path
-            d="M0 700L80 670L160 710L240 570L320 600L400 520L480 570L560 400L640 460L720 320L800 370L880 240L960 280L1040 160L1120 200L1200 80V800H0Z"
-            fill="currentColor"
-            opacity=".07"
-          />
-          <path
-            className={styles.chartLine}
-            d="M0 700L80 670L160 710L240 570L320 600L400 520L480 570L560 400L640 460L720 320L800 370L880 240L960 280L1040 160L1120 200L1200 80"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="4"
-            pathLength="1"
-          />
         </svg>
       )}
-      {name === "Arcade" && (
-        <>
-          <div className={styles.planet} />
-          <div className={styles.stars} />
-          <div className={styles.gameFloor} />
-        </>
+      {name === "XStream" && (
+        <div className={styles.signal}>
+          <i />
+          <i />
+          <i />
+        </div>
       )}
+      {name === "Crypto" && <div className={styles.cryptoSky} />}
       <div className={styles.shade} />
     </div>
   );

@@ -1,0 +1,142 @@
+/* WorldStreet's street: a cream road with an ink centre line, winding down
+   the categories from side to side, and the gold car that drives it. The
+   cream is the paper the platform tour ends on (Prediction's), so the
+   street runs on out of it. */
+.street {
+  --street: #f6f3ec;
+  --lane: #0c0a09;
+  --lit: var(--cx-ember);
+  --road: 28px;
+  --dash-w: 3px;
+  --dash: 14px;
+  --tile: 28px;
+  --car-w: 20px;
+  --car-h: 40px;
+}
+@media (min-width: 1024px) {
+  .street {
+    --road: 32px;
+    --dash-w: 4px;
+    --dash: 16px;
+    --tile: 32px;
+    --car-w: 24px;
+    --car-h: 48px;
+  }
+}
+
+/* A straight stretch, its dashes counted from its top */
+.road {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: var(--road);
+  transform: translateX(-50%);
+  background:
+    repeating-linear-gradient(to bottom, var(--lane) 0 var(--dash), transparent var(--dash) var(--tile)) 50% 0 /
+      var(--dash-w) 100% no-repeat,
+    var(--street);
+}
+/* A stretch counted up from its foot, so its dashes run on into the one
+   below */
+.up {
+  background:
+    repeating-linear-gradient(
+        to top,
+        transparent 0 calc(var(--tile) - var(--dash)),
+        var(--lane) calc(var(--tile) - var(--dash)) var(--tile)
+      )
+      50% 100% / var(--dash-w) 100% no-repeat,
+    var(--street);
+}
+/* Where the street starts or stops, it rounds off */
+.start {
+  border-radius: var(--road) var(--road) 0 0;
+}
+.end {
+  border-radius: 0 0 var(--road) var(--road);
+}
+/* The way the car has come: the centre line lit in gold behind it */
+.trail {
+  position: absolute;
+  top: 0;
+  width: var(--dash-w);
+  transform: translateX(-50%);
+  background: repeating-linear-gradient(to bottom, var(--lit) 0 var(--dash), transparent var(--dash) var(--tile));
+  filter: drop-shadow(0 0 3px var(--cx-halo));
+}
+/* The street's mouth: the cream above narrowing into the road between two
+   rounded corners */
+.mouth {
+  position: absolute;
+  top: 0;
+  /* A little over the road's top, so none of the lit line's glow shows
+     above it */
+  margin-top: -6px;
+  transform: translateX(-50%);
+  fill: var(--street);
+}
+/* The turn from one side to the other at the foot of a pinned story */
+.turnRoad,
+.turnLane,
+.turnTrail {
+  fill: none;
+}
+.turnRoad {
+  stroke: var(--street);
+  stroke-width: var(--road);
+}
+.turnLane,
+.turnTrail {
+  stroke-width: var(--dash-w);
+  stroke-dasharray: var(--dash) calc(var(--tile) - var(--dash));
+}
+.turnLane {
+  stroke: var(--lane);
+}
+.turnTrail {
+  stroke: var(--lit);
+  filter: drop-shadow(0 0 3px var(--cx-halo));
+}
+
+/* The car, seen from above with its nose down the street */
+.car {
+  position: absolute;
+  z-index: 10;
+  width: var(--car-w);
+  height: var(--car-h);
+  translate: -50% -50%;
+  pointer-events: none;
+}
+.car svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.55));
+}
+/* Its headlights, thrown down the road ahead, coming up out of the nose */
+.beam {
+  position: absolute;
+  top: 80%;
+  left: 50%;
+  width: calc(var(--car-w) * 3.6);
+  height: calc(var(--car-h) * 2.6);
+  transform: translateX(-50%);
+  background: radial-gradient(
+    ellipse 46% 92% at 50% 0,
+    rgba(255, 236, 170, 0.5),
+    rgba(255, 236, 170, 0.14) 45%,
+    transparent 72%
+  );
+  mask-image: linear-gradient(transparent, #000 30%);
+  mix-blend-mode: screen;
+}
+.brake {
+  fill: #ef4444;
+  filter: drop-shadow(0 0 2px #ef4444) drop-shadow(0 0 5px rgba(239, 68, 68, 0.8));
+}
+.reverse {
+  fill: #fff;
+  filter: drop-shadow(0 0 3px rgba(255, 255, 255, 0.9));
+}
