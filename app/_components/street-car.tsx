@@ -1,6 +1,6 @@
 "use client";
 
-import { useId } from "react";
+import { useId, type Ref } from "react";
 import { motion, useScroll, useTransform, useVelocity, type MotionStyle } from "motion/react";
 import styles from "./street.module.css";
 
@@ -11,9 +11,19 @@ const MARK = "M40.94 25.25L27.6 49L4 7h26.71zM77.9 7L54.3 49L40.94 25.25L51.21 7
  * The WorldStreet car: gold, seen from above with its nose down the street
  * and the W on its roof, its headlights thrown on the road ahead. Its lights
  * follow the page: brake lights while it's still, reversing lights while it
- * scrolls back up. Place it with `style` (left, top, rotate, opacity).
+ * scrolls back up, and an indicator blinking on the side it's turning to
+ * (`data-turn="left"` or `"right"` on it, by the screen). Place it with
+ * `style` (x, y and rotate, from where it's drawn).
  */
-export function StreetCar({ className = "", style }: { className?: string; style?: MotionStyle }) {
+export function StreetCar({
+  ref,
+  className = "",
+  style,
+}: {
+  ref?: Ref<HTMLDivElement>;
+  className?: string;
+  style?: MotionStyle;
+}) {
   const id = useId();
   const { scrollY } = useScroll();
   const speed = useVelocity(scrollY);
@@ -21,7 +31,7 @@ export function StreetCar({ className = "", style }: { className?: string; style
   const reverse = useTransform(speed, [-160, -40], [1, 0]);
 
   return (
-    <motion.div aria-hidden="true" className={`${styles.car} ${className}`} style={style}>
+    <motion.div ref={ref} aria-hidden="true" className={`${styles.car} ${className}`} style={style}>
       <span className={styles.beam} />
       <svg viewBox="0 0 24 48">
         <defs>
@@ -72,6 +82,16 @@ export function StreetCar({ className = "", style }: { className?: string; style
           <rect x="9" y="1.4" width="2.4" height="1.4" rx="0.7" />
           <rect x="12.6" y="1.4" width="2.4" height="1.4" rx="0.7" />
         </motion.g>
+        {/* The indicators, at its corners: nose down, the screen's right is
+            its own left */}
+        <g className={styles.signalRight}>
+          <rect x="20.2" y="41" width="2.6" height="2.6" rx="1" />
+          <rect x="20.2" y="3.6" width="2.6" height="2.6" rx="1" />
+        </g>
+        <g className={styles.signalLeft}>
+          <rect x="1.2" y="41" width="2.6" height="2.6" rx="1" />
+          <rect x="1.2" y="3.6" width="2.6" height="2.6" rx="1" />
+        </g>
       </svg>
     </motion.div>
   );

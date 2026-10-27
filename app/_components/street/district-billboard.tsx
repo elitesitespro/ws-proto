@@ -1,26 +1,28 @@
-import type { ReactNode } from "react";
+import { memo, type ComponentType } from "react";
 import { platformDetails, type ShowcasePlatformName } from "../platform-showcase-content";
-import type { District } from "./street-districts";
+import type { ArtProps, District } from "./street-districts";
 import styles from "./street-section.module.css";
 
 /**
  * A district's billboard by the road: its art, and over it why the district
  * is worth the stop. Its lamps come on as the car arrives. While you look at
- * one of its exits it advertises that platform instead.
+ * one of its exits (or the car's just passed one, on a phone or a tablet) it
+ * advertises that platform instead. It renders again only when one of those
+ * changes, not every time the car passes something.
  */
-export function DistrictBillboard({
+export const DistrictBillboard = memo(function DistrictBillboard({
   district,
   firstExit,
   focus,
   lit,
-  art,
+  Art,
 }: {
   district: District;
   /** The number of its first exit along the street. */
   firstExit: number;
   focus: ShowcasePlatformName | null;
   lit: boolean;
-  art: ReactNode;
+  Art: ComponentType<ArtProps>;
 }) {
   const index = district.exits.findIndex((exit) => exit.name === focus);
   const exit = district.exits[index];
@@ -33,7 +35,7 @@ export function DistrictBillboard({
         <i />
       </span>
       <div className={styles.face} data-tone={exit?.light ? "light" : undefined}>
-        {art}
+        <Art focus={focus} lit={lit} />
         <div aria-hidden="true" className={styles.scrim} />
         <div key={exit?.name ?? district.id} className={styles.copy}>
           <p className={styles.kicker}>
@@ -52,4 +54,4 @@ export function DistrictBillboard({
       </div>
     </article>
   );
-}
+});

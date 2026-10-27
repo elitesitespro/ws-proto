@@ -39,10 +39,6 @@
   display: grid;
   gap: 16px;
 }
-/* The switch between them (a phone's) */
-.switch {
-  display: none;
-}
 .plan {
   position: relative;
   overflow: hidden;
@@ -174,96 +170,64 @@
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
-/* A phone: the two in a row you swipe, the other showing at the edge, under
-   a switch between them; the plan you're on is lit */
+/* A phone: the two side by side all the same, set smaller, so they read
+   together; Pro's voice button down to its globe and its name */
 @media (max-width: 767px) {
   /* Less night between the plans and the finale */
   .section {
     padding-bottom: 72px;
   }
+  .head {
+    margin-bottom: 8px;
+  }
+  .lede {
+    font-size: 16px;
+    line-height: 24px;
+  }
   .plansWrap {
-    display: grid;
-    justify-items: center;
-    gap: 20px;
-    margin-top: 80px;
-  }
-  .switch {
-    position: relative;
-    display: inline-grid;
-    grid-template-columns: 1fr 1fr;
-    padding: 4px;
-    border-radius: 999px;
-    background: rgba(255, 255, 255, 0.05);
-    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.1);
-  }
-  .switch::before {
-    content: "";
-    position: absolute;
-    top: 4px;
-    bottom: 4px;
-    left: 4px;
-    width: calc(50% - 4px);
-    border-radius: 999px;
-    background: rgba(234, 179, 8, 0.16);
-    box-shadow: inset 0 0 0 1px rgba(234, 179, 8, 0.45);
-    transition:
-      translate 400ms var(--cx-ease),
-      background 400ms ease,
-      box-shadow 400ms ease;
-  }
-  .switch[data-plan="Pro"]::before {
-    translate: 100% 0;
-    background: #eab308;
-    box-shadow: 0 8px 24px -8px rgba(234, 179, 8, 0.8);
-  }
-  .switch button {
-    position: relative;
-    min-width: 104px;
-    height: 40px;
-    border: 0;
-    border-radius: 999px;
-    background: none;
-    color: #a8a29e;
-    font: inherit;
-    font-size: 15px;
-    font-weight: 500;
-    cursor: pointer;
-    transition: color 300ms ease;
-  }
-  .switch button[aria-pressed="true"] {
-    color: #facc15;
-  }
-  .switch[data-plan="Pro"] button[aria-pressed="true"] {
-    color: #1c1917;
-  }
-  .switch button:focus-visible {
-    outline: 2px solid #facc15;
-    outline-offset: 2px;
+    margin-top: 56px;
   }
   .plans {
-    display: flex;
-    align-items: flex-start;
-    gap: 12px;
-    justify-self: stretch;
-    margin: 0 -16px;
-    padding: 0 16px 8px;
-    overflow-x: auto;
-    overscroll-behavior-x: contain;
-    scroll-snap-type: x mandatory;
-    scroll-padding-inline: 16px;
-    scrollbar-width: none;
-  }
-  .plans::-webkit-scrollbar {
-    display: none;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
   }
   .plan {
-    flex: 0 0 88%;
-    scroll-snap-align: start;
-    opacity: 0.45;
-    transition: opacity 400ms ease;
+    gap: 10px;
+    padding: 16px 14px;
+    border-radius: 20px;
   }
-  .plan[data-on] {
-    opacity: 1;
+  .planName {
+    font-size: 14px;
+  }
+  .plan h3 {
+    font-size: var(--text-base);
+  }
+  .plan ul {
+    gap: 6px;
+  }
+  .plan li {
+    padding-left: 14px;
+    font-size: 13px;
+    line-height: 1.4;
+  }
+  .plan li::before {
+    left: 0;
+    width: 5px;
+    height: 5px;
+  }
+  .voice {
+    gap: 10px;
+    padding: 6px 14px 6px 6px;
+  }
+  .voiceOrb {
+    width: 40px;
+    height: 40px;
+  }
+  .voiceOrb > :last-child {
+    scale: 0.72;
+  }
+  .voice small {
+    display: none;
   }
 }
 /* On a laptop the heading and its line sit side by side */

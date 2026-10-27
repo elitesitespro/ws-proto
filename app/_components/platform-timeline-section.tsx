@@ -22,6 +22,8 @@ import {
   type MotionValue,
   type Variants,
 } from "motion/react";
+import { useMediaQuery } from "@/lib/use-media-query";
+import { usePauseOffscreen } from "@/lib/use-pause-offscreen";
 import { useReducedMotion } from "@/lib/use-reduced-motion";
 
 // Each platform wears its own colour (hueAttrs, the hub's family); the
@@ -306,6 +308,10 @@ type PlatformTimelineSectionProps = {
 
 export function PlatformTimelineSection({ intro, introLine }: PlatformTimelineSectionProps = {}) {
   const sectionRef = useRef<HTMLElement>(null);
+  usePauseOffscreen(sectionRef);
+  // The platforms one under another, for short windows and reduced motion:
+  // only there, so its thirteen scenes aren't all playing out of sight
+  const stacked = useMediaQuery("(max-height: 560px), (prefers-reduced-motion: reduce)");
   // Which platform is at the pointer, and which way the dial last turned
   const [step, setStep] = useState({ index: 0, direction: 1 });
   const activeIndex = step.index;
@@ -738,29 +744,31 @@ export function PlatformTimelineSection({ intro, introLine }: PlatformTimelineSe
           </motion.div>
         </motion.div>
       </motion.div>
-      <div className={styles.stackedLayout}>
-        {platforms.map((platform) => {
-          const hue = hueAttrs(platform.name);
-          const colours = sectionColours(platform.name);
-          return (
-            <div
-              key={platform.name}
-              data-hue={hue["data-hue"]}
-              className="relative isolate px-2 py-6 md:px-6"
-              style={{
-                ...hue.style,
-                backgroundColor: colours.fill,
-                color: colours.text,
-              }}
-            >
-              <PlatformBackdrop name={platform.name} />
-              <div className="mx-auto max-w-[560px]">
-                <PlatformView name={platform.name} />
+      {stacked && (
+        <div className={styles.stackedLayout}>
+          {platforms.map((platform) => {
+            const hue = hueAttrs(platform.name);
+            const colours = sectionColours(platform.name);
+            return (
+              <div
+                key={platform.name}
+                data-hue={hue["data-hue"]}
+                className="relative isolate px-2 py-6 md:px-6"
+                style={{
+                  ...hue.style,
+                  backgroundColor: colours.fill,
+                  color: colours.text,
+                }}
+              >
+                <PlatformBackdrop name={platform.name} />
+                <div className="mx-auto max-w-[560px]">
+                  <PlatformView name={platform.name} />
+                </div>
               </div>
-            </div>
-          );
-        })}
-      </div>
+            );
+          })}
+        </div>
+      )}
     </section>
   );
 }

@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, type PointerEvent } from "react";
 import { useScroll } from "motion/react";
+import { usePauseOffscreen } from "@/lib/use-pause-offscreen";
 import { useReducedMotion } from "@/lib/use-reduced-motion";
 import { cn } from "cn";
 import { ACCOUNT_LINKS } from "@/components/layout/nav-links";
@@ -105,6 +106,7 @@ function landFrom(mask: Uint8ClampedArray, mw: number, mh: number, count: number
  */
 export function JoinCta() {
   const sectionRef = useRef<HTMLElement>(null);
+  usePauseOffscreen(sectionRef);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const beaconRef = useRef<HTMLSpanElement>(null);
   const headingRef = useRef<HTMLHeadingElement>(null);

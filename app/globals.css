@@ -177,4 +177,12 @@
        their own pressed states */
     -webkit-tap-highlight-color: transparent;
   }
+
+  /* A section well off the screen holds its looping animations still
+     (lib/use-pause-offscreen.ts) */
+  [data-asleep] *,
+  [data-asleep] *::before,
+  [data-asleep] *::after {
+    animation-play-state: paused !important;
+  }
 }

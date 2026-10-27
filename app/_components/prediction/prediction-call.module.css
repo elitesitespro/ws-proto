@@ -473,11 +473,14 @@
     height: 44px;
   }
 }
-/* A tablet or a phone: the chart over the ticket */
+/* A tablet or a phone: the chart over the ticket, each card as tall as
+   what's in it at least (they stretch into any room to spare): squeezed to
+   the room, the chance and its chart ran out of the card's foot. Where
+   they don't fit, the scene's drawn smaller (scene-fit.tsx). */
 @media (max-width: 1023px) {
   .stage {
     grid-template-columns: minmax(0, 1fr);
-    grid-template-rows: minmax(0, 1fr) auto;
+    grid-template-rows: auto auto;
     gap: 12px;
   }
   .market,
@@ -556,9 +559,6 @@
    squeezed; if they're still too tall, the scene's drawn smaller to fit
    (scene-fit.tsx) */
 @media (max-width: 600px) and (max-height: 740px) {
-  .stage {
-    grid-template-rows: auto auto;
-  }
   .topics {
     display: none;
   }

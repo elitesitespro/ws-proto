@@ -1,7 +1,7 @@
 /* Vivid's switchboard (vivid-switchboard.tsx): questions on the left, the
    globe in the middle, the platforms that answer them on the right, joined
    by dotted gold wires (the loader's and the CTA's arcs). Laid out across on
-   a laptop; on a phone it stands up, and the routes swipe through the globe. */
+   a laptop; on a phone it stands up, and the scroll works it. */
 .board {
   --globe: clamp(220px, 19vw, 272px);
   position: relative;
@@ -233,16 +233,13 @@
   transform: translate(-50%, 0);
 }
 
-/* Your own question, under the globe, wired up into it */
+/* Your own question, under the board, wired up into the globe */
 .composer {
   display: flex;
-  grid-column: 1 / -1;
-  grid-row: 3;
-  justify-self: center;
   align-items: center;
   gap: 8px;
   width: min(100%, 480px);
-  margin-top: 64px;
+  margin: 64px auto 0;
   padding: 6px 6px 6px 20px;
   border-radius: 28px;
   background: rgba(255, 255, 255, 0.06);
@@ -290,117 +287,113 @@
   outline-offset: 2px;
 }
 .fine {
-  grid-column: 1 / -1;
-  grid-row: 4;
-  margin-top: -8px;
+  margin-top: 12px;
   color: rgba(255, 255, 255, 0.45);
   font-size: 12px;
   line-height: 16px;
   text-align: center;
 }
 
-/* A phone's pieces: the row's place-markers, the wires through the globe
-   and the platforms round it */
-.dots,
-.feed,
+/* The platforms round the globe (a phone's or a tablet's) */
 .orbit {
   display: none;
 }
 
-/* On a phone or a tablet the switchboard stands up: each route is a slide,
-   its question over the globe and its answer under it, and you swipe them
-   through. The globe holds still in the middle, between the two, and talks
-   each one through as it comes in; they come in by themselves until you
-   swipe or tap. */
+/* On a phone or a tablet the board stands up and holds the screen while you
+   scroll through it, a stretch of scroll for each route (the track's
+   height): the four questions over the globe, each on a jack at its right
+   whose wire runs down and into the globe; the thirteen platforms round it;
+   the answer under it. The lit question is the one the scroll's at. */
 @media (max-width: 1023px) {
+  .track {
+    height: calc(100svh + (var(--routes) - 1) * 30svh);
+  }
   .board {
-    --globe: 184px;
-    --ask: 84px;
-    --feed: 36px;
-    --gutter: 16px;
+    --globe: clamp(116px, 22svh, 184px);
+    position: sticky;
+    top: 0;
+    height: 100svh;
     grid-template-columns: minmax(0, 1fr);
-    row-gap: 0;
+    grid-template-rows: repeat(4, auto) auto auto;
+    align-content: center;
+    row-gap: 4px;
+    padding: 64px 0 16px;
   }
   .label {
     display: none;
   }
-  /* The row, out to the screen's edges, a slide at a time in the middle,
-     the next just showing */
+  /* Its questions and answers take the board's own rows */
   .routes {
-    display: flex;
     grid-column: 1;
-    grid-row: 1;
-    gap: 12px;
-    margin-inline: calc(var(--gutter) * -1);
-    padding-block: 4px;
-    padding-inline: max(calc(var(--gutter) + 20px), calc(50% + var(--gutter) - 220px));
-    overflow-x: auto;
-    overscroll-behavior-x: contain;
-    scroll-snap-type: x mandatory;
-    scrollbar-width: none;
-  }
-  .routes::-webkit-scrollbar {
-    display: none;
+    grid-row: 1 / span 6;
+    grid-template-columns: subgrid;
+    grid-template-rows: subgrid;
   }
   .route {
-    flex: 0 0 min(100%, 440px);
-    grid-column: auto;
-    grid-template-columns: minmax(0, 1fr);
-    grid-template-rows: var(--ask) calc(var(--globe) + 2 * var(--feed)) auto;
-    align-items: start;
-    scroll-snap-align: center;
-    scroll-snap-stop: always;
-    opacity: 0.35;
-    transition: opacity 300ms var(--cx-ease);
+    display: contents;
   }
-  .route[data-on] {
-    opacity: 1;
-  }
-  /* The question, said to Vivid */
+  /* A question, on its jack */
   .ask {
-    grid-row: 1;
+    position: relative;
+    grid-row: var(--row);
     grid-column: 1;
-    align-self: end;
-    justify-self: center;
-    padding: 10px 18px;
-    border-radius: 22px;
-    background: rgba(255, 255, 255, 0.06);
-    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.1);
+    padding: 8px 48px 8px 0;
+    color: rgba(250, 250, 249, 0.4);
     font-size: 17px;
     line-height: 24px;
-    text-align: center;
+    text-align: left;
+    text-wrap: pretty;
+    cursor: pointer;
+  }
+  .ask::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    right: 6px;
+    width: 12px;
+    height: 12px;
+    margin-top: -6px;
+    border-radius: 50%;
+    background: #0c0a09;
+    box-shadow: inset 0 0 0 2px rgba(234, 179, 8, 0.35);
     transition:
-      color 300ms var(--cx-ease),
-      box-shadow 300ms var(--cx-ease);
+      background 300ms ease,
+      box-shadow 300ms ease;
   }
   .route[data-on] .ask {
-    box-shadow: inset 0 0 0 1px rgba(234, 179, 8, 0.5);
+    color: #fafaf9;
   }
+  .route[data-on] .ask::after {
+    background: #facc15;
+    box-shadow:
+      0 0 0 4px rgba(250, 204, 21, 0.16),
+      0 0 14px #facc15;
+  }
+  /* The answers share one place under the globe; the lit one's showing */
   .card {
-    grid-row: 3;
+    grid-row: 6;
     grid-column: 1;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(10px);
+    transition:
+      opacity 250ms ease,
+      transform 400ms var(--cx-ease),
+      visibility 0s 250ms,
+      background 300ms var(--cx-ease),
+      box-shadow 300ms var(--cx-ease);
   }
-  /* The globe, between the two, still while they slide past; swipes go
-     through it to the row */
+  .route[data-on] .card {
+    opacity: 1;
+    visibility: visible;
+    transform: none;
+    transition-delay: 0s;
+  }
+  /* The globe in the middle, room round it for the ring */
   .slot {
     grid-column: 1;
-    grid-row: 1;
-    align-self: start;
-    margin-top: calc(4px + var(--ask) + var(--feed));
-    pointer-events: none;
-  }
-  .globeLink {
-    display: none;
-  }
-  .feed {
-    position: absolute;
-    left: 50%;
-    display: block;
-    width: 4px;
-    height: calc(var(--feed) - 12px);
-    margin-left: -2px;
-    background: radial-gradient(circle, #facc15 1.3px, transparent 1.8px) 50% 0 / 4px 9px repeat-y;
-    animation: feed 600ms linear infinite;
+    grid-row: 5;
+    margin-block: 34px;
   }
   /* The thirteen, each in its colour, going slowly round; the one the
      answer's from comes up bright, and for the wallet they all do */
@@ -434,69 +427,17 @@
     opacity: 0.9;
   }
   .orbit i[data-on] {
-    --s: 1.9;
+    --s: 2.2;
     opacity: 1;
-    box-shadow: 0 0 10px var(--hue);
-  }
-  .feedIn {
-    bottom: calc(100% + 6px);
-  }
-  .feedOut {
-    top: calc(100% + 6px);
-  }
-  .dots {
-    display: flex;
-    grid-row: 2;
-    justify-content: center;
-    margin-top: 16px;
-  }
-  .dots button {
-    position: relative;
-    width: 36px;
-    height: 24px;
-    padding: 0 4px;
-    border: 0;
-    background: none;
-    cursor: pointer;
-  }
-  .dots button::after,
-  .dots i {
-    content: "";
-    position: absolute;
-    top: 10px;
-    left: 4px;
-    right: 4px;
-    height: 4px;
-    border-radius: 2px;
-  }
-  .dots button::after {
-    background: rgba(255, 255, 255, 0.18);
-  }
-  .dots button[data-on]::after {
-    background: #facc15;
-  }
-  /* While it waits to bring the next in, the bar fills */
-  .dots button:has(i)::after {
-    background: rgba(250, 204, 21, 0.3);
-  }
-  .dots i {
-    z-index: 1;
-    background: #facc15;
-    transform-origin: left;
-    animation: fill linear both;
+    box-shadow: 0 0 12px var(--hue);
   }
   .composer {
-    grid-row: 3;
-    margin-top: 28px;
-  }
-  .fine {
-    margin-top: 4px;
+    margin-top: 40px;
   }
 }
 @media (min-width: 768px) and (max-width: 1023px) {
   .board {
-    --globe: 208px;
-    --gutter: 24px;
+    --globe: clamp(140px, 22svh, 220px);
   }
 }
 @keyframes orbit {
@@ -504,20 +445,9 @@
     rotate: 1turn;
   }
 }
-@keyframes feed {
-  to {
-    background-position: 50% 9px;
-  }
-}
-@keyframes fill {
-  from {
-    transform: scaleX(0);
-  }
-}
 
 @media (prefers-reduced-motion: reduce) {
   .wire[data-on],
-  .feed,
   .orbit {
     animation: none;
   }

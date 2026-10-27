@@ -20,6 +20,20 @@
   z-index: 1;
   padding-top: 72px;
 }
+/* The car's way: from its parking spot at the mouth to the one at the end.
+   Its rig is sticky on the car's line (top, in the TSX), so the browser
+   holds the car still on the screen while the street scrolls under it. */
+.carTrack {
+  position: absolute;
+  z-index: 10;
+  left: 0;
+  right: 0;
+  pointer-events: none;
+}
+.carRig {
+  position: sticky;
+  height: 0;
+}
 
 /* The approach to the street, with its opening words: the tour's cream runs
    on a little, so it doesn't end hard against the street, and the street
@@ -238,6 +252,12 @@
     inset 0 0 0 1px var(--hue-line),
     0 0 28px -10px rgba(var(--hue-rgb), 0.6);
 }
+.exit[data-now] {
+  background: #1c1917;
+  box-shadow:
+    inset 0 0 0 1.5px var(--hue),
+    0 0 40px -8px rgba(var(--hue-rgb), 0.75);
+}
 .exit:hover,
 .exit:focus-visible {
   transform: translateY(-2px);
@@ -266,6 +286,7 @@
     color 300ms ease;
 }
 .exit[data-lit] .exitNumber,
+.exit[data-now] .exitNumber,
 .exit:hover .exitNumber {
   background: var(--hue);
   color: var(--hue-on);
@@ -299,6 +320,7 @@
     transform 200ms ease,
     color 200ms ease;
 }
+.exit[data-now] .exitGo,
 .exit:hover .exitGo,
 .exit:focus-visible .exitGo {
   color: var(--hue);
@@ -341,21 +363,23 @@
   }
 }
 
-/* Where you are along a district's row of exits (a phone or a tablet's) */
-.swipeDots {
-  display: none;
-}
-
 /* A phone or a tablet: the road swaps sides from one district to the next,
-   as on a laptop, taking a round corner across between them, and each
-   district's exits are a row of signs you swipe along, running out past
-   the edge of the screen on the side away from the road */
+   in an S between them. Each district's billboard holds at the top of the
+   screen while its exits come by under it, one under another beside the
+   road, each off a slip road: you scroll the car past them, and the one
+   it's just passed is up on the billboard. */
 @media (max-width: 1023px) {
   .inner {
     --gutter: 16px;
   }
+  /* A block, not a grid: a grid's billboard could only stick inside its
+     own cell */
+  .district {
+    display: block;
+  }
+  /* Room for the S across */
   .district + .district {
-    margin-top: 176px;
+    margin-top: 320px;
   }
   .district[data-side="left"] {
     padding-right: 48px;
@@ -365,71 +389,24 @@
     right: 0;
     left: auto;
   }
+  /* Held under the header's place, on the street's dark, so the exits
+     passing under it go out of sight at its foot */
+  .board {
+    position: sticky;
+    top: 64px;
+    z-index: 2;
+    padding-bottom: 20px;
+    background: linear-gradient(var(--background) calc(100% - 20px), transparent);
+  }
+  .face {
+    aspect-ratio: auto;
+    height: clamp(208px, 34svh, 340px);
+    max-height: none;
+  }
+  /* The district's own case first, a little way before its first exit */
   .exits {
-    display: flex;
-    gap: 12px;
-    margin: -8px calc(var(--gutter) * -1) -12px 0;
-    padding: 18px var(--gutter) 20px 0;
-    overflow-x: auto;
-    overscroll-behavior-x: contain;
-    scroll-snap-type: x mandatory;
-    scrollbar-width: none;
-  }
-  .district[data-side="left"] .exits {
-    margin: -8px 0 -12px calc(var(--gutter) * -1);
-    padding: 18px 0 20px var(--gutter);
-    scroll-padding-left: var(--gutter);
-  }
-  .exits::-webkit-scrollbar {
-    display: none;
-  }
-  .exits > li {
-    display: grid;
-    flex: 0 0 min(84%, 320px);
-    scroll-snap-align: start;
-  }
-  /* Side by side, they light one after another as the car comes by */
-  .exit,
-  .exitNumber {
-    transition-delay: calc(var(--order) * 120ms);
-  }
-  .exit:hover,
-  .exit:focus-visible {
-    transition-delay: 0ms;
-  }
-  .swipeDots {
-    display: flex;
-    margin: -20px 0 0 -6px;
-  }
-  .district[data-side="left"] .swipeDots {
-    justify-content: flex-end;
-    margin: -20px -6px 0 0;
-  }
-  /* Each a way to its exit, bigger than it looks */
-  .swipeDots button {
-    display: grid;
-    place-items: center;
-    height: 24px;
-    padding: 0 3px;
-    border: 0;
-    background: none;
-    cursor: pointer;
-  }
-  .swipeDots i {
-    width: 6px;
-    height: 6px;
-    border-radius: 3px;
-    background: rgba(246, 243, 236, 0.22);
-    transition:
-      width 300ms var(--cx-ease),
-      background 300ms ease;
-  }
-  .swipeDots button:hover i {
-    background: rgba(246, 243, 236, 0.45);
-  }
-  .swipeDots button[data-on] i {
-    width: 20px;
-    background: var(--hue);
+    gap: 32px;
+    padding: 88px 0 8px;
   }
   .end[data-side="left"] {
     padding-right: 48px;
@@ -457,9 +434,6 @@
 
 /* A tablet: a wider billboard, its line back under the headline */
 @media (min-width: 640px) and (max-width: 1023px) {
-  .face {
-    aspect-ratio: 4 / 3;
-  }
   .copy {
     right: auto;
     max-width: 80%;

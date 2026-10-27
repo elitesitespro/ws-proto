@@ -1,4 +1,4 @@
-import type { CSSProperties, Ref } from "react";
+import { memo } from "react";
 import { Icon } from "@/components/icon";
 import { hueAttrs, platformDetails, type ShowcasePlatformName } from "../platform-showcase-content";
 import { platforms } from "../platform-timeline-section";
@@ -9,35 +9,37 @@ import styles from "./street-section.module.css";
  * A platform's exit off the street: a road sign with its number on a tab, its
  * tile as on the wheel, its name and a few words, out to the platform. It
  * lights once the car has passed it; looking at it puts its platform up on
- * the district's billboard.
+ * the district's billboard. `now`: it's the one up there (where the car
+ * picks it, passing). Only the sign whose state changes renders again.
  */
-export function ExitSign({
-  ref,
+export const ExitSign = memo(function ExitSign({
+  register,
   exit,
   number,
-  order,
   lit,
+  now = false,
   onLook,
 }: {
-  ref?: Ref<HTMLLIElement>;
+  /** Hears the sign's element, by its number, to lay the street by. */
+  register: (number: number, el: HTMLLIElement | null) => void;
   exit: Exit;
   number: number;
-  /** Its place among its district's exits: where they're side by side, they light in turn. */
-  order: number;
   lit: boolean;
+  now?: boolean;
   onLook: (name: ShowcasePlatformName | null) => void;
 }) {
   const { href } = platformDetails[exit.name];
   const icon = platforms.find((platform) => platform.name === exit.name)?.icon ?? "arrow-up-right";
 
   return (
-    <li ref={ref} style={{ "--order": order } as CSSProperties}>
+    <li ref={(el) => register(number, el)}>
       <a
         href={href}
         target="_blank"
         rel="noreferrer"
         className={styles.exit}
         data-lit={lit || undefined}
+        data-now={now || undefined}
         {...hueAttrs(exit.name)}
         onMouseEnter={() => onLook(exit.name)}
         onMouseLeave={() => onLook(null)}
@@ -56,4 +58,4 @@ export function ExitSign({
       </a>
     </li>
   );
-}
+});

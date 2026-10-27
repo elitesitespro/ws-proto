@@ -98,6 +98,41 @@
   filter: drop-shadow(0 0 3px var(--cx-halo));
 }
 
+/* The light the car leaves behind it on the street, a stretch at a time
+   (--shown thousandths of each, set as it drives): a long exposure's
+   streak, a soft gold glow round a bright core */
+.light path {
+  fill: none;
+  stroke-dasharray: calc(var(--shown, 0) * 1px) 2000px;
+}
+.light path:first-child {
+  stroke: rgba(250, 204, 21, 0.22);
+  stroke-width: 12px;
+}
+.light path:last-child {
+  stroke: #fde68a;
+  stroke-width: var(--dash-w);
+}
+/* A slip road off to an exit (a phone's or a tablet's), lit like the
+   street behind the car once it's passed */
+.ramp path {
+  fill: none;
+  stroke-linecap: round;
+}
+.ramp path:first-child {
+  stroke: var(--street);
+  stroke-width: 10px;
+}
+.ramp path:last-child {
+  stroke: #fde68a;
+  stroke-width: 2px;
+  opacity: 0;
+  transition: opacity 400ms ease;
+}
+.ramp[data-lit] path:last-child {
+  opacity: 1;
+}
+
 /* The car, seen from above with its nose down the street */
 .car {
   position: absolute;
@@ -106,6 +141,26 @@
   height: var(--car-h);
   translate: -50% -50%;
   pointer-events: none;
+  will-change: transform;
+}
+/* Its indicators, blinking on the side it's turning to */
+.signalLeft,
+.signalRight {
+  fill: #fbbf24;
+  opacity: 0;
+  filter: drop-shadow(0 0 3px #f59e0b);
+}
+.car[data-turn="left"] .signalLeft,
+.car[data-turn="right"] .signalRight {
+  animation: blink 0.8s steps(1, end) infinite;
+}
+@keyframes blink {
+  0% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0;
+  }
 }
 .car svg {
   position: absolute;

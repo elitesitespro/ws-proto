@@ -1,7 +1,10 @@
 "use client";
 
-import { useEffect, useEffectEvent, useRef, useState, useSyncExternalStore, type CSSProperties } from "react";
-import { useMotionValue, useScroll } from "motion/react";
+import { useEffect, useEffectEvent, useRef, useState, type CSSProperties } from "react";
+import { useLenis } from "lenis/react";
+import { useMotionValue, useMotionValueEvent, useScroll } from "motion/react";
+import { useMediaQuery } from "@/lib/use-media-query";
+import { usePauseOffscreen } from "@/lib/use-pause-offscreen";
 import { useReducedMotion } from "@/lib/use-reduced-motion";
 import { Icon, type IconName } from "@/components/icon";
 import { tick } from "@/lib/haptics";
@@ -81,16 +84,10 @@ const DOCK = 40;
 const DOCK_SEEN = 0.72;
 const BIG = 18;
 // How long one route stays lit before the next, once the globe has landed
-// (on a phone, where the next one slides in, long enough to read the answer)
+// (where it's laid across; on a phone or a tablet the scroll lights them)
 const CYCLE_MS = 2800;
-const CYCLE_NARROW_MS = 5200;
-// Where the routes are a row you swipe through the globe, not laid across
+// Where the board stands up, and holds while you scroll it through
 const NARROW = "(max-width: 1023px)";
-const watchNarrow = (change: () => void) => {
-  const query = window.matchMedia(NARROW);
-  query.addEventListener("change", change);
-  return () => query.removeEventListener("change", change);
-};
 // How long the globe talks when a route lights, and the rings it gives off
 const SPEAK_MS = 1300;
 const RINGS = [80, 460];
@@ -99,6 +96,10 @@ const RING_LIFE = 1500;
 // of level), a little off its dots
 const SPREAD = 0.62;
 const WIRE_GAP = 10;
+// Standing up, the wires come round the platforms' ring and into the
+// globe's right side, the first question's highest
+const SIDE_IN = [1.15, 0.8, 0.45, 0.1];
+const RING_GAP = 30;
 
 const clamp = (v: number) => Math.min(Math.max(v, 0), 1);
 const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
@@ -112,21 +113,27 @@ type Wires = { w: number; h: number; ins: string[]; outs: string[]; stem: string
  * the right, to the platform that answers it, in that platform's colour,
  * with what Vivid says. Everything's on the page at once, so nothing waits
  * to be read: one route at a time lights up as the globe talks it through.
- * Your own question comes in from below. On a phone the board stands up:
- * each route's question sits over the globe and its answer under it, and
- * you swipe them through.
+ * Your own question comes in from below.
+ *
+ * On a phone or a tablet the board stands up and holds the screen while you
+ * scroll through it, like a switchboard being worked: the four questions
+ * over the globe, each on a jack, the thirteen platforms round the globe and
+ * the answer under it. Scrolling plugs each question in in turn: its wire
+ * lights into the globe, the platform that answers lights on the ring, and
+ * its answer comes up. Tap a question to go straight to it.
  *
  * The globe is the dashboard's: as this comes up the screen it lifts off
  * the dock (../vivid-handoff) and flies down into its place here, growing.
  */
 export function VividSwitchboard() {
   const reduce = useReducedMotion();
+  const lenis = useLenis();
+  const trackRef = useRef<HTMLDivElement>(null);
   const boardRef = useRef<HTMLDivElement>(null);
   const slotRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const overlayRef = useRef<HTMLCanvasElement>(null);
   const composerRef = useRef<HTMLFormElement>(null);
-  const routesRef = useRef<HTMLOListElement>(null);
   const askRefs = useRef<(HTMLParagraphElement | null)[]>([]);
   const cardRefs = useRef<(HTMLAnchorElement | null)[]>([]);
   // The globe wakes while it's hovered, or while you're typing to it
@@ -143,11 +150,8 @@ export function VividSwitchboard() {
   const [landed, setLanded] = useState(false);
   const [onScreen, setOnScreen] = useState(false);
   const shown = pointed ?? active;
-  const narrow = useSyncExternalStore(watchNarrow, () => window.matchMedia(NARROW).matches, () => false);
-  // On a phone: you've swiped or tapped, so the routes stay where you put them
-  const [held, setHeld] = useState(false);
-  // The route the row's gliding to, while it does
-  const steering = useRef<number | null>(null);
+  const narrow = useMediaQuery(NARROW);
+  usePauseOffscreen(boardRef);
 
   // The flight, 0 to 1: from when the dock's in sight, low on the screen
   // (or this half a screen off, if it's further), to when the globe's place
@@ -184,55 +188,67 @@ export function VividSwitchboard() {
     spoke.current = true;
   }, [shown]);
 
-  /** Light route `i`; on a phone, the row glides it in under the globe. */
-  const go = (i: number) => {
-    setActive(i);
-    const row = routesRef.current;
-    const slide = row?.children[i] as HTMLElement | undefined;
-    if (!row || !slide || !window.matchMedia(NARROW).matches) return;
-    steering.current = i;
-    row.scrollTo({ left: slide.offsetLeft - (row.firstElementChild as HTMLElement).offsetLeft, behavior: "smooth" });
-  };
-  const next = useEffectEvent(() => go((active + 1) % ROUTES.length));
+  const next = useEffectEvent(() => setActive((active + 1) % ROUTES.length));
 
-  // Once it's here and on screen, the routes light in turn (hovering or
-  // focusing one holds it; on a phone, swiping or tapping stops it)
-  const cycling = landed && onScreen && !reduce && pointed === null && !typing && !(narrow && held);
+  // Laid across, once it's here and on screen, the routes light in turn
+  // (hovering or focusing one holds it)
+  const cycling = !narrow && landed && onScreen && !reduce && pointed === null && !typing;
   useEffect(() => {
     if (!cycling) return;
-    const timer = window.setTimeout(next, narrow ? CYCLE_NARROW_MS : CYCLE_MS);
+    const timer = window.setTimeout(next, CYCLE_MS);
     return () => window.clearTimeout(timer);
-  }, [cycling, narrow, active]);
+  }, [cycling, active]);
 
-  // Swiped along the row: the route under the globe lights
-  const swiped = () => {
-    const row = routesRef.current;
-    const first = row?.firstElementChild as HTMLElement | null;
-    if (!row || !first || !narrow) return;
-    const step = first.offsetWidth + parseFloat(getComputedStyle(row).columnGap || "0");
-    const at = Math.min(Math.max(Math.round(row.scrollLeft / step), 0), ROUTES.length - 1);
-    if (steering.current !== null) {
-      if (at === steering.current) steering.current = null;
-      return;
-    }
+  // Standing up, the scroll works the board: a route for each stretch of it,
+  // lit as you come to it, with a tick
+  const { scrollYProgress: worked } = useScroll({ target: trackRef, offset: ["start start", "end end"] });
+  useMotionValueEvent(worked, "change", (p) => {
+    if (!narrow) return;
+    const at = Math.round(p * (ROUTES.length - 1));
     if (at === active) return;
     setActive(at);
     tick();
+  });
+  /** Standing up: glide the page to where route `i` is lit. */
+  const goTo = (i: number) => {
+    const track = trackRef.current;
+    if (!track) return;
+    const top = track.getBoundingClientRect().top + window.scrollY;
+    const y = top + ((track.offsetHeight - window.innerHeight) * i) / (ROUTES.length - 1);
+    if (lenis) lenis.scrollTo(y, { duration: 0.8 });
+    else window.scrollTo({ top: y, behavior: "smooth" });
   };
 
-  // The wires, from where everything is laid out (only where the board is
-  // laid out across: on a phone the routes stack, and their own lines join them)
+  // The wires, from where everything is laid out
   useEffect(() => {
     const board = boardRef.current;
     const slot = slotRef.current;
     if (!board || !slot) return;
     const wide = window.matchMedia("(min-width: 1024px)");
     const measure = () => {
-      if (!wide.matches) return setWires(null);
       const box = board.getBoundingClientRect();
       const s = slot.getBoundingClientRect();
       const cx = s.left - box.left + s.width / 2;
       const cy = s.top - box.top + s.height / 2;
+      if (!wide.matches) {
+        // Standing up: from each question's jack, at its right, down the
+        // side and round into the globe past the ring of platforms; out of
+        // its foot, down to the answer
+        const r = s.width / 2 + RING_GAP;
+        const card = cardRefs.current[0]?.getBoundingClientRect();
+        const ins = ROUTES.map((_, i) => {
+          const ask = askRefs.current[i]?.getBoundingClientRect();
+          if (!ask) return "";
+          const jx = ask.right - box.left - 12;
+          const jy = ask.top - box.top + ask.height / 2;
+          const a = SIDE_IN[i] ?? 0;
+          const ex = cx + r * Math.cos(a);
+          const ey = cy - r * Math.sin(a);
+          return `M${jx} ${jy}C${jx} ${jy + (ey - jy) * 0.75} ${ex + Math.cos(a) * 48} ${ey - Math.sin(a) * 48} ${ex} ${ey}`;
+        });
+        const out = card ? `M${cx} ${cy + r}L${cx} ${card.top - box.top - 8}` : "";
+        return setWires({ w: box.width, h: box.height, ins, outs: ROUTES.map(() => out), stem: "" });
+      }
       const r = s.width / 2 + WIRE_GAP;
       const ins: string[] = [];
       const outs: string[] = [];
@@ -261,7 +277,7 @@ export function VividSwitchboard() {
           `M${ox} ${ey}C${ox + cos * out * 0.35} ${ey - sin * out * 0.35} ${x1 - out * 0.55} ${y1} ${x1} ${y1}`,
         );
       });
-      // Your own question, straight up into it
+      // Your own question, under the board, straight up into it
       const box2 = composerRef.current?.getBoundingClientRect();
       const stem = box2 ? `M${cx} ${box2.top - box.top - 14}L${cx} ${cy + r}` : "";
       setWires({ w: box.width, h: box.height, ins, outs, stem });
@@ -435,145 +451,120 @@ export function VividSwitchboard() {
     };
   }, [flight]);
 
-  // A pointer over a route, or focus on it, holds it (not a finger: that's
-  // a swipe or a tap)
+  // A pointer over a route, or focus on it, holds it, where they're laid
+  // across (not a finger: that's a tap)
   const byFinger = (event: object) => "pointerType" in event && event.pointerType === "touch";
   const hold = (i: number) => (event: object) => {
-    if (!byFinger(event)) setPointed(i);
+    if (!byFinger(event) && !narrow) setPointed(i);
   };
   const release = (i: number) => (event: object) => {
-    if (byFinger(event)) return;
+    if (byFinger(event) || narrow) return;
     setActive(i);
     setPointed(null);
   };
 
   return (
-    <div ref={boardRef} className={styles.board}>
-      <canvas ref={overlayRef} aria-hidden="true" className={styles.overlay} />
-      {wires && (
-        <svg
-          aria-hidden="true"
-          className={styles.wires}
-          width={wires.w}
-          height={wires.h}
-          viewBox={`0 0 ${wires.w} ${wires.h}`}
-        >
-          {wires.ins.map((d, i) => (
-            <path key={`in-${i}`} d={d} className={styles.wire} data-on={i === shown || undefined} />
-          ))}
-          {wires.outs.map((d, i) => (
-            <path key={`out-${i}`} d={d} className={styles.wire} data-on={i === shown || undefined} />
-          ))}
-          {wires.stem && <path d={wires.stem} className={styles.wire} data-on={typing || undefined} />}
-        </svg>
-      )}
-
-      <p className={cn(styles.label, styles.labelAsk)}>You ask</p>
-      <p className={cn(styles.label, styles.labelWhere)}>Vivid shows you where</p>
-
-      <ol
-        ref={routesRef}
-        className={styles.routes}
-        onScroll={swiped}
-        onPointerDown={(event) => {
-          if (event.pointerType !== "touch") return;
-          // A finger takes over, even mid-glide
-          steering.current = null;
-          setHeld(true);
-        }}
-      >
-        {ROUTES.map((route, i) => (
-          <li
-            key={route.ask}
-            className={styles.route}
-            data-on={i === shown || undefined}
-            onPointerEnter={hold(i)}
-            onPointerLeave={release(i)}
-          >
-            <p
-              ref={(el) => {
-                askRefs.current[i] = el;
-              }}
-              className={styles.ask}
+    <>
+      <div ref={trackRef} className={styles.track} style={{ "--routes": ROUTES.length } as CSSProperties}>
+        <div ref={boardRef} className={styles.board}>
+          <canvas ref={overlayRef} aria-hidden="true" className={styles.overlay} />
+          {wires && (
+            <svg
+              aria-hidden="true"
+              className={styles.wires}
+              width={wires.w}
+              height={wires.h}
+              viewBox={`0 0 ${wires.w} ${wires.h}`}
             >
-              <span className="sr-only">You ask: </span>“{route.ask}”
-            </p>
+              {wires.ins.map((d, i) => (
+                <path key={`in-${i}`} d={d} className={styles.wire} data-on={i === shown || undefined} />
+              ))}
+              {wires.outs.map((d, i) => (
+                <path key={`out-${i}`} d={d} className={styles.wire} data-on={i === shown || undefined} />
+              ))}
+              {wires.stem && <path d={wires.stem} className={styles.wire} data-on={typing || undefined} />}
+            </svg>
+          )}
+
+          <p className={cn(styles.label, styles.labelAsk)}>You ask</p>
+          <p className={cn(styles.label, styles.labelWhere)}>Vivid shows you where</p>
+
+          <ol className={styles.routes}>
+            {ROUTES.map((route, i) => (
+              <li
+                key={route.ask}
+                className={styles.route}
+                data-on={i === shown || undefined}
+                style={{ "--row": i + 1 } as CSSProperties}
+                onPointerEnter={hold(i)}
+                onPointerLeave={release(i)}
+              >
+                {/* Standing up, a tap on a question glides the board to it */}
+                <p
+                  ref={(el) => {
+                    askRefs.current[i] = el;
+                  }}
+                  className={styles.ask}
+                  onClick={narrow ? () => goTo(i) : undefined}
+                >
+                  <span className="sr-only">You ask: </span>“{route.ask}”
+                </p>
+                <a
+                  ref={(el) => {
+                    cardRefs.current[i] = el;
+                  }}
+                  href={route.href}
+                  target="_blank"
+                  rel="noopener"
+                  {...route.hue}
+                  className={styles.card}
+                  onFocus={hold(i)}
+                  onBlur={release(i)}
+                >
+                  <span aria-hidden="true" className={styles.tile}>
+                    <Icon name={route.icon} size={20} tone="current" />
+                  </span>
+                  <span className={styles.place}>
+                    <span className="sr-only">Vivid points you to </span>
+                    {route.place}
+                    {route.pro && <span className={styles.pro}>Pro</span>}
+                  </span>
+                  <span className={styles.answer}>{route.answer}</span>
+                  <Icon name="arrow-up-right" size={20} tone="current" className={styles.go} />
+                </a>
+              </li>
+            ))}
+          </ol>
+          <div ref={slotRef} className={styles.slot}>
+            {/* Standing up, every platform goes round it, the one it's sending
+                you to lit */}
+            <span aria-hidden="true" className={styles.orbit} data-all={ROUTES[shown].everywhere || undefined}>
+              {PLATFORMS.map((name, k) => {
+                const hue = hueAttrs(name);
+                return (
+                  <i
+                    key={name}
+                    data-hue={hue["data-hue"]}
+                    data-on={ROUTES[shown].place === name || undefined}
+                    style={{ ...hue.style, "--k": k } as CSSProperties}
+                  />
+                );
+              })}
+            </span>
+            <canvas ref={canvasRef} aria-hidden="true" className={styles.canvas} />
             <a
-              ref={(el) => {
-                cardRefs.current[i] = el;
-              }}
-              href={route.href}
+              href={VIVID_URL}
               target="_blank"
               rel="noopener"
-              {...route.hue}
-              className={styles.card}
-              onFocus={hold(i)}
-              onBlur={release(i)}
+              aria-label="Open Vivid"
+              className={styles.globeLink}
+              onPointerEnter={() => (woken.current = true)}
+              onPointerLeave={() => (woken.current = false)}
             >
-              <span aria-hidden="true" className={styles.tile}>
-                <Icon name={route.icon} size={20} tone="current" />
-              </span>
-              <span className={styles.place}>
-                <span className="sr-only">Vivid points you to </span>
-                {route.place}
-                {route.pro && <span className={styles.pro}>Pro</span>}
-              </span>
-              <span className={styles.answer}>{route.answer}</span>
-              <Icon name="arrow-up-right" size={20} tone="current" className={styles.go} />
+              <span className={styles.tip}>Open Vivid</span>
             </a>
-          </li>
-        ))}
-      </ol>
-      {/* On a phone: which route's under the globe, filling while it waits
-          for the next. Tap one to go to it (the routes' own links are the
-          way through for a keyboard or a screen reader). */}
-      <div aria-hidden="true" className={styles.dots}>
-        {ROUTES.map((route, i) => (
-          <button
-            key={route.ask}
-            type="button"
-            tabIndex={-1}
-            data-on={i === active || undefined}
-            onClick={() => {
-              setHeld(true);
-              go(i);
-            }}
-          >
-            {i === active && cycling && <i style={{ animationDuration: `${CYCLE_NARROW_MS}ms` }} />}
-          </button>
-        ))}
-      </div>
-
-      <div ref={slotRef} className={styles.slot}>
-        {/* On a phone, the question runs down into the globe and out to the answer */}
-        <i aria-hidden="true" className={cn(styles.feed, styles.feedIn)} />
-        <i aria-hidden="true" className={cn(styles.feed, styles.feedOut)} />
-        {/* And every platform goes round it, the one it's sending you to lit */}
-        <span aria-hidden="true" className={styles.orbit} data-all={ROUTES[shown].everywhere || undefined}>
-          {PLATFORMS.map((name, k) => {
-            const hue = hueAttrs(name);
-            return (
-              <i
-                key={name}
-                data-hue={hue["data-hue"]}
-                data-on={ROUTES[shown].place === name || undefined}
-                style={{ ...hue.style, "--k": k } as CSSProperties}
-              />
-            );
-          })}
-        </span>
-        <canvas ref={canvasRef} aria-hidden="true" className={styles.canvas} />
-        <a
-          href={VIVID_URL}
-          target="_blank"
-          rel="noopener"
-          aria-label="Open Vivid"
-          className={styles.globeLink}
-          onPointerEnter={() => (woken.current = true)}
-          onPointerLeave={() => (woken.current = false)}
-        >
-          <span className={styles.tip}>Open Vivid</span>
-        </a>
+          </div>
+        </div>
       </div>
 
       {/* Your own question opens Vivid with it typed in its box (?q=) */}
@@ -609,6 +600,6 @@ export function VividSwitchboard() {
         </button>
       </form>
       <p className={styles.fine}>Free with your account. Vivid AI can make mistakes, so check anything important.</p>
-    </div>
+    </>
   );
 }

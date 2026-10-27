@@ -1,13 +1,15 @@
 "use client";
 
-import { useRef, useState, type CSSProperties } from "react";
+import { useEffect, useRef, useState, type CSSProperties } from "react";
 import {
   motion,
+  useMotionValue,
   useMotionValueEvent,
   useScroll,
   useTransform,
   type Variants,
 } from "motion/react";
+import { usePauseOffscreen } from "@/lib/use-pause-offscreen";
 import { useReducedMotion } from "@/lib/use-reduced-motion";
 import { Icon } from "@/components/icon";
 import { DashboardPreview } from "./dashboard/dashboard-preview";
@@ -58,6 +60,7 @@ export function WalletSection({
   vividHref?: string;
 } = {}) {
   const sectionRef = useRef<HTMLElement>(null);
+  usePauseOffscreen(sectionRef);
   const roomRef = useRef<HTMLDivElement>(null);
   const headingRef = useRef<HTMLHeadingElement>(null);
   const screenRef = useRef<HTMLDivElement>(null);
@@ -65,13 +68,26 @@ export function WalletSection({
 
   // Opening: 0 as it pins, 1 once the circle covers the screen
   const { scrollYProgress: opening } = useScroll({ target: roomRef, offset: ["start start", "end start"] });
-  const radius = (p: number) => COVER * p ** 1.2;
-  const clipPath = useTransform(opening, (p) =>
-    p >= 1 ? "none" : `circle(${radius(p).toFixed(2)}vmax at ${reveal?.x ?? "50%"} ${reveal?.y ?? "50%"})`,
+  // The circle's radius in px (a vmax is this many), so its clip and its rim
+  // are the same circle
+  const vmax = useMotionValue(0);
+  useEffect(() => {
+    const size = () => vmax.set(Math.max(window.innerWidth, window.innerHeight) / 100);
+    size();
+    window.addEventListener("resize", size);
+    return () => window.removeEventListener("resize", size);
+  }, [vmax]);
+  const radius = useTransform([opening, vmax], ([p, v]: number[]) => COVER * p ** 1.2 * v);
+  const clipPath = useTransform([opening, radius], ([p, r]: number[]) =>
+    p >= 1 ? "none" : `circle(${r.toFixed(1)}px at ${reveal?.x ?? "50%"} ${reveal?.y ?? "50%"})`,
   );
   // A gold rim just inside the circle's edge, so it reads as a circle even
-  // where the dark dashboard fills it; it fades as the circle fills the screen
-  const rimSize = useTransform(opening, (p) => `${(2 * radius(p)).toFixed(2)}vmax`);
+  // where the dark dashboard fills it; it fades as the circle fills the screen.
+  // Circles drawn at its radius, a fine line and a soft light in from it:
+  // only the rim's drawn again as it grows, not a blurred shadow its size.
+  const rimLine = useTransform(radius, (r) => Math.max(r - 1, 0));
+  const rimLight = useTransform(radius, (r) => Math.max(r - 9, 0));
+  const rimHaze = useTransform(radius, (r) => Math.max(r - 22, 0));
   const rimOpacity = useTransform(opening, [0, 0.04, 0.6, 0.95], [0, 1, 1, 0]);
   // The dashboard waits lower down, so the circle opens on gold, and rises
   // into its place as the circle grows
@@ -112,11 +128,13 @@ export function WalletSection({
         </motion.span>
       </div>
       {reveal && (
-        <motion.span
-          aria-hidden="true"
-          className={styles.rim}
-          style={{ left: reveal.x, top: reveal.y, width: rimSize, height: rimSize, opacity: rimOpacity }}
-        />
+        <motion.span aria-hidden="true" className={styles.rim} style={{ left: reveal.x, top: reveal.y, opacity: rimOpacity }}>
+          <svg>
+            <motion.circle r={rimHaze} />
+            <motion.circle r={rimLight} />
+            <motion.circle r={rimLine} />
+          </svg>
+        </motion.span>
       )}
 
       <div className="relative mx-auto w-full max-w-7xl px-4 md:px-6">

@@ -4,6 +4,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { motion, useMotionValueEvent, useScroll, useTransform, type MotionStyle } from "motion/react";
 import { cn } from "cn";
 import { NightGlobe, type GlobePlacement, type NightGlobeHandle } from "@/components/globe/night-globe";
+import { usePauseOffscreen } from "@/lib/use-pause-offscreen";
 import { hueAttrs, type ShowcasePlatformName } from "@/app/_components/platform-showcase-content";
 import { GlobeIntro } from "./globe-intro";
 import { GlobePins } from "./globe-pins";
@@ -76,6 +77,8 @@ export function GlobePreviewSection() {
   const introRef = useRef<HTMLElement>(null);
   const diveRef = useRef<HTMLDivElement>(null);
   const stageRef = useRef<HTMLDivElement>(null);
+  const rootRef = useRef<HTMLDivElement>(null);
+  usePauseOffscreen(rootRef);
   const [active, setActive] = useState<{ platform: ShowcasePlatformName; rgb: string }>();
   const [held, setHeld] = useState(false);
   const [landed, setLanded] = useState(false);
@@ -165,7 +168,7 @@ export function GlobePreviewSection() {
   }, [away, closeCity]);
 
   return (
-    <div className="relative -mt-10 bg-background" data-loading={opened ? undefined : ""}>
+    <div ref={rootRef} className="relative -mt-10 bg-background" data-loading={opened ? undefined : ""}>
       <HeroLoader
         globe={globeRef}
         stage={stageRef}
