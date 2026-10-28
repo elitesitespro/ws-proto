@@ -38,10 +38,29 @@
   --pill-subtle: var(--cx-text-3, rgba(255, 255, 255, 0.5));
   --pill-well: var(--cx-surface-2, rgba(255, 255, 255, 0.06));
   color: var(--pill-ink);
+  /* Back up into view: it rises, overshooting a little */
+  transition: translate 0.5s cubic-bezier(0.2, 0.9, 0.3, 1.15);
 }
-/* The intro has Vivid: nothing here shows, and nothing can be reached */
+/* Out of the way (not born yet, or a part of the page needs the foot of the
+   screen): it sinks below the edge, then it's gone and can't be reached */
+.box[data-aside] {
+  translate: 0 calc(var(--h) + 32px + env(safe-area-inset-bottom));
+  visibility: hidden;
+  transition:
+    translate 0.35s cubic-bezier(0.5, 0, 0.75, 0),
+    visibility 0s 0.35s;
+}
+/* The intro has Vivid: nothing here shows, at once, and nothing can be reached */
 .box[data-away] {
   visibility: hidden;
+  translate: none;
+  transition: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  .box,
+  .box[data-aside] {
+    transition: none;
+  }
 }
 
 /* The body: one shape, drawn by the spring */

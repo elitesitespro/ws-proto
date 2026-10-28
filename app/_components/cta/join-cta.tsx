@@ -454,10 +454,12 @@ export function JoinCta() {
           >
             Create your account
           </a>
+          {/* Opens Vivid's pill at the foot of the screen, there and then (vivid-pill.tsx) */}
           <a
             href={VIVID_URL}
             target="_blank"
             rel="noopener"
+            data-vivid-summon=""
             className={cn(buttonVariants({ variant: "glass", size: "lg" }), styles.secondary)}
           >
             <VividGlobe size={20} />

@@ -119,9 +119,9 @@ type Geo = {
  * all thirteen platforms swirl in from the edges into an orbit round it, each
  * on a filament, with light running in and out along them, because all of
  * WorldStreet runs through it. Then they fold into it, and it falls to the
- * foot of the screen trailing light, into the ask pill that rides along from
- * then on, and a ring goes out as it settles there (../vivid-handoff:
- * dockLift as it leaves the dock, pillDock as it lands).
+ * foot of the screen trailing light, back into the ask pill that rides along
+ * (it stood aside for the wallet), and a ring goes out as it settles there
+ * (../vivid-handoff: dockLift as it leaves the dock, pillDock as it lands).
  *
  * Scrubbed by the scroll, start to finish, on a stage held by the browser
  * (sticky); every frame is transforms and opacity from one handler, and one

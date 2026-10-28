@@ -24,7 +24,8 @@ export default function Home() {
       <StreetToWallet />
       <VividSection />
       <JoinCta />
-      {/* Vivid's ask pill, docked at the foot of the screen once its intro hands it down (rendered into <body>) */}
+      {/* Vivid's ask pill, docked at the foot of the screen from the hero down, out of the way where a section needs
+          it to be (rendered into <body>) */}
       <VividPill />
     </main>
   );

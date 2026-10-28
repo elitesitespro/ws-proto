@@ -220,6 +220,9 @@ export function WalletSection({
       style={{ marginTop: reveal.overlap, "--room": reveal.room } as CSSProperties}
     >
       <div ref={roomRef} aria-hidden="true" className={styles.room} />
+      {/* Where the wallet starts for Vivid's pill (vivid-pill-hooks.ts), which steps out of the way of the
+          dashboard's own Ask Vivid: as the circle starts to open, not as this box comes up behind the street */}
+      <div aria-hidden="true" data-vivid-part="wallet" className={styles.part} />
       {section}
       <div aria-hidden="true" className={styles.roomAfter} />
     </div>

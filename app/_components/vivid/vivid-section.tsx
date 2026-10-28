@@ -6,7 +6,7 @@ import styles from "./vivid-section.module.css";
 /**
  * Vivid, after the wallet. First it's introduced: the dashboard's Ask Vivid
  * globe lifts off, wakes with all thirteen platforms wired to it, and comes
- * down into the ask pill that rides at the foot of the screen from then on
+ * back down into the ask pill that rides at the foot of the screen
  * (./vivid-intro). Then what that means: thirteen platforms is a lot to keep
  * in your head, so you don't; a switchboard of real questions and the
  * platforms that answer them, all of it readable at a glance. Then what it

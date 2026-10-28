@@ -170,10 +170,12 @@ export function SiteFooter() {
           <div>
             <p className="font-medium">Still deciding?</p>
             <p className="mt-1 max-w-xs text-foreground/75">Vivid knows every platform. Ask it anything.</p>
+            {/* On the landing, opens Vivid's pill at the foot of the screen instead (vivid-pill.tsx) */}
             <a
               href={VIVID_URL}
               target="_blank"
               rel="noopener"
+              data-vivid-summon=""
               className={cn(buttonVariants({ variant: "glass", size: "sm" }), "mt-2 gap-1")}
             >
               <VividGlobe size={20} />

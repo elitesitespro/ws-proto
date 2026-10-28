@@ -27,6 +27,17 @@
 .roomAfter {
   height: var(--room);
 }
+/* For Vivid's pill, which reads the page at a line 45% down the screen: that
+   line, at the moment the wallet pins and its circle starts to open, to the
+   wallet's end */
+.part {
+  position: absolute;
+  top: 45svh;
+  bottom: 0;
+  left: 0;
+  width: 1px;
+  pointer-events: none;
+}
 .section[data-reveal] {
   position: sticky;
   top: 0;

@@ -87,6 +87,11 @@
     text-align: right;
     transition: opacity 0.4s var(--cx-ease);
   }
+  /* Over Vivid's pill, which comes up at the foot once the hero's in (it
+     sets data-vivid-pill on <html>, vivid-pill.tsx) */
+  :global([data-vivid-pill]) .hint {
+    bottom: calc(84px + env(safe-area-inset-bottom, 0px));
+  }
   .hint[data-played] {
     opacity: 0;
   }
