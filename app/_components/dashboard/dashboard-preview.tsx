@@ -614,9 +614,10 @@ function Promos({ run }: { run: boolean }) {
 /** Ask Vivid, at the foot of Home, typing what people ask it. */
 /**
  * Ask Vivid, at the foot of Home, as the hub has it: its globe, and the
- * questions people ask it, one after another. When the Vivid section takes
- * its globe up (../vivid/vivid-handoff), the globe leaves the dock and the
- * question waits on the one Vivid goes on to answer.
+ * questions people ask it, one after another. When Vivid's intro takes its
+ * globe up (../vivid/vivid-intro, through ../vivid/vivid-handoff's dockLift),
+ * the globe leaves the dock and the question waits on the one Vivid goes on
+ * to answer (the switchboard's first).
  */
 function VividDock({ run, href }: { run: boolean; href: string }) {
   const [question, setQuestion] = useState(0);

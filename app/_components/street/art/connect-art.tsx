@@ -133,18 +133,19 @@ const SEATS = (
   };
 });
 
-// WorldMeet's link between the two on the call, in % of the face: one shape
-// for a wide face, one for a tall one. Its mark rides the peak
+// WorldMeet's link between the two on the call, in % of the art: one shape
+// for a laptop's or a tablet's face, one for a phone's band (from one tile's
+// top to the other's, side by side). Its mark rides the peak
 type Link = { from: readonly [number, number]; via: readonly [number, number]; to: readonly [number, number] };
-const LINKS: Record<"wide" | "tall", Link> = {
+const LINKS: Record<"wide" | "phone", Link> = {
   wide: { from: [53, 22], via: [70, -4], to: [78, 27] },
-  tall: { from: [36, 18], via: [49, -1], to: [62, 20] },
+  phone: { from: [30, 30], via: [50, 4], to: [70, 32] },
 };
 const linkPath = ({ from, via, to }: Link) => `M${from[0]} ${from[1]}Q${via[0]} ${via[1]} ${to[0]} ${to[1]}`;
 const peak = ({ from, via, to }: Link) =>
   [(from[0] + 2 * via[0] + to[0]) / 4, (from[1] + 2 * via[1] + to[1]) / 4].map((n) => `${round(n)}%`);
 const [WIDE_X, WIDE_Y] = peak(LINKS.wide);
-const [TALL_X, TALL_Y] = peak(LINKS.tall);
+const [PHONE_X, PHONE_Y] = peak(LINKS.phone);
 
 /** The orbit's two rings: their far halves go behind the helmet, their near halves in front. */
 function Rings({ near }: { near: boolean }) {
@@ -260,10 +261,12 @@ export function ConnectArt({ focus, lit }: ArtProps) {
       {/* WorldMeet: a call from London to Lagos on one gold link */}
       <div
         className={`${styles.layer} ${styles.meet}`}
-        style={{ "--peak-x": WIDE_X, "--peak-y": WIDE_Y, "--peak-x-tall": TALL_X, "--peak-y-tall": TALL_Y } as CSSProperties}
+        style={
+          { "--peak-x": WIDE_X, "--peak-y": WIDE_Y, "--peak-x-phone": PHONE_X, "--peak-y-phone": PHONE_Y } as CSSProperties
+        }
       >
         <svg className={styles.link} viewBox="0 0 100 100" preserveAspectRatio="none">
-          {(["wide", "tall"] as const).map((shape) => (
+          {(["wide", "phone"] as const).map((shape) => (
             <g key={shape} data-shape={shape}>
               <path className={styles.glow} d={linkPath(LINKS[shape])} />
               <path d={linkPath(LINKS[shape])} />

@@ -36,8 +36,8 @@
 }
 
 /* A phone: the copy centred, the words and Explore at the top, the planet
-   and its cards under them, and the hint at the foot over a dark floor the
-   planet sinks into */
+   and its cards under them. The planet sinks into a dark floor at the foot
+   (on the globe's stage, globe-preview-section.tsx, so it holds still) */
 @media (max-width: 767px) {
   .copy {
     align-self: stretch;
@@ -68,27 +68,46 @@
   .actions > .second {
     display: none;
   }
+  /* The word on how to play: small and to the side, in the corner at the
+     foot over the planet's floor, clear of the bottom of the screen (and of
+     a browser's bar over it). It holds its place against the section while
+     it fades (its own opacity, in the TSX), so it never rides up over the
+     planet, and it steps out once the visitor has pressed on the planet. */
   .hint {
+    position: absolute;
+    right: 16px;
+    bottom: calc(24px + env(safe-area-inset-bottom, 0px));
+    z-index: 10;
     display: flex;
-    justify-content: center;
     align-items: center;
-    gap: 8px;
-    margin: auto -16px 0;
-    padding: 40px 16px max(16px, env(safe-area-inset-bottom));
-    background: linear-gradient(to top, var(--color-background) 35%, transparent);
-    color: var(--cx-text-2);
-    font-size: 13px;
+    gap: 12px;
+    color: var(--cx-text-muted);
+    font-size: var(--text-xs);
     line-height: 20px;
+    text-align: right;
+    transition: opacity 0.4s var(--cx-ease);
+  }
+  .hint[data-played] {
+    opacity: 0;
+  }
+  .hintText {
+    display: flex;
+    flex-direction: column;
   }
   /* A finger's touch, going round */
   .hint::before {
     content: "";
+    flex-shrink: 0;
     width: 8px;
     height: 8px;
     border-radius: 50%;
     background: var(--cx-ember);
     box-shadow: 0 0 0 4px rgba(var(--cx-accent-rgb), 0.18);
     animation: swipe 2.4s var(--cx-ease-in-out) infinite;
+  }
+  /* Done with, it stops going round */
+  .hint[data-played]::before {
+    animation: none;
   }
 }
 /* Shorter: the line under the headline steps aside for the planet and its

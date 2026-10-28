@@ -3,33 +3,34 @@ import {
   platformDetails,
   type ShowcasePlatformName,
 } from "@/app/_components/platform-showcase-content";
+import { HUB } from "@/lib/hub";
 
 /*
  * Where the header goes. The same navigation as the live site's
  * (worldstreetgold.com: the hub's components/landing/v4/Nav.tsx and
  * site-links.ts), in this app's own look: Platforms opens the landing's
  * chapters and every platform, then four plain pages, then the account
- * actions. The pages and the account live on the live site, so those links
- * go there.
+ * actions. The pages and the account live in the hub (lib/hub.ts), so those
+ * links go there.
  */
 
-const LIVE_SITE = "https://www.worldstreetgold.com";
-
 export const ACCOUNT_LINKS = {
-  signIn: `${LIVE_SITE}/login`,
-  join: `${LIVE_SITE}/register`,
+  /** Home, the dashboard. A device new to the hub goes through onboarding first. */
+  signIn: `${HUB}/welcome`,
+  /** A new account starts at onboarding, "Make WorldStreet yours", then Home. */
+  join: `${HUB}/onboarding`,
 } as const;
 
 /** The plain pages beside Platforms, in the live nav's order. */
 export const NAV_PAGES = [
-  { label: "Leaderboard", href: `${LIVE_SITE}/leaderboard` },
-  { label: "Community", href: `${LIVE_SITE}/community` },
-  { label: "About", href: `${LIVE_SITE}/about` },
-  { label: "Legal", href: `${LIVE_SITE}/legal` },
+  { label: "Leaderboard", href: `${HUB}/leaderboard` },
+  { label: "Community", href: `${HUB}/community` },
+  { label: "About", href: `${HUB}/about` },
+  { label: "Legal", href: `${HUB}/legal` },
 ] as const;
 
 /** The phone menu lists Contact with them, as the live one does. */
-export const CONTACT_LINK = { label: "Contact", href: `${LIVE_SITE}/contact` } as const;
+export const CONTACT_LINK = { label: "Contact", href: `${HUB}/contact` } as const;
 
 /** The landing's chapters, in page order, by their sections' ids on "/"
  *  (the street's four districts, the wallet, Vivid). */

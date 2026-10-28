@@ -3,6 +3,7 @@ import localFont from "next/font/local";
 import { IconDefs } from "@/ds/components/icon";
 import { ThemeProvider } from "@/components/theme-provider";
 import { SiteHeader } from "@/components/layout/site-header";
+import { HubHandoff } from "@/components/layout/hub-handoff";
 import { SiteFooter } from "@/components/layout/site-footer";
 import { SmoothScroll } from "@/components/layout/smooth-scroll";
 import "./globals.css";
@@ -62,6 +63,8 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           <SiteHeader />
           {children}
           <SiteFooter />
+          {/* Links into the hub (onboarding, Home, Vivid) step in through its stone */}
+          <HubHandoff />
         </ThemeProvider>
       </body>
     </html>

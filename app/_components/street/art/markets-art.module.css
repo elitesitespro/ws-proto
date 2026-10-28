@@ -1,7 +1,8 @@
 /* Markets Row's billboard art: the financial district at night, and each
    exit's own look while you're at it. All four stay mounted and crossfade;
    the frame dims the face until the car arrives, and lays its copy over the
-   bottom left, so each subject sits top right (top half on a phone). */
+   bottom left, so each subject sits top right (on a phone the art has a
+   band of its own, over the copy: see the end). */
 .art {
   position: absolute;
   inset: 0;
@@ -335,7 +336,7 @@
 .near {
   stroke-opacity: 0.6;
 }
-.tall {
+.phone {
   display: none;
 }
 .btc {
@@ -449,59 +450,74 @@
     0 0 4cqmin rgba(123, 198, 206, 0.55);
 }
 
-/* A phone (a portrait face): each subject in the top half, the copy below */
-@container (aspect-ratio < 1) {
+/* A phone: the billboard gives the art a band of its own, over its words
+   (street-section.module.css), wider than it's tall, so each subject fills
+   the band, kept off its foot, where it fades into the words' ground */
+@media (max-width: 639px) {
   .disc {
     left: var(--px);
     top: var(--py);
+    width: var(--ps);
   }
 
+  /* The district: the ticker across the top, the whole skyline under it,
+     climbing left to right, only its far left fading into the night */
+  .city {
+    --sky: calc(4cqh + max(28px, 7cqh));
+  }
   .skyline {
-    mask-image: linear-gradient(#000 34%, transparent 64%);
+    top: var(--sky);
+    height: calc(100% - var(--sky));
+    mask-image: linear-gradient(to right, transparent, #000 28%);
+  }
+  .ticker {
+    top: 4cqh;
+  }
+
+  /* Forex: the chart climbing across the band, stopping short of its price
+     tag, its start fading under the pair */
+  .forex {
+    --chart-x: -6%;
+    --chart-y: 8%;
+    --chart-w: 94%;
+    --chart-h: 78%;
   }
   .candles {
-    mask-image: none;
+    mask-image: linear-gradient(to right, transparent 4%, #000 44%);
   }
 
-  /* Forex: a wider chart, its start off the left edge, so the latest
-     candles are big enough to read */
-  .forex {
-    --chart-x: -50%;
-    --chart-y: -3%;
-    --chart-w: 140%;
-    --chart-h: 73%;
-  }
-
+  /* Crypto: Bitcoin in the middle, its orbit across the band */
   .crypto {
     background:
-      radial-gradient(circle at 52% 26%, rgba(255, 204, 45, 0.14), transparent 30cqmin),
-      radial-gradient(ellipse 90% 50% at 52% 20%, rgba(36, 64, 102, 0.5), transparent 70%),
+      radial-gradient(circle at 50% 52%, rgba(255, 204, 45, 0.14), transparent 40cqmin),
+      radial-gradient(ellipse 80% 80% at 50% 40%, rgba(36, 64, 102, 0.5), transparent 70%),
       #070f1a;
-  }
-  .spark {
-    height: 50%;
   }
   .wide {
     display: none;
   }
-  .tall {
+  .phone {
     display: inline;
   }
 
+  /* Prediction: the card in the middle of its cream */
+  .prediction {
+    background:
+      radial-gradient(ellipse 50% 60% at 50% 50%, rgba(123, 198, 206, 0.3), transparent 70%),
+      radial-gradient(ellipse 70% 60% at 50% 0%, #fffdf8, transparent 70%),
+      #f6f3ec;
+  }
   .card {
-    top: 6%;
-    left: 7%;
-    right: 7%;
-    width: auto;
-    height: 40%;
+    top: 47%;
+    left: 50%;
+    right: auto;
+    width: min(76cqw, 140cqh);
+    height: 78cqh;
+    translate: -50% -50%;
     rotate: -1.5deg;
   }
   .odds strong {
-    font-size: 14cqmin;
-  }
-  .crowd {
-    top: 56%;
-    bottom: 10%;
+    font-size: 17cqmin;
   }
 }
 

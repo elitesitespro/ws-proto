@@ -208,6 +208,15 @@ export function SiteFooter() {
         </div>
 
         <FooterWordmark />
+
+        {/* On the landing, Vivid's ask pill sits over the foot of the screen (it sets data-vivid-pill on <html>):
+            room for it under the name, so the page's last row scrolls clear of it. Positioned, so it lies over
+            the name's foot and glow, which fade into it rather than stopping at a line. */}
+        <div
+          aria-hidden="true"
+          className="pointer-events-none relative hidden h-[calc(82px+env(safe-area-inset-bottom))] md:h-[94px] [[data-vivid-pill]_&]:block"
+          style={{ backgroundImage: "linear-gradient(to bottom, transparent, var(--background) min(2vw, 26px))" }}
+        />
       </div>
     </footer>
   );

@@ -9,9 +9,12 @@ import {
   useTransform,
   type Variants,
 } from "motion/react";
+import { cn } from "cn";
+import { HUB } from "@/lib/hub";
 import { usePauseOffscreen } from "@/lib/use-pause-offscreen";
 import { useReducedMotion } from "@/lib/use-reduced-motion";
 import { Icon } from "@/components/icon";
+import { buttonVariants } from "@/components/ui/button";
 import { DashboardPreview } from "./dashboard/dashboard-preview";
 import { Flag, WorldStreetMark } from "./dashboard/dashboard-art";
 import { RevealWords } from "./street/reveal-words";
@@ -28,6 +31,11 @@ const pop: Variants = {
     scale: 1,
     transition: { type: "spring", stiffness: 420, damping: 22, delay: 0.1 + i * 0.07 },
   }),
+};
+// Then the way into the real wallet rises in after them
+const rise: Variants = {
+  hidden: { opacity: 0, y: 8 },
+  shown: { opacity: 1, y: 0, transition: { duration: 0.4, ease: [0.2, 0.8, 0.2, 1], delay: 0.2 + FLAGS.length * 0.07 } },
 };
 // A circle this big (in vmax) covers the screen from any point on it
 const COVER = 142;
@@ -153,26 +161,37 @@ export function WalletSection({
               progress={reveal ? openingWords : headingIn}
             />
           </h2>
-          <motion.p
-            className={styles.currencies}
+          <motion.div
+            className={styles.ways}
             initial={reduce ? false : "hidden"}
             {...(reveal
               ? { animate: alive ? "shown" : "hidden" }
               : { whileInView: "shown", viewport: { once: true, amount: 0.8 } })}
           >
-            <span className={styles.discs} aria-hidden="true">
-              {FLAGS.map((currency, i) => (
-                <motion.span key={currency} className={styles.disc} custom={i} variants={pop}>
-                  <Flag currency={currency} />
+            <p className={styles.currencies}>
+              <span className={styles.discs} aria-hidden="true">
+                {FLAGS.map((currency, i) => (
+                  <motion.span key={currency} className={styles.disc} custom={i} variants={pop}>
+                    <Flag currency={currency} />
+                  </motion.span>
+                ))}
+                <motion.span className={`${styles.disc} ${styles.more}`} custom={FLAGS.length} variants={pop}>
+                  <Icon name="plus" size={20} tone="current" />
                 </motion.span>
-              ))}
-              <motion.span className={`${styles.disc} ${styles.more}`} custom={FLAGS.length} variants={pop}>
-                <Icon name="plus" size={20} tone="current" />
-              </motion.span>
-            </span>
-            <span className="sr-only">Dollars, pounds, euros, naira, cedis, shillings and more:</span>
-            Hold, send, convert
-          </motion.p>
+              </span>
+              <span className="sr-only">Dollars, pounds, euros, naira, cedis, shillings and more:</span>
+              Hold, send, convert
+            </p>
+            {/* The real one: Home in the hub, where this dashboard lives (a new visitor sets up first) */}
+            <motion.a
+              href={`${HUB}/welcome`}
+              variants={rise}
+              className={cn(buttonVariants(), "cx-btn--arrow", styles.open)}
+            >
+              Open your wallet
+              <Icon name="arrow-right" size={20} tone="current" />
+            </motion.a>
+          </motion.div>
         </header>
 
         <div ref={screenRef} className={styles.screen}>

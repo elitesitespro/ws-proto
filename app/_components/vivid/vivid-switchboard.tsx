@@ -2,7 +2,7 @@
 
 import { useEffect, useEffectEvent, useRef, useState, type CSSProperties } from "react";
 import { useLenis } from "lenis/react";
-import { useMotionValue, useMotionValueEvent, useScroll } from "motion/react";
+import { useMotionValueEvent, useScroll } from "motion/react";
 import { useMediaQuery } from "@/lib/use-media-query";
 import { usePauseOffscreen } from "@/lib/use-pause-offscreen";
 import { useReducedMotion } from "@/lib/use-reduced-motion";
@@ -10,13 +10,14 @@ import { Icon, type IconName } from "@/components/icon";
 import { tick } from "@/lib/haptics";
 import { cn } from "@/lib/utils";
 import { hueAttrs, platformDetails, type ShowcasePlatformName } from "../platform-showcase-content";
-import { FIRST_TURN, TURN_ACTIVE, TURN_IDLE, acrossFor, dotsFor, drawGlobe, globePoints, talking } from "./globe-draw";
-import { dockLift } from "./vivid-handoff";
+import { FIRST_TURN, TURN_ACTIVE, TURN_IDLE, dotsFor, drawGlobe, globePoints, talking } from "./globe-draw";
+import { HUB } from "@/lib/hub";
+import { PILL_H } from "./vivid-handoff";
 import { VIVID_URL } from "./vivid-links";
 import styles from "./vivid-switchboard.module.css";
 
-// Where the wallet lives: the hub, at the live site
-const HUB_URL = "https://www.worldstreetgold.com/";
+// Where the wallet lives: the hub's wallet page
+const WALLET_URL = `${HUB}/wallet`;
 
 type Route = {
   /** What you ask, in your own words. */
@@ -45,7 +46,7 @@ const ROUTES: readonly Route[] = [
     icon: "wallet",
     hue: { "data-hue": "gold" },
     answer: "Tap Add money on your wallet card, pick a currency and pay. The same money works on every platform.",
-    href: HUB_URL,
+    href: WALLET_URL,
     everywhere: true,
   },
   {
@@ -78,13 +79,10 @@ const ROUTES: readonly Route[] = [
 // All thirteen, round the globe on a phone
 const PLATFORMS = Object.keys(platformDetails) as ShowcasePlatformName[];
 
-// The dock's globe, and the big one's dots across its face
-const DOCK = 40;
-// The globe lifts off once the dock's this far down the screen
-const DOCK_SEEN = 0.72;
+// The globe's dots across its face
 const BIG = 18;
-// How long one route stays lit before the next, once the globe has landed
-// (where it's laid across; on a phone or a tablet the scroll lights them)
+// How long one route stays lit before the next, once it's on screen (where
+// it's laid across; on a phone or a tablet the scroll lights them)
 const CYCLE_MS = 2800;
 // Where the board stands up, and holds while you scroll it through
 const NARROW = "(max-width: 1023px)";
@@ -101,7 +99,6 @@ const WIRE_GAP = 10;
 const SIDE_IN = [1.15, 0.8, 0.45, 0.1];
 const RING_GAP = 30;
 
-const clamp = (v: number) => Math.min(Math.max(v, 0), 1);
 const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
 const easeInOut = (t: number) => (t < 0.5 ? 4 * t ** 3 : 1 - (-2 * t + 2) ** 3 / 2);
 
@@ -120,10 +117,11 @@ type Wires = { w: number; h: number; ins: string[]; outs: string[]; stem: string
  * over the globe, each on a jack, the thirteen platforms round the globe and
  * the answer under it. Scrolling plugs each question in in turn: its wire
  * lights into the globe, the platform that answers lights on the ring, and
- * its answer comes up. Tap a question to go straight to it.
+ * its answer comes up. Tap a question to go straight to it. Its foot is kept
+ * clear for the ask pill riding at the bottom of the screen.
  *
- * The globe is the dashboard's: as this comes up the screen it lifts off
- * the dock (../vivid-handoff) and flies down into its place here, growing.
+ * The globe here is just part of the diagram: Vivid arrived in the intro
+ * before it (./vivid-intro) and rides along in the pill.
  */
 export function VividSwitchboard() {
   const reduce = useReducedMotion();
@@ -132,7 +130,6 @@ export function VividSwitchboard() {
   const boardRef = useRef<HTMLDivElement>(null);
   const slotRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const overlayRef = useRef<HTMLCanvasElement>(null);
   const composerRef = useRef<HTMLFormElement>(null);
   const askRefs = useRef<(HTMLParagraphElement | null)[]>([]);
   const cardRefs = useRef<(HTMLAnchorElement | null)[]>([]);
@@ -140,49 +137,15 @@ export function VividSwitchboard() {
   const woken = useRef(false);
   // A route has just lit: the globe talks it through
   const spoke = useRef(false);
-  // Starts the globe's drawing, if it's stopped
-  const kick = useRef<(() => void) | null>(null);
 
   const [wires, setWires] = useState<Wires | null>(null);
   const [active, setActive] = useState(0);
   const [pointed, setPointed] = useState<number | null>(null);
   const [typing, setTyping] = useState(false);
-  const [landed, setLanded] = useState(false);
   const [onScreen, setOnScreen] = useState(false);
   const shown = pointed ?? active;
   const narrow = useMediaQuery(NARROW);
   usePauseOffscreen(boardRef);
-
-  // The flight, 0 to 1: from when the dock's in sight, low on the screen
-  // (or this half a screen off, if it's further), to when the globe's place
-  // here is in the middle of it
-  const { scrollY } = useScroll();
-  const flight = useMotionValue(0);
-  useEffect(() => {
-    const slot = slotRef.current;
-    if (!slot) return;
-    const follow = () => {
-      const vh = window.innerHeight;
-      const s = slot.getBoundingClientRect();
-      const to = s.top + s.height / 2 - vh / 2;
-      const dock = document.querySelector("[data-vivid-dock]")?.getBoundingClientRect();
-      const from = Math.min(dock ? dock.top + dock.height / 2 - vh * DOCK_SEEN : to, to - vh / 2);
-      // Both measured from where the page is now
-      const q = clamp(-from / (to - from));
-      flight.set(q);
-      if (!reduce) dockLift.set(q);
-      // In the air, it's drawn even before the board's in sight
-      if (q > 0 && q < 1) kick.current?.();
-    };
-    follow();
-    const unsubscribe = scrollY.on("change", follow);
-    window.addEventListener("resize", follow);
-    return () => {
-      unsubscribe();
-      window.removeEventListener("resize", follow);
-      dockLift.set(0);
-    };
-  }, [scrollY, flight, reduce]);
 
   useEffect(() => {
     spoke.current = true;
@@ -190,9 +153,9 @@ export function VividSwitchboard() {
 
   const next = useEffectEvent(() => setActive((active + 1) % ROUTES.length));
 
-  // Laid across, once it's here and on screen, the routes light in turn
-  // (hovering or focusing one holds it)
-  const cycling = !narrow && landed && onScreen && !reduce && pointed === null && !typing;
+  // Laid across, once it's on screen, the routes light in turn (hovering or
+  // focusing one holds it)
+  const cycling = !narrow && onScreen && !reduce && pointed === null && !typing;
   useEffect(() => {
     if (!cycling) return;
     const timer = window.setTimeout(next, CYCLE_MS);
@@ -293,28 +256,20 @@ export function VividSwitchboard() {
     };
   }, []);
 
-  // The globe: flying down from the dock (on a canvas over the page), then
-  // in its place (on its own), turning, and talking as each route lights
+  // The globe in its place, turning, and talking as each route lights
   useEffect(() => {
     const board = boardRef.current;
     const slot = slotRef.current;
     const canvas = canvasRef.current;
-    const overlay = overlayRef.current;
     const ctx = canvas?.getContext("2d");
-    const octx = overlay?.getContext("2d");
-    if (!board || !slot || !canvas || !overlay || !ctx || !octx) return;
+    if (!board || !slot || !canvas || !ctx) return;
     const still = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    // The dock's globe, dot for dot, and the bigger one it grows into
-    const across = acrossFor(DOCK);
-    const small = globePoints(dotsFor(across));
     const big = globePoints(dotsFor(BIG));
 
     let dpr = 1;
     let side = 0;
     const fit = () => {
       dpr = Math.min(window.devicePixelRatio || 1, 2);
-      overlay.width = Math.round(overlay.clientWidth * dpr);
-      overlay.height = Math.round(overlay.clientHeight * dpr);
       side = canvas.clientWidth;
       canvas.width = canvas.height = Math.round(side * dpr);
     };
@@ -325,37 +280,14 @@ export function VividSwitchboard() {
     let pace = 0;
     let speakUntil = 0;
     let rings: number[] = [];
-    let here = false;
-    let dirty = false;
     let raf = 0;
     let last = 0;
-
-    /** The globe `width` across at x, y: the dock's coarse dots giving way to the fine ones as it grows. */
-    const globe = (g: CanvasRenderingContext2D, x: number, y: number, width: number) => {
-      const handover = clamp((width - DOCK) / 60);
-      for (const [pts, dots, fade] of [
-        [small, across, 1 - handover],
-        [big, BIG, handover],
-      ] as const) {
-        if (fade <= 0) continue;
-        const dot = (width / dots) * 0.27;
-        drawGlobe(g, pts, { cx: x, cy: y, radius: width / 2 - dot * 1.4 - 0.5, dot, turn, level, fade });
-      }
-    };
 
     const draw = (t: number) => {
       const dt = last ? Math.min(t - last, 100) : 16;
       last = t;
-      const q = still ? 1 : flight.get();
-      const flying = q > 0 && q < 1;
-      const arrived = q >= 1;
-      if (arrived !== here) {
-        here = arrived;
-        setLanded(arrived);
-        // It lands talking: the dock's question gets its answer
-        if (arrived) spoke.current = true;
-      }
-      if (spoke.current && here && !still) {
+      // It comes on screen talking: the dock's question gets its answer
+      if (spoke.current && !still) {
         spoke.current = false;
         speakUntil = t + SPEAK_MS;
         rings = RINGS.map((at) => t + at);
@@ -364,50 +296,32 @@ export function VividSwitchboard() {
       voiced += ((speaking ? 1 : 0) - voiced) * (speaking ? 0.2 : 0.06);
       const wake = woken.current ? 1 : 0;
       level += (Math.max(talking(t) * voiced, wake * 0.35) - level) * 0.18;
-      pace += (Math.max(flying ? 1 : 0, voiced, wake) - pace) * 0.04;
+      pace += (Math.max(voiced, wake) - pace) * 0.04;
       turn = (turn + dt / lerp(TURN_IDLE, TURN_ACTIVE, pace)) % 1;
 
-      if (dirty) {
-        octx.setTransform(1, 0, 0, 1, 0, 0);
-        octx.clearRect(0, 0, overlay.width, overlay.height);
-        dirty = false;
-      }
       ctx.setTransform(1, 0, 0, 1, 0, 0);
       ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
       const size = slot.clientWidth;
-
-      if (flying) {
-        // From the dock, wherever the page has it now, to its place here
-        const s = slot.getBoundingClientRect();
-        const dock = document.querySelector("[data-vivid-dock]")?.getBoundingClientRect();
-        const from = dock?.width
-          ? { x: dock.left + dock.width / 2, y: dock.top + dock.height / 2, w: dock.width }
-          : { x: overlay.clientWidth / 2, y: overlay.clientHeight + DOCK, w: DOCK };
-        const k = easeInOut(q);
-        octx.setTransform(dpr, 0, 0, dpr, 0, 0);
-        globe(octx, lerp(from.x, s.left + s.width / 2, k), lerp(from.y, s.top + s.height / 2, k), lerp(from.w, size, k));
-        dirty = true;
-      } else if (arrived) {
-        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-        const c = side / 2;
-        // Rings off it as it starts to talk
-        ctx.strokeStyle = "#eab308";
-        ctx.lineWidth = 1;
-        for (const at of rings) {
-          const age = t - at;
-          if (age < 0 || age > RING_LIFE) continue;
-          const p = age / RING_LIFE;
-          ctx.globalAlpha = (1 - p) ** 2 * 0.45;
-          ctx.beginPath();
-          ctx.arc(c, c, (size / 2) * (1.02 + 0.42 * easeInOut(p)), 0, Math.PI * 2);
-          ctx.stroke();
-        }
-        ctx.globalAlpha = 1;
-        globe(ctx, c, c, size);
+      const c = side / 2;
+      // Rings off it as it starts to talk
+      ctx.strokeStyle = "#eab308";
+      ctx.lineWidth = 1;
+      for (const at of rings) {
+        const age = t - at;
+        if (age < 0 || age > RING_LIFE) continue;
+        const p = age / RING_LIFE;
+        ctx.globalAlpha = (1 - p) ** 2 * 0.45;
+        ctx.beginPath();
+        ctx.arc(c, c, (size / 2) * (1.02 + 0.42 * easeInOut(p)), 0, Math.PI * 2);
+        ctx.stroke();
       }
+      ctx.globalAlpha = 1;
+      const dot = (size / BIG) * 0.27;
+      drawGlobe(ctx, big, { cx: c, cy: c, radius: size / 2 - dot * 1.4 - 0.5, dot, turn, level });
       if (still) return;
-      // It runs while the board's in sight or the globe's in the air
-      if (visible || flying) raf = requestAnimationFrame(draw);
+      // It runs while the board's in sight
+      if (visible) raf = requestAnimationFrame(draw);
       else stop();
     };
 
@@ -420,13 +334,7 @@ export function VividSwitchboard() {
     const stop = () => {
       cancelAnimationFrame(raf);
       raf = 0;
-      if (dirty) {
-        octx.setTransform(1, 0, 0, 1, 0, 0);
-        octx.clearRect(0, 0, overlay.width, overlay.height);
-        dirty = false;
-      }
     };
-    kick.current = start;
     const refit = () => {
       fit();
       if (still) draw(performance.now());
@@ -435,7 +343,7 @@ export function VividSwitchboard() {
     const resized = new ResizeObserver(refit);
     resized.observe(slot);
     window.addEventListener("resize", refit);
-    // Off screen (and not in the air), it all stops
+    // Off screen, it all stops
     const io = new IntersectionObserver(([entry]) => {
       visible = entry.isIntersecting;
       setOnScreen(visible);
@@ -443,13 +351,12 @@ export function VividSwitchboard() {
     });
     io.observe(board);
     return () => {
-      kick.current = null;
       stop();
       io.disconnect();
       resized.disconnect();
       window.removeEventListener("resize", refit);
     };
-  }, [flight]);
+  }, []);
 
   // A pointer over a route, or focus on it, holds it, where they're laid
   // across (not a finger: that's a tap)
@@ -465,9 +372,12 @@ export function VividSwitchboard() {
 
   return (
     <>
-      <div ref={trackRef} className={styles.track} style={{ "--routes": ROUTES.length } as CSSProperties}>
+      <div
+        ref={trackRef}
+        className={styles.track}
+        style={{ "--routes": ROUTES.length, "--pill": `${PILL_H}px` } as CSSProperties}
+      >
         <div ref={boardRef} className={styles.board}>
-          <canvas ref={overlayRef} aria-hidden="true" className={styles.overlay} />
           {wires && (
             <svg
               aria-hidden="true"

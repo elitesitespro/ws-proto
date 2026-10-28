@@ -1,17 +1,22 @@
+import { VividIntro } from "./vivid-intro";
 import { VividPlans } from "./vivid-plans";
 import { VividSwitchboard } from "./vivid-switchboard";
 import styles from "./vivid-section.module.css";
 
 /**
- * Vivid, after the wallet. Thirteen platforms is a lot to keep in your
- * head, so you don't: you ask Vivid, and it shows you where to go. The
- * dashboard's Ask Vivid globe flies down into the middle of a switchboard of
- * real questions and the platforms that answer them, all of it readable at a
- * glance. Then what it does free, and with Pro.
+ * Vivid, after the wallet. First it's introduced: the dashboard's Ask Vivid
+ * globe lifts off, wakes with all thirteen platforms wired to it, and comes
+ * down into the ask pill that rides at the foot of the screen from then on
+ * (./vivid-intro). Then what that means: thirteen platforms is a lot to keep
+ * in your head, so you don't; a switchboard of real questions and the
+ * platforms that answer them, all of it readable at a glance. Then what it
+ * does free, and with Pro.
  */
 export function VividSection() {
   return (
-    <section id="vivid" aria-labelledby="vivid-heading" className={styles.section}>
+    <section id="vivid" aria-labelledby="vivid-meet" className={styles.section}>
+      <VividIntro />
+
       <div className="mx-auto w-full max-w-7xl px-4 md:px-6">
         <header className={styles.head}>
           <div>

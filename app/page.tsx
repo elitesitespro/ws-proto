@@ -3,6 +3,7 @@ import { JoinCta } from "./_components/cta/join-cta";
 import { GlobePreviewSection } from "./_components/globe-hero/globe-preview-section";
 import { PlatformTimelineSection } from "./_components/platform-timeline-section";
 import { StreetToWallet } from "./_components/street/street-to-wallet";
+import { VividPill } from "./_components/vivid/vivid-pill";
 import { VividSection } from "./_components/vivid/vivid-section";
 
 export const metadata: Metadata = {
@@ -23,6 +24,8 @@ export default function Home() {
       <StreetToWallet />
       <VividSection />
       <JoinCta />
+      {/* Vivid's ask pill, docked at the foot of the screen once its intro hands it down (rendered into <body>) */}
+      <VividPill />
     </main>
   );
 }

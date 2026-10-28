@@ -2,8 +2,8 @@
    data-focus. Nobody's far away (people on a night map, joined by gold
    arcs), WorldSpace (the helmet in its orbit of faces) and WorldMeet (a
    London to Lagos call on one gold link). The frame sets its words over the
-   bottom left, so each keeps its subject top right, or in the top half when
-   the face is tall. */
+   bottom left, so each keeps its subject top right (on a phone the art has
+   a band of its own, over the words: see the end). */
 
 .art {
   position: absolute;
@@ -335,7 +335,8 @@
     linear-gradient(210deg, #fffcf5 0%, #fef3c7 42%, #f6c445 76%, #a16207 100%);
 }
 
-/* The link, one shape for a wide face and one for a tall one */
+/* The link, one shape for a laptop's or a tablet's face and one for a
+   phone's band */
 .link {
   position: absolute;
   inset: 0;
@@ -360,7 +361,7 @@
   stroke: rgba(250, 204, 21, 0.4);
   stroke-width: 12;
 }
-.link g[data-shape="tall"] {
+.link g[data-shape="phone"] {
   display: none;
 }
 
@@ -475,59 +476,72 @@
 }
 
 /* ---------------------------------------------------------------------- */
-/* A tall face (a phone): each picture keeps to the top half, over the
-   frame's words */
-@container (aspect-ratio < 1) {
+/* A phone: the billboard gives the art a band of its own, over its words
+   (street-section.module.css), wider than it's tall, so each picture fills
+   the band, kept off its foot, where it fades into the words' ground */
+@media (max-width: 639px) {
+  /* The people fill the band: the map as big as lets Toronto to Mumbai fit
+     across it and London to Nairobi down it (pins and all), centred on
+     them. Their spread, in map widths: Toronto 0.22 left of London, Mumbai
+     0.2 right; Nairobi 0.15 below */
   .people {
-    --glow-at: 55% 22%;
+    --glow-at: 50% 40%;
   }
   .world {
-    --w: 190cqw;
-    --ax: 52cqw;
-    --ay: 12cqh;
+    --w: min(calc((100cqw - 64px) * 2.36), calc((100cqh - 56px) * 6.8));
+    --ax: calc(50cqw + var(--w) * 0.009);
+    --ay: calc(50cqh - var(--w) * 0.073);
   }
   .land {
     stroke-width: 0.8;
   }
   .pin {
-    --size: clamp(32px, 11cqw, 44px);
+    --size: clamp(28px, 18cqh, 40px);
   }
   .pin[data-lead] {
-    --size: clamp(44px, 16cqw, 60px);
+    --size: clamp(36px, 26cqh, 52px);
   }
   .pin[data-only="wide"],
   .arc[data-only="wide"] {
     display: none;
   }
 
+  /* WorldSpace: the helmet in the middle, its orbit as wide as the band */
   .space {
     --x: 50%;
-    --y: 22%;
+    --y: 50%;
   }
   .orbit {
-    --s: min(100cqw, 82cqh);
+    --s: min(150cqh, 92cqw);
   }
 
+  /* WorldMeet: London and Lagos side by side, the link over them, on
+     paper warming to gold behind them */
+  .meet {
+    background:
+      radial-gradient(ellipse 70% 70% at 50% 72%, rgba(246, 196, 69, 0.4), transparent 70%),
+      linear-gradient(180deg, #fffcf5, #fef3c7);
+  }
   .link g[data-shape="wide"] {
     display: none;
   }
-  .link g[data-shape="tall"] {
+  .link g[data-shape="phone"] {
     display: inline;
   }
   .mark {
-    left: var(--peak-x-tall);
-    top: var(--peak-y-tall);
+    left: var(--peak-x-phone);
+    top: var(--peak-y-phone);
     width: 32px;
   }
   .london {
-    left: 27%;
-    top: 25%;
-    height: 26cqh;
+    left: 30%;
+    top: 60%;
+    height: min(56cqh, 44cqw);
   }
   .lagos {
-    left: 72%;
-    top: 28%;
-    height: 30cqh;
+    left: 70%;
+    top: 62%;
+    height: min(62cqh, 48cqw);
   }
   .plate {
     left: 8px;

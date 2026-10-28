@@ -2,8 +2,9 @@
    windows in brass and warm light (a thing to buy, a trade, a school, a
    doctor). Looking at an exit, that platform's own picture in its own
    colours. The frame's words sit bottom-left, so the subject sits top-right
-   (the top half on a phone). Every layer stays mounted and crossfades on
-   data-focus; data-lit switches the shop lights on. */
+   (on a phone the art has a band of its own, over the words: see the end).
+   Every layer stays mounted and crossfades on data-focus; data-lit switches
+   the shop lights on. */
 .art {
   position: absolute;
   inset: 0;
@@ -565,10 +566,14 @@
   background: #00776e;
 }
 
-/* ---- A phone: portrait, the picture in the top half ---- */
-@container (aspect-ratio < 1) {
+/* ---- A phone: the billboard gives the art a band of its own, over its
+   words (street-section.module.css), wider than it's tall, so each picture
+   fills the band, sized by its height, kept off its foot, where it fades
+   into the words' ground ---- */
+@media (max-width: 639px) {
+  /* The high street: the shopfront across the band, its four windows tall */
   .street {
-    background: linear-gradient(180deg, #14152a 0%, #2a2133 4%, #130f0d 52%, #0e0b09 100%);
+    background: linear-gradient(180deg, #231f33 0%, #2a2133 6%, #1b1512 40%, #0e0b09 100%);
   }
   .skyline,
   .lamp {
@@ -577,105 +582,121 @@
   .facade {
     left: 0;
     top: 4%;
-    height: 44%;
+    height: 82%;
   }
   .fascia {
     left: 4%;
     right: 4%;
-    top: 7.5%;
-    height: 1.8%;
+    top: 9%;
+    height: 2.6%;
   }
   .windows {
     left: 7%;
     right: 7%;
-    top: 12%;
-    height: 30%;
+    top: 18%;
+    height: 56%;
     gap: 3cqw;
   }
   .pane {
-    border-radius: 50% 50% 3px 3px / 26% 26% 3px 3px;
+    border-radius: 50% 50% 3px 3px / 30% 30% 3px 3px;
+  }
+  .kerb {
+    top: 88%;
   }
 
+  /* WorldStore: its W behind, the two finds side by side in front */
+  .store {
+    background:
+      radial-gradient(ellipse 70% 80% at 50% 30%, rgba(250, 204, 21, 0.1), transparent 70%),
+      linear-gradient(180deg, #14110f, #0c0a09);
+  }
   .storeW {
-    right: 10%;
-    top: 5%;
-    width: 80cqw;
+    right: auto;
+    left: 50%;
+    top: 6%;
+    width: min(76cqw, 118cqh);
+    translate: -50% 0;
   }
   .stand[data-item="vase"] {
-    left: 8%;
-    top: 23%;
-    width: 30cqw;
+    left: 22%;
+    top: 36%;
+    width: 34cqh;
   }
   .stand[data-item="perfume"] {
-    left: 48%;
-    top: 11%;
-    width: 42cqw;
+    left: 50%;
+    top: 14%;
+    width: 46cqh;
   }
   .held {
     right: auto;
     bottom: auto;
-    left: 6%;
-    top: 3%;
+    left: 5%;
+    top: 6%;
   }
 
+  /* Worldwork: the trades three by two across the band, the tailor in the
+     top row's middle */
+  .work {
+    background:
+      radial-gradient(ellipse 60% 70% at 50% 40%, rgba(255, 255, 255, 0.07), transparent 70%),
+      #0a0a0a;
+  }
   .trades {
     left: -4%;
     right: -4%;
-    top: 3%;
+    top: -6%;
     width: auto;
-    height: 44%;
+    height: 104%;
     grid-template-columns: repeat(3, minmax(0, 1fr));
     grid-template-rows: repeat(2, minmax(0, 1fr));
     gap: 2cqw;
     transform: rotate(-4deg);
   }
-  /* The tailor to the top row's middle */
   .trade:first-child,
   .trade[data-near] {
     order: -1;
   }
 
+  /* Mastery Academy: the case on its pedestal in the middle (where it sits
+     in the picture: 0.68 across, 0.6 down), the certificate at its foot */
   .piece {
     right: auto;
-    left: -50cqw;
-    top: -18cqh;
-    width: 150cqw;
+    left: calc(50cqw - 143cqh);
+    top: -29cqh;
+    width: 211cqh;
   }
   .warmth {
-    left: 48%;
+    left: 50%;
     top: -12%;
-    width: 120cqw;
-    height: 52%;
+    width: 110cqh;
+    height: 70%;
   }
   .cert {
-    right: -7%;
-    bottom: auto;
-    top: 28%;
-    width: 32cqw;
-    transform: rotate(8deg);
+    right: auto;
+    left: 4cqw;
+    bottom: 16cqh;
+    width: 30cqh;
   }
 
+  /* WorldHealth: the call in the middle, the mint going to deep teal at
+     the foot, into the words' ground */
   .health {
-    background: radial-gradient(
-      ellipse 140% 80% at 50% 0%,
-      #f4f8f7 0%,
-      #eef5f3 42%,
-      #cfe3df 58%,
-      #3f8079 78%,
-      #0f2f2c 100%
-    );
+    background: linear-gradient(180deg, #f4f8f7 0%, #eef5f3 40%, #cfe3df 62%, #3f8079 86%, #0f2f2c 100%);
   }
   .halo {
-    right: -15%;
-    top: -12%;
-    width: 130cqw;
+    right: auto;
+    left: 50%;
+    top: -20%;
+    width: 120cqh;
+    translate: -50% 0;
   }
   .call {
-    left: 8%;
-    right: 8%;
-    top: 6%;
-    width: auto;
-    height: 40%;
+    left: 50%;
+    right: auto;
+    top: 46%;
+    width: min(70cqw, 120cqh);
+    height: 78cqh;
+    translate: -50% -50%;
   }
   .healthMark {
     left: 12px;

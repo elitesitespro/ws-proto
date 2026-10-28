@@ -129,6 +129,31 @@
   font-size: 14px;
   font-weight: 500;
 }
+/* The currencies, and the way into the real wallet beside them (under them
+   when there isn't room) */
+.ways {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: 12px;
+}
+/* Ink on the gold, as the eyebrow: the kit's gold button would vanish here */
+.head .open {
+  background: #1c1917;
+  color: #ffffff;
+}
+.head .open:hover {
+  box-shadow: 0 10px 24px -10px rgba(28, 25, 23, 0.7);
+}
+.head .open:active {
+  background: #292524;
+}
+.head .open:focus-visible {
+  outline: 2px solid #1c1917;
+  outline-offset: 3px;
+  box-shadow: none;
+}
 /* Multi-currency: overlapping flag discs, each ringed in the gold behind */
 .currencies {
   display: inline-flex;

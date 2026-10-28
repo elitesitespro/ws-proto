@@ -50,8 +50,28 @@
   padding-left: 48px;
   color: var(--lane);
 }
+/* The street's headline, big enough to stop you on any screen: set tight,
+   in regular weight, its lines balanced. It grows with the screen, a step
+   up on a tablet and again on a laptop. */
+.heading {
+  font-size: clamp(34px, 9.6vw, 42px);
+  font-weight: 400;
+  line-height: 1.05;
+  letter-spacing: -0.035em;
+  text-wrap: balance;
+}
 .introLine {
   color: rgba(12, 10, 9, 0.66);
+}
+@media (min-width: 640px) {
+  .heading {
+    font-size: clamp(44px, 6.6vw, 60px);
+  }
+}
+@media (min-width: 1024px) {
+  .heading {
+    font-size: clamp(56px, 4.6vw, 72px);
+  }
 }
 
 /* A district */
@@ -160,6 +180,12 @@
 }
 .billboard[data-lit] .face {
   filter: none;
+}
+/* The art and the shade over it. It fills the face, the words lying over
+   it, except on a phone (below). */
+.picture {
+  position: absolute;
+  inset: 0;
 }
 .scrim {
   position: absolute;
@@ -369,8 +395,17 @@
    road, each off a slip road: you scroll the car past them, and the one
    it's just passed is up on the billboard. */
 @media (max-width: 1023px) {
+  /* The cream runs on into the mouth's funnel, so it needs less of its own
+     under the words */
+  .approach {
+    padding-top: 64px;
+    padding-bottom: 32px;
+  }
+  /* Room under the approach for the mouth's funnel and the S out of it into
+     the first lane (the TSX lays them in whatever room this leaves) */
   .inner {
     --gutter: 16px;
+    padding-top: 232px;
   }
   /* A block, not a grid: a grid's billboard could only stick inside its
      own cell */
@@ -418,32 +453,81 @@
     --gutter: 24px;
   }
 }
-/* A phone: the street's sign over the billboard names it, so its kicker
-   steps aside for the art; facts that run to two lines stay snug */
+/* A phone: the billboard's too small to lay words over a picture, so the
+   picture takes its top and the headline sits under it, on the billboard's
+   own ground (paper on a light one), the picture's foot fading into it.
+   Each art keeps its subject inside its band (see its own phone block).
+   Just the headline: the street's sign over the billboard names it, and
+   the exits coming by under it say the rest. The words' room holds three
+   lines of headline, so the band keeps its size from one ad to the next. */
 @media (max-width: 639px) {
-  .kicker {
-    display: none;
+  .face {
+    display: flex;
+    flex-direction: column;
   }
-  .facts li {
-    padding: 5px 12px;
-    border-radius: 16px;
-    line-height: 18px;
-    text-wrap: balance;
+  .face[data-tone="light"] {
+    background: #f6f3ec;
+  }
+  .picture {
+    position: relative;
+    flex: 1 1 0;
+    min-height: 0;
+  }
+  .scrim {
+    background: linear-gradient(transparent calc(100% - 24px), #171412);
+  }
+  .face[data-tone="light"] .scrim {
+    background: linear-gradient(transparent calc(100% - 24px), #f6f3ec);
+  }
+  .copy {
+    position: relative;
+    flex: none;
+    align-content: center;
+    min-height: 100px;
+    padding: 8px 16px 16px;
+  }
+  .kicker,
+  .line,
+  .facts {
+    display: none;
   }
 }
 
-/* A tablet: a wider billboard, its line back under the headline */
+/* A tablet: the face as wide for its height as a laptop's, so the words lie
+   over the picture as they do there, kept to its left half, clear of each
+   art's subject, and under the laptop's shade (below). A district's facts
+   make its case without its line. On a short face the line steps aside. */
 @media (min-width: 640px) and (max-width: 1023px) {
+  .face {
+    container: billboard / size;
+  }
   .copy {
     right: auto;
-    max-width: 80%;
+    max-width: 50%;
     padding: 28px;
-  }
-  .copy:has(.facts) .line {
-    display: block;
   }
   .reason {
     font-size: var(--text-xl);
+  }
+  @container billboard (height < 280px) {
+    .line {
+      display: none;
+    }
+  }
+}
+
+/* A tablet or a laptop: the shade under the words, up from the foot and in
+   from the left, where they lie */
+@media (min-width: 640px) {
+  .scrim {
+    background:
+      linear-gradient(to top, rgba(12, 10, 9, 0.92), transparent 58%),
+      linear-gradient(to right, rgba(12, 10, 9, 0.8), transparent 62%);
+  }
+  .face[data-tone="light"] .scrim {
+    background:
+      linear-gradient(to top, rgba(246, 243, 236, 0.92), transparent 58%),
+      linear-gradient(to right, rgba(246, 243, 236, 0.9), rgba(246, 243, 236, 0.5) 40%, transparent 64%);
   }
 }
 
@@ -499,16 +583,6 @@
     aspect-ratio: auto;
     height: clamp(360px, 56svh, 480px);
     max-height: none;
-  }
-  .scrim {
-    background:
-      linear-gradient(to top, rgba(12, 10, 9, 0.92), transparent 58%),
-      linear-gradient(to right, rgba(12, 10, 9, 0.8), transparent 62%);
-  }
-  .face[data-tone="light"] .scrim {
-    background:
-      linear-gradient(to top, rgba(246, 243, 236, 0.92), transparent 58%),
-      linear-gradient(to right, rgba(246, 243, 236, 0.9), rgba(246, 243, 236, 0.5) 40%, transparent 64%);
   }
   .copy {
     right: auto;

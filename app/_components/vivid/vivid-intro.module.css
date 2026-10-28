@@ -1,0 +1,503 @@
+/* Vivid's intro (vivid-intro.tsx): the dashboard's globe lifts off into the
+   night, wakes with all thirteen platforms wired to it, then comes down into
+   the ask pill at the foot of the screen. A stage held while you scroll
+   (sticky, so the browser holds it, not script) that paints to the screen's
+   real foot (lvh), under a phone browser's floating bar, with everything that
+   matters inside the part the bar never covers (the frame, 100svh). Gold is
+   Vivid's and nothing else's; each platform wears its own colour. */
+.track {
+  --pin: 140svh;
+  /* What follows comes up over the stage's empty foot as it lets go, so
+     there's no stretch of night between the last line and the next heading */
+  --overlap: 120px;
+  position: relative;
+  height: calc(100lvh + var(--pin));
+  margin-bottom: calc(var(--overlap) * -1);
+}
+
+/* The lights going down on the wallet as the globe lifts out of it: over the
+   page above (this section stacks over it), under the stage coming up */
+.veil {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 0;
+  width: 100%;
+  height: 100lvh;
+  background: #0c0a09;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.stage {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  height: 100lvh;
+  overflow: clip;
+}
+
+/* The thirteen, their filaments and the light round the globe, placed from
+   the stage's corner by the script (transforms only) */
+.orbit {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+.haze {
+  position: absolute;
+  top: 0;
+  left: 0;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, rgba(234, 179, 8, 0.2), rgba(234, 179, 8, 0.06) 55%, transparent);
+  opacity: 0;
+  will-change: opacity;
+}
+/* The ring it sends out to them as they connect: a fine gold line */
+.wave {
+  position: absolute;
+  top: 0;
+  left: 0;
+  border-radius: 50%;
+  box-shadow: inset 0 0 0 1px rgba(250, 204, 21, 0.75);
+  opacity: 0;
+  will-change: transform, opacity;
+}
+
+/* A filament: from the globe's middle toward its mark (turned to face it).
+   Its line runs gold at the globe to the platform's colour at the mark,
+   stretched to length; light runs along it, in and out. */
+.spoke {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 0;
+  height: 0;
+  opacity: 0;
+  will-change: transform, opacity;
+}
+.line {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100px;
+  height: 1px;
+  background: linear-gradient(90deg, rgba(250, 204, 21, 0.75), rgba(var(--hue-rgb), 0.75));
+  transform: scaleX(0);
+  transform-origin: 0 50%;
+}
+/* The light's run, rim to mark (set where the orbit settles) */
+.wire {
+  position: absolute;
+  top: 0;
+  left: var(--r0, 0px);
+  width: var(--len, 0px);
+  height: 0;
+  opacity: 0;
+}
+/* A bead of light at the run's far end, carried along it: in from the
+   platform in its colour; out from Vivid (data-out) in gold */
+.pulse {
+  position: absolute;
+  top: -7px;
+  left: 0;
+  width: 100%;
+  height: 14px;
+  animation: inward 2.8s linear infinite;
+  animation-delay: calc(var(--k) * -0.43s);
+}
+.pulse::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  right: -7px;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, rgb(var(--hue-rgb)) 30%, rgba(var(--hue-rgb), 0.35) 60%, transparent);
+}
+.pulse[data-out] {
+  animation-direction: reverse;
+}
+.pulse[data-out]::after {
+  background: radial-gradient(closest-side, #fef3c7 30%, rgba(250, 204, 21, 0.4) 60%, transparent);
+}
+/* Only while the light's showing, and on a run long enough to travel */
+.orbit:not([data-live]) .pulse {
+  animation-play-state: paused;
+}
+.spoke[data-short] .wire {
+  display: none;
+}
+@keyframes inward {
+  0% {
+    opacity: 0;
+    transform: translateX(0);
+  }
+  8%,
+  52% {
+    opacity: 1;
+  }
+  60%,
+  100% {
+    opacity: 0;
+    transform: translateX(-100%);
+  }
+}
+
+/* A platform's mark, as the street's exits and the dial have it: its tile in
+   its colour, the glyph in ink; a ring of night keeps the filament off it */
+.mark {
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border-radius: var(--cx-r-icon);
+  background: var(--hue);
+  box-shadow: 0 0 0 4px #0c0a09;
+  color: var(--hue-on);
+  opacity: 0;
+  will-change: transform, opacity;
+}
+
+/* The words and the orbit's room. Standing up (a phone, a tablet): the
+   words over the orbit, the name giving way to what it is in the same
+   place, the readout just under it (well clear of the browser's bar); the
+   last line high in the orbit's room, over the globe as it falls away. */
+.frame {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: auto auto minmax(0, 1fr);
+  row-gap: 16px;
+  height: 100svh;
+  padding-top: 64px;
+  padding-bottom: 24px;
+}
+.meet,
+.claim {
+  grid-area: 1 / 1;
+  align-self: start;
+}
+.readout {
+  grid-area: 2 / 1;
+}
+.net {
+  grid-area: 3 / 1;
+}
+.handoff {
+  grid-area: 3 / 1;
+  align-self: start;
+}
+
+/* Meet, small; Vivid, as big as the page sets anything, lit like its globe
+   (cream where it faces you, warming to gold) */
+.meet {
+  margin: 0;
+  font-weight: 400;
+}
+.meetSmall {
+  display: block;
+  color: rgba(250, 250, 249, 0.64);
+  font-size: var(--cx-h3);
+  line-height: 1.3;
+  letter-spacing: var(--cx-h3-ls);
+}
+.meetBig {
+  display: block;
+  width: fit-content;
+  padding-bottom: 0.04em;
+  background: linear-gradient(180deg, #fef3c7 8%, #facc15 58%, #eab308);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  font-size: 100px;
+  line-height: 0.9;
+  letter-spacing: -4px;
+}
+
+.claim {
+  display: grid;
+  gap: 12px;
+  max-width: 34rem;
+}
+.claimLine {
+  color: #fafaf9;
+  font-size: var(--cx-h3);
+  line-height: 1.25;
+  letter-spacing: var(--cx-h3-ls);
+  text-wrap: balance;
+}
+.claimFine {
+  max-width: 30rem;
+  color: #a8a29e;
+  font-size: var(--cx-body);
+  line-height: 1.5;
+  text-wrap: pretty;
+}
+
+.handoff {
+  display: grid;
+  gap: 4px;
+}
+.handoffLine {
+  color: #fafaf9;
+  font-size: var(--cx-h3);
+  line-height: 1.25;
+  letter-spacing: var(--cx-h3-ls);
+}
+.handoffFine {
+  color: #a8a29e;
+  font-size: var(--cx-body);
+  line-height: 1.5;
+}
+
+/* A quiet live readout, with a beating dot */
+.readout {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: rgba(250, 250, 249, 0.6);
+  font-size: 14px;
+  line-height: 20px;
+  font-variant-numeric: tabular-nums;
+}
+.live {
+  position: relative;
+  flex-shrink: 0;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #facc15;
+}
+.live::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: #facc15;
+  animation: beat 2s var(--cx-ease) infinite;
+}
+@keyframes beat {
+  from {
+    opacity: 0.6;
+    transform: scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: scale(2.6);
+  }
+}
+
+/* The globe's canvas, its trail and the ring it sets off landing: fixed to
+   the screen, so the globe can lift out of the wallet and come down to the
+   pill; placed and scaled by the script */
+.sky {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 2;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+}
+.globe {
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: block;
+  visibility: hidden;
+  transform-origin: 50% 50%;
+  will-change: transform;
+}
+/* The trail as it falls, a long exposure in the street's light
+   (street.module.css .light): a bright core in a faint gold haze, tapering
+   to nothing and fading back up its path. The taper and the fade are drawn
+   once; the script only stretches and turns the bar along the fall. */
+.trail {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 480px;
+  height: 14px;
+  background: linear-gradient(
+    180deg,
+    transparent,
+    rgba(250, 204, 21, 0.22) 30%,
+    #fde68a 46%,
+    #fef3c7 50%,
+    #fde68a 54%,
+    rgba(250, 204, 21, 0.22) 70%,
+    transparent
+  );
+  clip-path: polygon(0 50%, 100% 0, 100% 100%);
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 85%);
+  mask-image: linear-gradient(90deg, transparent, #000 85%);
+  opacity: 0;
+  visibility: hidden;
+  transform-origin: 0 50%;
+  will-change: transform, opacity;
+}
+/* The ring that goes out from the pill as the globe settles into it: a soft
+   band of gold at its edge, scaled out from the pill's circle and faded, by
+   the clock, once; it ends unseen */
+.ripple {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 240px;
+  height: 240px;
+  border-radius: 50%;
+  background: radial-gradient(
+    closest-side,
+    transparent 84%,
+    rgba(250, 204, 21, 0.45) 92%,
+    rgba(253, 230, 138, 0.8) 96%,
+    transparent
+  );
+  opacity: 0;
+  will-change: transform, opacity;
+}
+
+@media (min-width: 768px) {
+  .mark {
+    width: 44px;
+    height: 44px;
+  }
+  .meetBig {
+    font-size: 156px;
+    letter-spacing: -6px;
+  }
+  .claimLine,
+  .handoffLine {
+    font-size: var(--cx-h2);
+    line-height: 1.15;
+    letter-spacing: -0.02em;
+  }
+  .claimFine,
+  .handoffFine {
+    font-size: var(--cx-lead);
+    line-height: 1.4;
+  }
+}
+
+/* Laid across (a laptop): the words down the left, the name at the top and
+   what it is at the foot, the last line between them; the orbit on the
+   right, the readout under it; the foot kept clear for the pill */
+@media (min-width: 1024px) {
+  .track {
+    --pin: 150vh;
+  }
+  .frame {
+    grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+    grid-template-rows: auto minmax(0, 1fr) auto;
+    column-gap: 48px;
+    padding-top: 104px;
+    padding-bottom: calc(var(--pill) + 56px);
+  }
+  .meet {
+    grid-area: 1 / 1;
+  }
+  .claim {
+    grid-area: 3 / 1;
+    align-self: end;
+  }
+  .handoff {
+    grid-area: 2 / 1;
+    align-self: center;
+  }
+  .net {
+    grid-area: 1 / 2 / 4 / 3;
+  }
+  .readout {
+    grid-area: 3 / 2;
+    align-self: end;
+    justify-self: end;
+  }
+}
+
+/* Reduced motion: one still picture in the page's flow, nothing held or
+   flown: the name, the globe with the thirteen wired round it, what it is,
+   and the last line */
+@media (prefers-reduced-motion: reduce) {
+  .track {
+    height: auto;
+    margin-bottom: 0;
+  }
+  .veil,
+  .wave,
+  .wire,
+  .trail,
+  .ripple {
+    display: none;
+  }
+  .stage {
+    position: relative;
+    height: auto;
+  }
+  .frame {
+    grid-template-rows: repeat(5, auto);
+    row-gap: 24px;
+    height: auto;
+    min-height: 100svh;
+    padding-bottom: 48px;
+  }
+  .meet {
+    grid-area: 1 / 1;
+  }
+  .net {
+    grid-area: 2 / 1;
+    height: min(100vw, 64svh);
+  }
+  .claim {
+    grid-area: 3 / 1;
+  }
+  .readout {
+    grid-area: 4 / 1;
+  }
+  .handoff {
+    grid-area: 5 / 1;
+    align-self: start;
+  }
+  .meet,
+  .claim,
+  .handoff,
+  .readout {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+  .sky {
+    position: absolute;
+  }
+  .live::after {
+    animation: none;
+  }
+}
+@media (prefers-reduced-motion: reduce) and (min-width: 1024px) {
+  .frame {
+    grid-template-rows: auto minmax(0, 1fr) auto auto;
+    min-height: 100vh;
+  }
+  .meet {
+    grid-area: 1 / 1;
+  }
+  .claim {
+    grid-area: 2 / 1;
+    align-self: end;
+  }
+  .handoff {
+    grid-area: 3 / 1;
+  }
+  .net {
+    grid-area: 1 / 2 / 5 / 3;
+    height: auto;
+    min-height: 560px;
+  }
+  .readout {
+    grid-area: 4 / 2;
+  }
+}

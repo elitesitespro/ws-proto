@@ -4,11 +4,12 @@ import type { ArtProps, District } from "./street-districts";
 import styles from "./street-section.module.css";
 
 /**
- * A district's billboard by the road: its art, and over it why the district
- * is worth the stop. Its lamps come on as the car arrives. While you look at
- * one of its exits (or the car's just passed one, on a phone or a tablet) it
- * advertises that platform instead. It renders again only when one of those
- * changes, not every time the car passes something.
+ * A district's billboard by the road: its art, and over it (under it, on a
+ * phone) why the district is worth the stop. Its lamps come on as the car
+ * arrives. While you look at one of its exits (or the car's just passed one,
+ * on a phone or a tablet) it advertises that platform instead. It renders
+ * again only when one of those changes, not every time the car passes
+ * something.
  */
 export const DistrictBillboard = memo(function DistrictBillboard({
   district,
@@ -35,8 +36,11 @@ export const DistrictBillboard = memo(function DistrictBillboard({
         <i />
       </span>
       <div className={styles.face} data-tone={exit?.light ? "light" : undefined}>
-        <Art focus={focus} lit={lit} />
-        <div aria-hidden="true" className={styles.scrim} />
+        {/* The art and its shade: the words lie over it, or below it on a phone */}
+        <div className={styles.picture}>
+          <Art focus={focus} lit={lit} />
+          <div aria-hidden="true" className={styles.scrim} />
+        </div>
         <div key={exit?.name ?? district.id} className={styles.copy}>
           <p className={styles.kicker}>
             {exit ? `Exit ${firstExit + index} · ${exit.label}` : `${district.street} · ${district.exits.length} exits`}

@@ -90,6 +90,11 @@ const navButtonClass =
   "text-inherit hover:text-inherit disabled:bg-transparent disabled:text-inherit disabled:opacity-40";
 
 const cardAngleStep = 36;
+// On a phone or tablet the dial lies across the foot of the screen, centred
+// under its pointer, on a wider ring with the platforms closer round it: the
+// one at the pointer has a neighbour either side, the next ones peek in at
+// the screen's edges, and all thirteen fit once round, so no two share a place
+const PHONE_STEP = 18;
 const LAST = platforms.length - 1;
 // How far the page scrolls from one platform to the next, in screen heights
 // (vh). The page never stops on the way: a few turns of the wheel bring the
@@ -98,9 +103,15 @@ const STEP_VH = 32;
 // Seconds to glide to a platform picked on the dial or by the arrows
 const GLIDE = 0.8;
 // The world under the dial turns with it, a third as fast
-const GLOBE_TURN = cardAngleStep / 3;
+const GLOBE_PACE = 1 / 3;
 // The bezel's marks, one every 6°: a longer one at each platform's place
 const TICKS = Array.from({ length: 60 }, (_, index) => index * 6);
+// A phone's dial is marked along the planet's rim instead: a fine mark every
+// 6° from the first platform's place to the last, so the scale ends where
+// the platforms do, and a detent at each platform's own place (drawn apart)
+const RIM_TICKS = Array.from({ length: LAST * (PHONE_STEP / 6) + 1 }, (_, index) => index * 6).filter(
+  (angle) => angle % PHONE_STEP !== 0,
+);
 
 // With an intro, how far the page scrolls with the section pinned before the
 // platforms start, in screen heights (vh): the heading holds, then the dial
@@ -131,8 +142,21 @@ function detent(progress: number) {
 // The first platform sits at the pointer as the section pins, the last as it
 // lets go. The ones still to come wait below the pointer and the dial turns
 // them up into place, so it moves the way the page does as you scroll down.
-function orbitAngle(progress: number, index: number) {
-  return (index - progress * LAST) * cardAngleStep;
+function orbitAngle(progress: number, index: number, step = cardAngleStep) {
+  return (index - progress * LAST) * step;
+}
+
+// On a phone's dial, how big and how bright a platform is by how many places
+// it is from the pointer: the one at it whole, its neighbours a step smaller
+// and dimmer, the next ones smaller and fainter again, gone a little past
+// that. It changes all the way round, so each grows into the pointer.
+function phoneDepth(places: number) {
+  return 1 - 0.16 * Math.min(places, 1) - 0.14 * Math.min(Math.max(places - 1, 0), 1);
+}
+function phoneShown(places: number) {
+  if (places <= 1) return 1 - 0.3 * places;
+  if (places <= 2) return 0.7 - 0.35 * (places - 1);
+  return Math.max(0, 0.35 * (1 - (places - 2) / 0.6));
 }
 
 // Moving from one platform to the next. The page on the right slides the
@@ -235,6 +259,8 @@ function OrbitCard({
   index,
   progress,
   sweep,
+  step,
+  narrow,
   active,
   near,
   onSelect,
@@ -243,6 +269,10 @@ function OrbitCard({
   progress: MotionValue<number>;
   /** An extra turn of the ring, in degrees, while it comes in. */
   sweep: MotionValue<number>;
+  /** The degrees between one platform and the next round the ring. */
+  step: number;
+  /** A phone's or tablet's dial, across the foot of the screen. */
+  narrow: boolean;
   active: boolean;
   /** On the visible arc, so it can be clicked. */
   near: boolean;
@@ -250,15 +280,18 @@ function OrbitCard({
 }) {
   const platform = platforms[index];
   const hue = hueAttrs(platform.name);
+  // Where it is round the ring (the turn coming in is in the laptop's degrees, so it's scaled to this ring's)
+  const angleOf = (value: number, turn: number) => orbitAngle(value, index, step) + (turn * step) / cardAngleStep;
   const transform = useTransform([progress, sweep], ([value, turn]: number[]) => {
-    const angle = orbitAngle(value, index) + turn;
+    const angle = angleOf(value, turn);
     // Further round from the pointer, smaller, so the dial reads as a wheel turning away
-    const depth = 1 - 0.3 * Math.min(Math.abs(angle) / 96, 1);
+    const depth = narrow ? phoneDepth(Math.abs(angle) / step) : 1 - 0.3 * Math.min(Math.abs(angle) / 96, 1);
 
     return `translate(-50%, -50%) rotate(calc(${angle}deg + var(--orbit-offset, 0deg))) translateX(calc(var(--orbit-size) / 2)) rotate(calc(${-angle}deg - var(--orbit-offset, 0deg))) scale(${depth})`;
   });
   const opacity = useTransform([progress, sweep], ([value, turn]: number[]) => {
-    const distanceFromVisibleArc = Math.abs(orbitAngle(value, index) + turn);
+    const distanceFromVisibleArc = Math.abs(angleOf(value, turn));
+    if (narrow) return phoneShown(distanceFromVisibleArc / step);
 
     if (distanceFromVisibleArc <= 84) return 1;
     if (distanceFromVisibleArc >= 96) return 0;
@@ -312,6 +345,9 @@ export function PlatformTimelineSection({ intro, introLine }: PlatformTimelineSe
   // The platforms one under another, for short windows and reduced motion:
   // only there, so its thirteen scenes aren't all playing out of sight
   const stacked = useMediaQuery("(max-height: 560px), (prefers-reduced-motion: reduce)");
+  // A phone's or tablet's dial: across the foot of the screen, its platforms closer round a wider ring
+  const narrow = useMediaQuery("(max-width: 1023px)");
+  const ringStep = narrow ? PHONE_STEP : cardAngleStep;
   // Which platform is at the pointer, and which way the dial last turned
   const [step, setStep] = useState({ index: 0, direction: 1 });
   const activeIndex = step.index;
@@ -390,19 +426,22 @@ export function PlatformTimelineSection({ intro, introLine }: PlatformTimelineSe
     damping: 28,
     mass: 0.6,
   });
-  // The pointer holds on whichever platform the dial is nearest
+  // The pointer holds on whichever platform the dial is nearest (on a phone
+  // it holds still at the top of the dial instead: see .phonePointer)
   const pointerTransform = useTransform(orbitProgress, (progress) => {
-    const angle = orbitAngle(progress, Math.max(0, Math.min(LAST, Math.round(progress * LAST))));
+    const angle = orbitAngle(progress, Math.max(0, Math.min(LAST, Math.round(progress * LAST))), ringStep);
     return `translate(-50%, -50%) rotate(calc(${angle}deg + var(--orbit-offset, 0deg))) translateX(calc(var(--orbit-size) / 2 + var(--pointer-offset)))`;
   });
-  // The bezel turns with the platforms; the world beneath turns slower
+  // The bezel turns with the platforms; the world beneath turns slower (the
+  // turn coming in is in the laptop's degrees, so it's scaled to the ring's)
   const bezelTransform = useTransform(
     [orbitProgress, sweep],
-    ([progress, turn]: number[]) => `rotate(calc(${turn - progress * LAST * cardAngleStep}deg + var(--orbit-offset, 0deg)))`,
+    ([progress, turn]: number[]) =>
+      `rotate(calc(${((turn - progress * LAST * cardAngleStep) * ringStep) / cardAngleStep}deg + var(--orbit-offset, 0deg)))`,
   );
   const globeRotate = useTransform(
     [orbitProgress, sweep],
-    ([progress, turn]: number[]) => turn / 3 - progress * LAST * GLOBE_TURN,
+    ([progress, turn]: number[]) => (((turn - progress * LAST * cardAngleStep) * ringStep) / cardAngleStep) * GLOBE_PACE,
   );
 
   // A platform picked on the dial, while the page glides to it
@@ -595,6 +634,30 @@ export function PlatformTimelineSection({ intro, introLine }: PlatformTimelineSe
           {/* The world at night, seen from over the pole, turning as the dial does */}
           <div aria-hidden="true" className={styles.orbitCutout}>
             <motion.div className={styles.globe} style={{ rotate: globeRotate }} />
+            {/* A phone's: the rim lit in the platform's colour at the pointer, holding still */}
+            <div className={styles.rimLight} />
+            {/* A phone's: the scale along the rim, turning with the platforms, a detent in each one's
+                colour at its place; the one at the pointer lights up */}
+            <motion.svg viewBox="-100 -100 200 200" className={styles.rimBezel} style={{ transform: bezelTransform }}>
+              {RIM_TICKS.map((angle) => (
+                <line key={angle} x1="99.4" x2="98.4" transform={`rotate(${angle})`} className={styles.rimTick} />
+              ))}
+              {platforms.map((platform, index) => {
+                const hue = hueAttrs(platform.name);
+                return (
+                  <line
+                    key={platform.name}
+                    x1="99.4"
+                    x2="97.6"
+                    transform={`rotate(${index * PHONE_STEP})`}
+                    data-hue={hue["data-hue"]}
+                    data-active={index === activeIndex || undefined}
+                    style={hue.style}
+                    className={styles.detent}
+                  />
+                );
+              })}
+            </motion.svg>
           </div>
           <div aria-hidden="true" className={styles.orbitCircle}>
             <motion.svg
@@ -633,6 +696,8 @@ export function PlatformTimelineSection({ intro, introLine }: PlatformTimelineSe
                   index={index}
                   progress={orbitProgress}
                   sweep={sweep}
+                  step={ringStep}
+                  narrow={narrow}
                   active={activeIndex === index}
                   near={Math.abs(index - activeIndex) <= 2}
                   onSelect={pickPlatform}
@@ -650,6 +715,9 @@ export function PlatformTimelineSection({ intro, introLine }: PlatformTimelineSe
               style={{ transform: pointerTransform, opacity: pointerOpacity }}
             />
           </div>
+          {/* A phone's pointer: still, at the top of the dial in the middle of the screen, just under
+              the lit detent; the platforms turn under it */}
+          <motion.div aria-hidden="true" className={styles.phonePointer} style={{ opacity: pointerOpacity }} />
 
           {!shouldReduceMotion && (
             <motion.div

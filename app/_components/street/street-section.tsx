@@ -28,11 +28,16 @@ const ART: Record<District["id"], ComponentType<ArtProps>> = {
 // Each district's first exit, numbered along the street
 const FIRST_EXIT = DISTRICTS.map((_, i) => 1 + DISTRICTS.slice(0, i).reduce((n, d) => n + d.exits.length, 0));
 
-// The mouth's two rounded corners and the road between them, in px: on a
-// laptop, and on a phone or a tablet (as round as the road's bends there;
-// the roads as wide as street.module.css draws them)
+// A laptop's mouth: its two rounded corners and the road between them, in
+// px (the road as wide as street.module.css draws it there)
 const MOUTH = { radius: 112, road: 32 };
-const MOUTH_SM = { radius: 88, road: 28 };
+// A phone's or a tablet's first lane runs down the screen's edge, so its
+// mouth opens nearer the middle: a funnel this deep at most (or this share
+// of the room under the approach), opening this far either side of the road
+// at most (as wide as street.module.css draws it there). The road leaves it
+// in one S into the first lane, going across at most this much for every px
+// it drops, as gently as the bends between the districts.
+const FUNNEL = { depth: 96, share: 0.4, half: 144, road: 28, lean: 1.2 };
 // The car keeps this far down the screen while it drives. The street's
 // opening words have all come up by the time they reach this line too.
 export const ANCHOR = 0.6;
@@ -66,8 +71,8 @@ type Road = {
   bends: { from: number; to: number; side: number }[];
   start: number;
   end: number;
-  /** Where the mouth opens, and how big it is. */
-  mouth: { x: number; radius: number; road: number };
+  /** Where the mouth opens (its middle), how big it is, and its shape. */
+  mouth: { x: number; width: number; height: number; d: string };
   /** How far down each district starts, and each exit sits. */
   districts: number[];
   exits: number[];
@@ -131,7 +136,8 @@ export function StreetSection({
 
   // Lay the street down the districts' lanes, straight down each, and across
   // to the next between them: on a laptop a round corner, a straight run
-  // across and a round corner back down; on a phone or a tablet one S
+  // across and a round corner back down; on a phone or a tablet one S (and
+  // one more out of the mouth into the first lane)
   const measure = () => {
     const section = sectionRef.current;
     if (!section) return;
@@ -151,6 +157,15 @@ export function StreetSection({
     // The street opens at the foot of the approach
     const start = approachRef.current ? approachRef.current.getBoundingClientRect().bottom - box.top : 0;
     const end = box.height - END_GAP;
+    const entry = lanes[0];
+    // Where it opens. On a laptop that's over the first lane. On a phone or
+    // a tablet it's nearer the middle, in a funnel that narrows to the road
+    // (the car waits in its neck), and the road sweeps from there into the
+    // first lane, all in the room left under the approach
+    const neck = wide ? start : start + Math.min(FUNNEL.depth, Math.max(entry.top - start, 0) * FUNNEL.share);
+    const middle = box.width / 2 - entry.x;
+    const lead = wide ? 0 : Math.sign(middle) * Math.min(Math.abs(middle), (entry.top - neck) * FUNNEL.lean);
+    const mouthX = entry.x + lead;
 
     const points: Point[] = [];
     const pieces: Piece[] = [];
@@ -161,7 +176,7 @@ export function StreetSection({
       points.push({ x, y, v, at: last ? last.at + Math.hypot(x - last.x, y - last.y) : 0 });
     };
     // Each stretch ends where the next starts
-    let piece = `M${lanes[0].x} ${start}`;
+    let piece = `M${mouthX} ${start}`;
     let pieceFrom = 0;
     const cut = () => {
       const last = points[points.length - 1];
@@ -169,8 +184,38 @@ export function StreetSection({
       piece = `M${last.x} ${last.y}`;
       pieceFrom = last.at;
     };
-    let d = `M${lanes[0].x} ${start}`;
-    walk(lanes[0].x, start);
+    let d = `M${mouthX} ${start}`;
+    walk(mouthX, start);
+    // A phone's or a tablet's S, from one lane to the next, the car on its
+    // line all the way: it swings across as the page comes down. It's a
+    // stretch of its own, and a bend the car signals for.
+    const swing = (x0: number, y0: number, x1: number, y1: number) => {
+      bends.push({ from: y0, to: y1, side: Math.sign(x1 - x0) });
+      const drop = y1 - y0;
+      const c1 = y0 + SWAY * drop;
+      const c2 = y1 - SWAY * drop;
+      const s = `C${x0} ${c1} ${x1} ${c2} ${x1} ${y1}`;
+      d += s;
+      piece += s;
+      for (let step = 1; step <= 64; step++) {
+        const t = step / 64;
+        const u = 1 - t;
+        walk(
+          u ** 3 * x0 + 3 * u * u * t * x0 + 3 * u * t * t * x1 + t ** 3 * x1,
+          u ** 3 * y0 + 3 * u * u * t * c1 + 3 * u * t * t * c2 + t ** 3 * y1,
+        );
+      }
+      cut();
+    };
+    // Out of the mouth: down its neck, where the car waits, then across
+    // into the first lane
+    if (Math.abs(lead) >= 1 && neck > start) {
+      d += `V${neck}`;
+      piece += `V${neck}`;
+      walk(mouthX, neck);
+      cut();
+      swing(mouthX, neck, entry.x, entry.top);
+    }
     lanes.forEach((lane, i) => {
       if (i === 0) return;
       const from = lanes[i - 1];
@@ -180,28 +225,12 @@ export function StreetSection({
       walk(from.x, from.bottom);
       if (Math.abs(across) < 1) return;
       cut();
-      const side = Math.sign(across);
-      bends.push({ from: from.bottom, to: lane.top, side });
       if (!wide) {
-        // An S from one lane to the next, the car on its line all the way:
-        // it swings across as the page comes down
-        const drop = lane.top - from.bottom;
-        const c1 = from.bottom + SWAY * drop;
-        const c2 = lane.top - SWAY * drop;
-        const s = `C${from.x} ${c1} ${lane.x} ${c2} ${lane.x} ${lane.top}`;
-        d += s;
-        piece += s;
-        for (let step = 1; step <= 64; step++) {
-          const t = step / 64;
-          const u = 1 - t;
-          walk(
-            u ** 3 * from.x + 3 * u * u * t * from.x + 3 * u * t * t * lane.x + t ** 3 * lane.x,
-            u ** 3 * from.bottom + 3 * u * u * t * c1 + 3 * u * t * t * c2 + t ** 3 * lane.top,
-          );
-        }
-        cut();
+        swing(from.x, from.bottom, lane.x, lane.top);
         return;
       }
+      const side = Math.sign(across);
+      bends.push({ from: from.bottom, to: lane.top, side });
       const mid = (from.bottom + lane.top) / 2;
       const r = Math.min(CORNER, (lane.top - from.bottom) / 2, Math.abs(across) / 2);
       // Down to the first corner, round it onto the run across, along, and
@@ -256,6 +285,34 @@ export function StreetSection({
           return `M${x0} ${y0}C${x0} ${y0 + 36} ${x1 - out * 28} ${y1} ${x1} ${y1}`;
         });
 
+    // The mouth, the cream of the approach narrowing into the road. A
+    // laptop's: two round corners. A phone's or a tablet's: a wide funnel,
+    // each side one long curve, leaving the approach's edge level and meeting
+    // the road upright.
+    let mouth: Road["mouth"];
+    if (wide) {
+      const { radius: r, road: w } = MOUTH;
+      mouth = {
+        x: mouthX,
+        width: 2 * r + w,
+        height: r,
+        d: `M0 0A${r} ${r} 0 0 1 ${r} ${r}H${r + w}A${r} ${r} 0 0 1 ${2 * r + w} 0Z`,
+      };
+    } else {
+      const half = Math.max(Math.min(FUNNEL.half, mouthX - 16, box.width - mouthX - 16), FUNNEL.road);
+      const reach = half - FUNNEL.road / 2;
+      const deep = neck - start;
+      const far = 2 * half;
+      mouth = {
+        x: mouthX,
+        width: far,
+        height: deep,
+        d:
+          `M0 0C${0.66 * reach} 0 ${reach} ${0.4 * deep} ${reach} ${deep}` +
+          `H${far - reach}C${far - reach} ${0.4 * deep} ${far - 0.66 * reach} 0 ${far} 0Z`,
+      };
+    }
+
     lightShown.current = [];
     setRoad({
       width: box.width,
@@ -266,7 +323,7 @@ export function StreetSection({
       bends,
       start,
       end,
-      mouth: { x: lanes[0].x, ...(wide ? MOUTH : MOUTH_SM) },
+      mouth,
       districts: lanes.map((lane) => lane.top),
       exits,
       ramps,
@@ -321,11 +378,12 @@ export function StreetSection({
 
   const { scrollY } = useScroll();
   useMotionValueEvent(scrollY, "change", drive);
-  // The street's opening words come up as you scroll, all in by the time
-  // they reach the car's line
+  // The street's opening words come up as you scroll: the headline is all in
+  // while it's still low on the screen, just risen into view, and the line
+  // under it by the time it reaches the car's line
   const { scrollYProgress: openIn } = useScroll({
     target: openingRef,
-    offset: ["start 85%", `end ${ANCHOR * 100}%`],
+    offset: ["start 90%", `end ${ANCHOR * 100}%`],
   });
   const remeasure = useEffectEvent(measure);
   const redrive = useEffectEvent(drive);
@@ -341,7 +399,6 @@ export function StreetSection({
     const frame = requestAnimationFrame(() => redrive());
     return () => cancelAnimationFrame(frame);
   }, [road]);
-  const mouth = road?.mouth;
   const parked = road ? road.start + PARKED : 0;
 
   return (
@@ -391,17 +448,15 @@ export function StreetSection({
           ))}
         </svg>
       )}
-      {road && mouth && (
+      {road && (
         <svg
           aria-hidden="true"
           className={street.mouth}
-          style={{ left: mouth.x, top: road.start }}
-          width={2 * mouth.radius + mouth.road}
-          height={mouth.radius}
+          style={{ left: road.mouth.x, top: road.start }}
+          width={road.mouth.width}
+          height={road.mouth.height}
         >
-          <path
-            d={`M0 0A${mouth.radius} ${mouth.radius} 0 0 1 ${mouth.radius} ${mouth.radius}H${mouth.radius + mouth.road}A${mouth.radius} ${mouth.radius} 0 0 1 ${2 * mouth.radius + mouth.road} 0Z`}
-          />
+          <path d={road.mouth.d} />
         </svg>
       )}
 
@@ -409,17 +464,14 @@ export function StreetSection({
           opening words come up in it before it opens out */}
       <div ref={approachRef} className={`${styles.approach} px-4 md:px-6`}>
         <header ref={openingRef} className={`${styles.intro} mx-auto w-full max-w-7xl`}>
-          <h2
-            id="street-heading"
-            className="max-w-4xl text-lg leading-[36px] text-balance font-normal tracking-[-0.03em] sm:text-xl sm:leading-[44px] md:text-3xl md:leading-[56px]"
-          >
-            <RevealWords text="The world, on one street." progress={openIn} to={0.4} />
+          <h2 id="street-heading" className={`${styles.heading} max-w-4xl`}>
+            <RevealWords text="The world, on one street." progress={openIn} to={0.3} />
           </h2>
-          <p className={`${styles.introLine} max-w-[44ch] text-sm`}>
+          <p className={`${styles.introLine} max-w-[44ch] text-sm md:text-base`}>
             <RevealWords
               text="Four districts, thirteen exits, and your wallet at the end of the road."
               progress={openIn}
-              from={0.3}
+              from={0.2}
             />
           </p>
         </header>

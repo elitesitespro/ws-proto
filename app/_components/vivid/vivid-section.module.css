@@ -1,22 +1,26 @@
-/* Vivid, after the wallet, on the night: its heading, the switchboard
-   (vivid-switchboard.module.css), and its two plans. Vivid wears
+/* Vivid, after the wallet, on the night: its intro (vivid-intro.module.css),
+   its heading, the switchboard (vivid-switchboard.module.css), and its two
+   plans. Vivid wears
    WorldStreet's gold and nothing else (worldstreet-hub lib/hues.ts); the
    platforms it points to wear their own. */
 .section {
   position: relative;
   z-index: 2;
-  padding: 112px 0 128px;
+  /* The intro starts it, straight off the wallet */
+  padding: 0 0 128px;
   background: #0c0a09;
   color: var(--color-foreground);
 }
 
-/* Over the dashboard's globe as it flies down past it */
+/* Close after the intro's last line: it comes up over the stage's foot as
+   the stage lets go (vivid-intro.module.css --overlap), so it sits over it */
 .head {
   position: relative;
   z-index: 1;
   display: grid;
   gap: 16px;
   margin-bottom: 64px;
+  padding-top: 16px;
 }
 .eyebrow {
   margin-bottom: 16px;
@@ -237,6 +241,7 @@
     align-items: end;
     gap: 48px;
     margin-bottom: 80px;
+    padding-top: 32px;
   }
   .lede {
     justify-self: end;

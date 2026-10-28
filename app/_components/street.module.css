@@ -64,8 +64,9 @@
   background: repeating-linear-gradient(to bottom, var(--lit) 0 var(--dash), transparent var(--dash) var(--tile));
   filter: drop-shadow(0 0 3px var(--cx-halo));
 }
-/* The street's mouth: the cream above narrowing into the road between two
-   rounded corners */
+/* The street's mouth: the cream above narrowing into the road, between two
+   rounded corners on a laptop, down a long funnel on a phone or a tablet
+   (its shape is drawn in the TSX) */
 .mouth {
   position: absolute;
   top: 0;

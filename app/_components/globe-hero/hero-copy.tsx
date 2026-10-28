@@ -24,6 +24,10 @@ type HeroCopyProps = {
   y: MotionValue<number>;
   /** How the scroll cue fades, a little sooner. */
   cueOpacity: MotionValue<number>;
+  /** How a phone's word on playing with the planet fades, sooner still. */
+  hintOpacity: MotionValue<number>;
+  /** The visitor has pressed on the planet (to spin it, or tap a city), so the word on how has done its job. */
+  played: boolean;
 } & Pick<ComponentProps<typeof GlobeHeadline>, "onWordChange" | "paused" | "waiting">;
 
 /**
@@ -32,12 +36,25 @@ type HeroCopyProps = {
  * headline's line, its word and bar, the paragraph, each button, then the
  * cue, each rising out of a soft blur (hero-copy.module.css).
  * On a phone it's centred: the words and Explore at the top (the menu has
- * the account), the planet and its cards under them, and a word on how to
- * play with it at the foot.
+ * the account), the planet and its cards under them, and a small word on how
+ * to play with it tucked into the corner at the foot. That word isn't part of
+ * the copy, so it never rides up over the planet as the copy lifts away: it
+ * holds its corner and is gone within the first moment of scrolling, or as
+ * soon as the visitor presses on the planet.
  * Explore carries you down the page to the platforms, through the statement
  * and the dive on the way, as if you'd scrolled it.
  */
-export function HeroCopy({ copyRef, opacity, y, cueOpacity, onWordChange, paused, waiting }: HeroCopyProps) {
+export function HeroCopy({
+  copyRef,
+  opacity,
+  y,
+  cueOpacity,
+  hintOpacity,
+  played,
+  onWordChange,
+  paused,
+  waiting,
+}: HeroCopyProps) {
   const lenis = useLenis();
   const explore = (event: MouseEvent<HTMLAnchorElement>) => {
     const to = document.getElementById("discover");
@@ -87,12 +104,17 @@ export function HeroCopy({ copyRef, opacity, y, cueOpacity, onWordChange, paused
             Create your account
           </a>
         </div>
-        <p className={cn(styles.hint, styles.rise)} style={at(6)}>
-          Spin the globe, or tap a city
-        </p>
       </motion.div>
       <motion.div style={{ opacity: cueOpacity, ...at(6) } as MotionStyle} className={styles.cue}>
         <GlobeScrollCue />
+      </motion.div>
+      {/* How to play with the planet (a phone's): in the corner at the foot, a line to each half */}
+      <motion.div style={{ opacity: hintOpacity }}>
+        <p className={cn(styles.hint, styles.rise)} style={at(6)} data-played={played || undefined}>
+          <span className={styles.hintText}>
+            <span>Spin the globe,</span> <span>or tap a city</span>
+          </span>
+        </p>
       </motion.div>
     </>
   );

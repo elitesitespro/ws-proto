@@ -1,0 +1,309 @@
+/* Vivid's ask pill (vivid-pill.tsx), docked at the foot of the screen. Solid
+   colours, as the hub's pill: the system's raised stone, a warm gold hairline,
+   light ink, gold dots and a gold send button. No glass, no glow. */
+
+/* Centred at the bottom. A phone keeps 12px clear of the bottom edge (and the
+   home bar); a fixed bottom offset keeps it in the small viewport, above the
+   bar iOS Safari floats over the page. Under the header and its menus (z 40
+   and 50), over the page. */
+.box,
+.anchor {
+  position: fixed;
+  bottom: calc(12px + env(safe-area-inset-bottom));
+  left: 50%;
+  z-index: 30;
+  pointer-events: none;
+}
+@media (min-width: 48rem) {
+  .box,
+  .anchor {
+    bottom: 20px;
+  }
+}
+
+/* Where the intro lands Vivid's globe: the circle the pill is born as. Laid
+   out always, seen never. */
+.anchor {
+  width: 58px;
+  height: 58px;
+  margin-left: -29px;
+  visibility: hidden;
+}
+
+.box {
+  --pill-fill: var(--cx-elevated, #1c1917);
+  --pill-line: rgba(234, 179, 8, 0.24);
+  --pill-ink: var(--cx-text, #ffffff);
+  --pill-muted: var(--cx-text-muted, #a8a29e);
+  --pill-subtle: var(--cx-text-3, rgba(255, 255, 255, 0.5));
+  --pill-well: var(--cx-surface-2, rgba(255, 255, 255, 0.06));
+  color: var(--pill-ink);
+}
+/* The intro has Vivid: nothing here shows, and nothing can be reached */
+.box[data-away] {
+  visibility: hidden;
+}
+
+/* The body: one shape, drawn by the spring */
+.body {
+  position: absolute;
+  inset: 0;
+  overflow: visible;
+  pointer-events: none;
+}
+.body path {
+  fill: var(--pill-fill);
+  stroke: var(--pill-line);
+  stroke-width: 1;
+}
+
+/* Awake: sphere · prompt · mic · send */
+.form {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  height: 58px;
+  padding: 0 8px;
+}
+.sphere,
+.thumb,
+.icon,
+.send {
+  cursor: pointer;
+}
+.sphere {
+  display: grid;
+  flex: none;
+  place-items: center;
+  border-radius: 50%;
+}
+.sphere:focus-visible,
+.thumb:focus-visible,
+.icon:focus-visible,
+.send:focus-visible {
+  outline: 2px solid var(--cx-peach, #fde68a);
+  outline-offset: 2px;
+}
+
+.field {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+}
+.label {
+  display: block;
+  overflow: hidden;
+  color: var(--pill-subtle);
+  font-size: var(--cx-small, 14px);
+  font-weight: 500;
+  line-height: 18px;
+  letter-spacing: var(--cx-small-ls, -0.02em);
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.line {
+  position: relative;
+  height: 22px;
+}
+.roll {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+.roll span,
+.input {
+  font-size: var(--cx-body, 16px);
+  line-height: 22px;
+  letter-spacing: var(--cx-body-ls, -0.2px);
+}
+.roll span {
+  display: block;
+  overflow: hidden;
+  color: var(--pill-muted);
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+/* 16px, so iOS doesn't zoom the page when it's focused */
+.input {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  border: 0;
+  background: transparent;
+  color: var(--pill-ink);
+  caret-color: var(--cx-ember, #eab308);
+  outline: none;
+}
+/* The kit rings whatever has keyboard focus (.cx-root :focus-visible), which
+   draws a box inside the pill round the field: the pill's own hairline
+   lights up instead */
+.box .input:focus-visible {
+  box-shadow: none;
+}
+.box:has(.input:focus-visible) .body path {
+  stroke: rgba(234, 179, 8, 0.6);
+}
+
+.actions {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: 4px;
+}
+.icon {
+  display: grid;
+  width: 40px;
+  height: 40px;
+  place-items: center;
+  border-radius: 50%;
+  color: var(--pill-ink);
+  transition: transform 0.2s var(--cx-ease, ease), background-color 0.2s;
+}
+.send {
+  display: grid;
+  width: 42px;
+  height: 42px;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--cx-ember, #eab308);
+  color: var(--cx-on-primary, #1c1917);
+  transition: transform 0.2s var(--cx-ease, ease), background-color 0.2s;
+}
+/* Only where there's a pointer to hover with: on a phone a tap would leave it lit */
+@media (hover: hover) {
+  .icon:hover {
+    background: var(--pill-well);
+  }
+  .send:hover {
+    background: var(--cx-flame, #facc15);
+  }
+}
+.icon:active,
+.send:active {
+  transform: scale(0.95);
+}
+
+/* Asleep: the thumb, Vivid's dots, tap to open */
+.thumb {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  display: grid;
+  width: 76px;
+  height: 34px;
+  margin-left: -38px;
+  place-items: center;
+  border-radius: 17px;
+}
+
+/* Open: the sign-in card, laid out at its full size and uncovered by the growing shape */
+.sheet {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  width: var(--w);
+  height: var(--h);
+  overflow: hidden;
+  border-radius: var(--r);
+  transform: translateX(-50%);
+}
+.gate {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  display: flex;
+  flex-direction: column;
+  transform: translateX(-50%);
+}
+.gateHead {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  height: 56px;
+  padding: 0 8px 0 14px;
+}
+.who {
+  flex: 1;
+  min-width: 0;
+}
+.name {
+  font-size: var(--cx-body, 16px);
+  font-weight: 500;
+  line-height: 20px;
+}
+.tagline {
+  overflow: hidden;
+  color: var(--pill-subtle);
+  font-size: var(--cx-small, 14px);
+  line-height: 18px;
+  letter-spacing: var(--cx-small-ls, -0.02em);
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.gateBody {
+  padding: 4px 16px 0;
+}
+.title {
+  font-size: var(--cx-lead, 20px);
+  font-weight: 500;
+  line-height: 26px;
+  letter-spacing: var(--cx-lead-ls, -0.3px);
+}
+.text {
+  margin-top: 4px;
+  color: var(--pill-muted);
+  font-size: var(--cx-body, 16px);
+  line-height: 22px;
+  letter-spacing: var(--cx-body-ls, -0.2px);
+  text-wrap: pretty;
+}
+.waiting {
+  margin-top: 8px;
+  overflow: hidden;
+  color: var(--pill-subtle);
+  font-size: var(--cx-small, 14px);
+  line-height: 18px;
+  letter-spacing: var(--cx-small-ls, -0.02em);
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+/* Two system buttons: one above the other on a phone, where "Create an
+   account" won't fit beside "Sign in", side by side from 768px */
+.gateActions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 16px 12px 12px;
+}
+@media (min-width: 48rem) {
+  .gateActions {
+    flex-direction: row;
+  }
+  .gateActions a {
+    flex: 1;
+  }
+}
+
+/* A new label or question rises into place */
+@keyframes rise-in {
+  from {
+    opacity: 0;
+    transform: translateY(90%);
+  }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .swap {
+    animation: rise-in 0.45s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+  }
+}
+.swap {
+  display: inline-block;
+}
+.roll .swap {
+  display: block;
+}

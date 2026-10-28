@@ -97,6 +97,9 @@ export function GlobePreviewSection() {
   const onGlobeReady = useCallback(() => setGlobeReady(true), []);
   const onOpen = useCallback(() => setOpened(true), []);
   const onSettled = useCallback(() => setSettled(true), []);
+  // The visitor has pressed on the planet (to spin it, or tap a city): a
+  // phone's word on how to play with it steps out
+  const [played, setPlayed] = useState(false);
   const city = useGlobeCity();
   const { open: cityOpen, close: closeCity } = city;
 
@@ -114,6 +117,9 @@ export function GlobePreviewSection() {
   const copyOpacity = useTransform(arrive, [0, 0.45], [1, 0]);
   const copyY = useTransform(arrive, [0, 0.6], [0, -64]);
   const cueOpacity = useTransform(arrive, [0, 0.15], [1, 0]);
+  // A phone's word on how to play with the planet is gone within the first
+  // few steps of scrolling, before the copy has lifted far
+  const hintOpacity = useTransform(arrive, [0, 0.06], [1, 0]);
   const pinsShown = useTransform(arrive, [0, 0.3], [1, 0]);
   const pinsPointer = useTransform(arrive, (v) => (v > 0.1 ? "none" : "auto"));
   const globeOpacity = useTransform([arrive, hold, travel], ([a, h, t]: number[]) => {
@@ -124,6 +130,11 @@ export function GlobePreviewSection() {
   // The planet's lower half dissolves into the canvas while it sits low, so
   // it never meets the edge of the screen hard; gone again once it rises
   const floorOpacity = useTransform([arrive, travel], ([a, t]: number[]) => along(a, [0.3, 1]) * (1 - along(t * DIVE_SCREENS, [0, 0.6])));
+  // On a phone the hero's planet runs off the foot of the screen, so it sinks
+  // into a shallow dark floor there instead of meeting the edge hard (or the
+  // strip under a browser's bar). It holds still on the stage, and gives way
+  // to the deeper floor above as the planet settles under the statement.
+  const footOpacity = useTransform(arrive, [0.7, 1], [1, 0]);
   const skyOpacity = useTransform(travel, (t) => along(t * DIVE_SCREENS, [SKY_OPENS[0], SKY_OPENS[0] + 0.2]));
   const skyScale = useTransform(travel, (t) => 0.4 + 2.4 * easeInOut(along(t * DIVE_SCREENS, SKY_OPENS)));
   const skyFill = useTransform(travel, (t) => along(t * DIVE_SCREENS, SKY_FILLS));
@@ -184,7 +195,11 @@ export function GlobePreviewSection() {
           style={{ "--layer-shown": pinsShown, "--layer-pointer": pinsPointer } as MotionStyle}
           className="sticky top-0 h-svh overflow-hidden motion-reduce:relative"
         >
-          <motion.div style={{ opacity: globeOpacity }} className={cn("absolute inset-0", away && "pointer-events-none")}>
+          <motion.div
+            style={{ opacity: globeOpacity }}
+            className={cn("absolute inset-0", away && "pointer-events-none")}
+            onPointerDown={() => setPlayed(true)}
+          >
             <NightGlobe
               ref={globeRef}
               placement={HERO.wide}
@@ -200,6 +215,11 @@ export function GlobePreviewSection() {
             aria-hidden="true"
             style={{ opacity: floorOpacity }}
             className="pointer-events-none absolute inset-x-0 bottom-0 h-1/3 bg-linear-to-t from-background to-transparent"
+          />
+          <motion.div
+            aria-hidden="true"
+            style={{ opacity: footOpacity }}
+            className="pointer-events-none absolute inset-x-0 bottom-0 h-10 bg-linear-to-t from-background from-35% to-transparent md:hidden"
           />
           <div
             aria-hidden="true"
@@ -236,6 +256,8 @@ export function GlobePreviewSection() {
           opacity={copyOpacity}
           y={copyY}
           cueOpacity={cueOpacity}
+          hintOpacity={hintOpacity}
+          played={played}
           onWordChange={onWordChange}
           paused={held || !!cityOpen}
           waiting={!landed}

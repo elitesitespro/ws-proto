@@ -77,21 +77,24 @@ const FX_CANDLES = FX_CLOSES.map((c, i) => {
 });
 
 // The pair, in front of the line, and two more further off: where each sits
-// on a laptop (x, y) and on a phone (px, py), as % of the face, and its size
+// on a laptop (x, y), as % of the face, and on a phone (px, py), as % of the
+// art's band over the words, and its size on each (s, ps). On a phone the
+// pair sits low on the left, over the chart's faded start.
 const FLAGS = [
-  { id: "jpy", x: 44, y: 14, px: 86, py: 34, s: 8, far: true },
-  { id: "gbp", x: 93, y: 7, px: 10, py: 8, s: 10, far: true },
-  { id: "eur", x: 56, y: 36, px: 30, py: 30, s: 30, far: false },
-  { id: "usd", x: 66, y: 39, px: 50, py: 33, s: 30, far: false },
+  { id: "jpy", x: 44, y: 14, px: 52, py: 14, s: 8, ps: 10, far: true },
+  { id: "gbp", x: 93, y: 7, px: 9, py: 17, s: 10, ps: 12, far: true },
+  { id: "eur", x: 56, y: 36, px: 21, py: 50, s: 30, ps: 42, far: false },
+  { id: "usd", x: 66, y: 39, px: 35, py: 57, s: 30, ps: 42, far: false },
 ] as const;
 
 /* Crypto */
 
 type Orbit = { cx: number; cy: number; rx: number; ry: number; tilt: number };
 
-// Bitcoin's orbit on a laptop and on a phone (% of the face; tilt in degrees)
+// Bitcoin's orbit on a laptop (% of the face) and on a phone (% of the art's
+// band, in the middle of it); tilt in degrees
 const ORBIT: Orbit = { cx: 72, cy: 36, rx: 22, ry: 14, tilt: -10 };
-const ORBIT_PHONE: Orbit = { cx: 52, cy: 26, rx: 38, ry: 10, tilt: -8 };
+const ORBIT_PHONE: Orbit = { cx: 50, cy: 52, rx: 36, ry: 22, tilt: -8 };
 
 /** A point on an orbit, `deg` round from its right-hand end. */
 function onOrbit(o: Orbit, deg: number) {
@@ -110,12 +113,12 @@ function halfOrbit(o: Orbit, near: boolean) {
 }
 
 // The coins round it: how far round the orbit each sits (past 180 is the far
-// side, behind Bitcoin) and its size
+// side, behind Bitcoin) and its size on a laptop and on a phone
 const COINS = [
-  { id: "eth", at: 205, s: 16 },
-  { id: "bnb", at: 320, s: 10 },
-  { id: "sol", at: 60, s: 13 },
-  { id: "xrp", at: 120, s: 9 },
+  { id: "eth", at: 205, s: 16, ps: 22 },
+  { id: "bnb", at: 320, s: 10, ps: 14 },
+  { id: "sol", at: 60, s: 13, ps: 18 },
+  { id: "xrp", at: 120, s: 9, ps: 12 },
 ].map((c, i) => {
   const [x, y] = onOrbit(ORBIT, c.at);
   const [px, py] = onOrbit(ORBIT_PHONE, c.at);
@@ -258,7 +261,15 @@ export function MarketsArt({ focus, lit }: ArtProps) {
             key={f.id}
             className={styles.disc}
             data-far={f.far || undefined}
-            style={vars({ "--x": `${f.x}%`, "--y": `${f.y}%`, "--px": `${f.px}%`, "--py": `${f.py}%`, "--s": `${f.s}cqmin`, "--d": `${i * 60}ms` })}
+            style={vars({
+              "--x": `${f.x}%`,
+              "--y": `${f.y}%`,
+              "--px": `${f.px}%`,
+              "--py": `${f.py}%`,
+              "--s": `${f.s}cqmin`,
+              "--ps": `${f.ps}cqmin`,
+              "--d": `${i * 60}ms`,
+            })}
           >
             <Image src={`/assets/forex/${f.id}.svg`} alt="" fill sizes={SIZES} unoptimized />
           </div>
@@ -283,15 +294,25 @@ export function MarketsArt({ focus, lit }: ArtProps) {
         </svg>
         <svg className={styles.orbit} viewBox="0 0 100 100" preserveAspectRatio="none">
           <path className={`${styles.ring} ${styles.wide}`} d={halfOrbit(ORBIT, false)} />
-          <path className={`${styles.ring} ${styles.tall}`} d={halfOrbit(ORBIT_PHONE, false)} />
+          <path className={`${styles.ring} ${styles.phone}`} d={halfOrbit(ORBIT_PHONE, false)} />
         </svg>
         {COINS.filter((c) => c.far).map((c) => (
           <Coin key={c.id} {...c} />
         ))}
-        <Coin id="btc" x={ORBIT.cx} y={ORBIT.cy} px={ORBIT_PHONE.cx} py={ORBIT_PHONE.cy} s={30} far={false} delay={0} />
+        <Coin
+          id="btc"
+          x={ORBIT.cx}
+          y={ORBIT.cy}
+          px={ORBIT_PHONE.cx}
+          py={ORBIT_PHONE.cy}
+          s={30}
+          ps={46}
+          far={false}
+          delay={0}
+        />
         <svg className={styles.orbit} viewBox="0 0 100 100" preserveAspectRatio="none">
           <path className={`${styles.ring} ${styles.near} ${styles.wide}`} d={halfOrbit(ORBIT, true)} />
-          <path className={`${styles.ring} ${styles.near} ${styles.tall}`} d={halfOrbit(ORBIT_PHONE, true)} />
+          <path className={`${styles.ring} ${styles.near} ${styles.phone}`} d={halfOrbit(ORBIT_PHONE, true)} />
         </svg>
         {COINS.filter((c) => !c.far).map((c) => (
           <Coin key={c.id} {...c} />
@@ -326,13 +347,41 @@ export function MarketsArt({ focus, lit }: ArtProps) {
   );
 }
 
-/** A coin, round and lit from the top left, where it sits on a laptop and on a phone. */
-function Coin({ id, x, y, px, py, s, far, delay }: { id: string; x: number; y: number; px: number; py: number; s: number; far: boolean; delay: number }) {
+/** A coin, round and lit from the top left, where it sits and how big it is on a laptop and on a phone. */
+function Coin({
+  id,
+  x,
+  y,
+  px,
+  py,
+  s,
+  ps,
+  far,
+  delay,
+}: {
+  id: string;
+  x: number;
+  y: number;
+  px: number;
+  py: number;
+  s: number;
+  ps: number;
+  far: boolean;
+  delay: number;
+}) {
   return (
     <div
       className={id === "btc" ? `${styles.disc} ${styles.btc}` : styles.disc}
       data-far={far || undefined}
-      style={vars({ "--x": `${x}%`, "--y": `${y}%`, "--px": `${px}%`, "--py": `${py}%`, "--s": `${s}cqmin`, "--d": `${delay}ms` })}
+      style={vars({
+        "--x": `${x}%`,
+        "--y": `${y}%`,
+        "--px": `${px}%`,
+        "--py": `${py}%`,
+        "--s": `${s}cqmin`,
+        "--ps": `${ps}cqmin`,
+        "--d": `${delay}ms`,
+      })}
     >
       <Image src={`/assets/crypto/${id}.svg`} alt="" fill sizes={SIZES} unoptimized />
     </div>
