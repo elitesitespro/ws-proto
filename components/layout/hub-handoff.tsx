@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState, type CSSProperties, type RefObject } from "react";
 import { HUB, isHubLink } from "@/lib/hub";
+import { BrandLoader } from "@/components/ui/brand-loader";
 import styles from "./hub-handoff.module.css";
 
 type Leaving = { href: string; x: number; y: number; to: number };
@@ -43,7 +44,8 @@ function go(gone: RefObject<boolean>, href: string) {
  * and opens in this tab doesn't cut straight to it: the hub's stone grows
  * out of what was pressed, in a circle with a gold rim (the way the wallet
  * opens out of the street), and the hub loads behind it on the same colour
- * (its onboarding and Home are on #0C0A09). The connection to the hub is
+ * (its onboarding and Home are on #0C0A09), the hub's W loader drawing
+ * itself in the middle until the hub paints. The connection to the hub is
  * opened as a pointer or focus comes to such a link, and again on the press,
  * so it's warm by the time the circle has closed. Links that open a new tab,
  * and clicks with a modifier key, are left to the browser. Under reduced
@@ -112,7 +114,13 @@ export function HubHandoff() {
       aria-hidden="true"
       className={styles.veil}
       style={{ "--x": `${leaving.x}px`, "--y": `${leaving.y}px`, "--to": `${leaving.to}px` } as CSSProperties}
-      onAnimationEnd={() => go(gone, leaving.href)}
-    />
+      // The circle's own end, not the mark's inside it
+      onAnimationEnd={(event) => {
+        if (event.target === event.currentTarget) go(gone, leaving.href);
+      }}
+    >
+      {/* The hub's loader, where the hub draws its own, so the wait for it reads as the hub already loading */}
+      <BrandLoader label={null} className={styles.loader} />
+    </div>
   );
 }

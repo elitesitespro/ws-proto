@@ -15,10 +15,10 @@ import { HUB } from "@/lib/hub";
  */
 
 export const ACCOUNT_LINKS = {
-  /** Home, the dashboard. A device new to the hub goes through onboarding first. */
-  signIn: `${HUB}/welcome`,
-  /** A new account starts at onboarding, "Make WorldStreet yours", then Home. */
-  join: `${HUB}/onboarding`,
+  /** Signing in, then Home (the dashboard). */
+  signIn: `${HUB}/login`,
+  /** A new account: create it, confirm the email, then onboarding ("Make WorldStreet yours") and Home. */
+  join: `${HUB}/register`,
 } as const;
 
 /** The plain pages beside Platforms, in the live nav's order. */
@@ -63,12 +63,11 @@ export type NavPlatform = {
   hue?: ShowcasePlatformName;
 };
 
-const at = (name: ShowcasePlatformName) => ({ href: platformDetails[name].href, hue: name });
+const at = (name: ShowcasePlatformName) => ({ href: platformDetails[name].href ?? undefined, hue: name });
 
 /**
- * Every platform, in the live nav's order and with its lines. E-Embassy and
- * WorldSports aren't in this app's showcase, so they wear no platform colour;
- * WorldSports isn't out yet, so it has no link.
+ * Every platform, in the live nav's order and with its lines, each in its
+ * colour. WorldSports isn't out yet, so it has no link.
  */
 export const NAV_PLATFORMS: readonly NavPlatform[] = [
   { name: "Forex", line: "Trade currency pairs", icon: "chart-up", ...at("Forex") },
@@ -78,13 +77,13 @@ export const NAV_PLATFORMS: readonly NavPlatform[] = [
   { name: "Arcade", line: "Play and win prizes", icon: "gamepad", ...at("Arcade") },
   { name: "WorldHealth", line: "See a doctor online", icon: "heart-pulse", ...at("WorldHealth") },
   { name: "Worldwork", line: "Hire artisans nearby", icon: "briefcase", ...at("WorkWorld") },
-  // Not in the live nav yet, but it's one of the page's thirteen
+  // Not in the live nav yet, but it's one of the page's platforms
   { name: "Mastery Academy", line: "Learn skills that pay", icon: "graduation", ...at("Academy") },
   { name: "Xtream", line: "Go live, or watch live", icon: "play", ...at("XStream") },
   { name: "Vision", line: "Watch films & shows", icon: "film", ...at("Vsion") },
   { name: "AI Movie", line: "Make films with AI", icon: "sparkle", ...at("AI Movie") },
   { name: "Prediction", line: "Predict real events", icon: "target", ...at("Prediction") },
-  { name: "E-Embassy", line: "Visas and passports", icon: "id-card", href: "https://embassy.worldstreetgold.com/" },
+  { name: "E-Embassy", line: "Visas and passports", icon: "id-card", ...at("E-Embassy") },
   { name: "WorldMeet", line: "Free HD video calls", icon: "video", ...at("WorldMeet") },
-  { name: "WorldSports", line: "Trade sports players", icon: "trophy" },
+  { name: "WorldSports", line: "Trade sports players", icon: "trophy", ...at("WorldSports") },
 ];

@@ -10,7 +10,7 @@ import {
   type Variants,
 } from "motion/react";
 import { cn } from "cn";
-import { HUB } from "@/lib/hub";
+import { ACCOUNT_LINKS } from "@/components/layout/nav-links";
 import { usePauseOffscreen } from "@/lib/use-pause-offscreen";
 import { useReducedMotion } from "@/lib/use-reduced-motion";
 import { Icon } from "@/components/icon";
@@ -182,9 +182,9 @@ export function WalletSection({
               <span className="sr-only">Dollars, pounds, euros, naira, cedis, shillings and more:</span>
               Hold, send, convert
             </p>
-            {/* The real one: Home in the hub, where this dashboard lives (a new visitor sets up first) */}
+            {/* The real one: Home in the hub, where this dashboard lives, through creating an account */}
             <motion.a
-              href={`${HUB}/welcome`}
+              href={ACCOUNT_LINKS.join}
               variants={rise}
               className={cn(buttonVariants(), "cx-btn--arrow", styles.open)}
             >

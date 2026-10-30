@@ -445,7 +445,7 @@ export function JoinCta() {
           {reduce ? "From here to everywhere." : <RevealWords text="From here to everywhere." progress={headingIn} />}
         </h2>
         <p className={styles.line}>
-          One account opens all thirteen platforms, a wallet for every currency, and Vivid to show you around.
+          One account opens every WorldStreet platform, a wallet for every currency, and Vivid to show you around.
         </p>
         <div className={styles.actions}>
           <a

@@ -1,0 +1,59 @@
+/* The hub's BrandLoader (worldstreet-hub components/landing/BrandLoader.module.css):
+   the W's two strokes drawing in and back out, breathing, not spinning */
+.root {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--cx-ember, #eab308);
+}
+
+.mark {
+  overflow: visible;
+}
+
+.mark path {
+  fill: currentColor;
+  fill-opacity: 0;
+  stroke: currentColor;
+  stroke-width: 3.5;
+  stroke-linejoin: miter;
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  animation: draw 0.85s cubic-bezier(0.65, 0, 0.35, 1) infinite alternate;
+}
+
+/* The second stroke trails the first, so the W reads as being written */
+.mark path:nth-child(2) {
+  animation-delay: 0.1s;
+}
+
+@keyframes draw {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+/* As the hub's route loader draws it (app/loading.tsx) */
+.block .mark {
+  width: 5.5rem;
+}
+
+/* Sized from the button's own type, so it never changes the control's height */
+.inline {
+  vertical-align: -0.1em;
+}
+.inline .mark {
+  width: 1.35em;
+}
+.inline .mark path {
+  stroke-width: 7;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mark path {
+    animation: none;
+    stroke-dashoffset: 0;
+    fill-opacity: 1;
+    stroke-opacity: 0.35;
+  }
+}
