@@ -67,14 +67,31 @@
   gap: 16px;
   padding-inline: 16px;
 }
+/* Clouds passing close, in front of the heading: the sky's box, from the
+   top of the screen to its real foot */
+.nearClouds {
+  position: absolute;
+  inset-inline: 0;
+  top: -80px;
+  height: 100lvh;
+  pointer-events: none;
+}
+/* A phone's words take the width: nothing passes in front of them there */
+@media (max-width: 767px) {
+  .nearClouds {
+    display: none;
+  }
+}
 .introLine {
   font-size: var(--text-lg);
   line-height: 1.4;
   text-align: center;
   text-wrap: balance;
   /* Softer than the heading: its colour, part see-through (its opacity is
-     the fade in and out) */
-  color: color-mix(in srgb, var(--hue-on) 72%, transparent);
+     the fade in and out), with a little of the sky's haze round it so it
+     reads over a cloud passing behind */
+  color: color-mix(in srgb, var(--hue-on) 78%, transparent);
+  text-shadow: 0 1px 14px rgba(var(--hue-rgb), 0.95);
 }
 
 /* Where the platforms stack instead, it sits above them in the flow, on the
@@ -92,6 +109,9 @@
     position: static;
     height: auto;
     padding-block: 64px 32px;
+  }
+  .nearClouds {
+    display: none;
   }
 }
 

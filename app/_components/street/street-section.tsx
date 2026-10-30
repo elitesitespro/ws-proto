@@ -469,7 +469,7 @@ export function StreetSection({
           </h2>
           <p className={`${styles.introLine} max-w-[44ch] text-sm md:text-base`}>
             <RevealWords
-              text="Four districts, thirteen exits, and your wallet at the end of the road."
+              text="Four districts, an exit for every platform, and your wallet at the end of the road."
               progress={openIn}
               from={0.2}
             />

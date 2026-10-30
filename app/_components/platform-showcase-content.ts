@@ -4,14 +4,15 @@ import type { CSSProperties } from "react";
 
 export type PlatformPreviewKind =
   | "social" | "call" | "meeting" | "live" | "film" | "studio" | "arcade"
-  | "store" | "work" | "academy" | "health" | "forex" | "crypto" | "prediction";
+  | "store" | "work" | "academy" | "health" | "travel" | "forex" | "crypto" | "sports" | "prediction";
 
 type PlatformDetail = {
   headline: string;
   description: string;
   features: readonly string[];
   action: string;
-  href: string;
+  /** Its front door; none yet for a platform that's coming soon. */
+  href: string | null;
   preview: PlatformPreviewKind;
 };
 
@@ -76,6 +77,12 @@ export const platformDetails = {
     features: ["Video, audio or text", "Reviewed consultants", "Their own rates and hours"],
     action: "Find a doctor", href: "https://health.worldstreetgold.com/", preview: "health",
   },
+  "E-Embassy": {
+    headline: "The world is closer than you think.",
+    description: "Tell us where you're going. One consultant sorts out the passport, the visa, the flights and the hotel, and tells you what's happening as it happens.",
+    features: ["Passports", "Visas", "Flights and stays"],
+    action: "Start a trip", href: "https://embassy.worldstreetgold.com/", preview: "travel",
+  },
   Forex: {
     headline: "Trade the pairs that move the world.",
     description: "Majors, minors and crosses through the Tokyo, London and New York sessions. Set take-profit and stop-loss before you enter. Trading carries risk.",
@@ -87,6 +94,12 @@ export const platformDetails = {
     description: "Buy, sell and manage Bitcoin, Ethereum, Solana, XRP and more, spot or perpetual futures. Prices shown are illustrative.",
     features: ["Spot trading", "Perpetual futures", "Live portfolio"],
     action: "Start trading crypto", href: "https://dashboard.worldstreetgold.com/", preview: "crypto",
+  },
+  WorldSports: {
+    headline: "Own sport like stock.",
+    description: "Buy shares in the players you rate and watch their price move with every match. Coming soon, for adults 18 and over. Players and prices shown are illustrative.",
+    features: ["Player shares", "Prices that move with form", "Lineups to copy"],
+    action: "Coming soon", href: null, preview: "sports",
   },
   Prediction: {
     headline: "Pick what happens. Get paid if you're right.",
@@ -120,8 +133,14 @@ const platformHues: Record<ShowcasePlatformName, HueId | Tint> = {
   WorkWorld: { id: "work", hue: "#74cab9", rgb: "116, 202, 185", ink: "#a3dfd2" },
   Academy: "academy",
   WorldHealth: { id: "health", hue: "#e9a0aa", rgb: "233, 160, 170", ink: "#f8c0c7" },
+  // E-Embassy's passport blue (#0450C0), softened into the family and turned
+  // a little towards indigo, clear of WorldSpace's sky (oklch hue 276)
+  "E-Embassy": { id: "embassy", hue: "#a8b3f0", rgb: "168, 179, 240", ink: "#c4ceff" },
   Forex: "forex",
   Crypto: "crypto",
+  // WorldSports' pitch green (#10B981), softened into the family and turned
+  // towards grass, clear of Forex's green (oklch hue 138)
+  WorldSports: { id: "sports", hue: "#9cc58e", rgb: "156, 197, 142", ink: "#bbddb0" },
   Prediction: "prediction",
 };
 

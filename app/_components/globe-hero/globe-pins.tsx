@@ -361,7 +361,8 @@ export function GlobePins({
         set &&
         pins.map((pin) => {
           const detail = platformDetails[shownFor];
-          const external = detail.href.startsWith("https");
+          const href = detail.href ?? undefined;
+          const external = !!href?.startsWith("https");
           const hue = hueAttrs(shownFor);
           return (
             <div key={pin.key} data-lat={pin.city.lat} data-lon={pin.city.lon} className={styles.anchor}>
@@ -375,7 +376,7 @@ export function GlobePins({
                 <span className={styles.dot} />
                 <span className={styles.stem} />
                 <a
-                  href={detail.href}
+                  href={href}
                   target={external ? "_blank" : undefined}
                   rel={external ? "noreferrer" : undefined}
                   className={cn("cx-liquid cx-liquid--interactive", styles.card)}

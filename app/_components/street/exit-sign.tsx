@@ -7,8 +7,8 @@ import styles from "./street-section.module.css";
 
 /**
  * A platform's exit off the street: a road sign with its number on a tab, its
- * tile as on the wheel, its name and a few words, out to the platform. It
- * lights once the car has passed it; looking at it puts its platform up on
+ * tile as on the wheel, its name and a few words, out to the platform (or
+ * "Coming soon", where it isn't open yet). It lights once the car has passed it; looking at it puts its platform up on
  * the district's billboard. `now`: it's the one up there (where the car
  * picks it, passing). Only the sign whose state changes renders again.
  */
@@ -30,32 +30,46 @@ export const ExitSign = memo(function ExitSign({
 }) {
   const { href } = platformDetails[exit.name];
   const icon = platforms.find((platform) => platform.name === exit.name)?.icon ?? "arrow-up-right";
+  const sign = {
+    className: styles.exit,
+    "data-lit": lit || undefined,
+    "data-now": now || undefined,
+    ...hueAttrs(exit.name),
+    onMouseEnter: () => onLook(exit.name),
+    onMouseLeave: () => onLook(null),
+    onFocus: () => onLook(exit.name),
+    onBlur: () => onLook(null),
+  };
+  const face = (
+    <>
+      <span className={styles.exitNumber}>Exit {number}</span>
+      <span className={styles.exitTile}>
+        <Icon name={icon} size={20} tone="current" />
+      </span>
+      <span className={styles.exitText}>
+        <b>{exit.label}</b>
+        <small>{exit.hook}</small>
+      </span>
+      {href ? (
+        <Icon name="arrow-up-right" size={20} tone="current" className={styles.exitGo} />
+      ) : (
+        <span className={styles.exitSoon}>Coming soon</span>
+      )}
+    </>
+  );
 
   return (
     <li ref={(el) => register(number, el)}>
-      <a
-        href={href}
-        target="_blank"
-        rel="noreferrer"
-        className={styles.exit}
-        data-lit={lit || undefined}
-        data-now={now || undefined}
-        {...hueAttrs(exit.name)}
-        onMouseEnter={() => onLook(exit.name)}
-        onMouseLeave={() => onLook(null)}
-        onFocus={() => onLook(exit.name)}
-        onBlur={() => onLook(null)}
-      >
-        <span className={styles.exitNumber}>Exit {number}</span>
-        <span className={styles.exitTile}>
-          <Icon name={icon} size={20} tone="current" />
-        </span>
-        <span className={styles.exitText}>
-          <b>{exit.label}</b>
-          <small>{exit.hook}</small>
-        </span>
-        <Icon name="arrow-up-right" size={20} tone="current" className={styles.exitGo} />
-      </a>
+      {href ? (
+        <a href={href} target="_blank" rel="noreferrer" {...sign}>
+          {face}
+        </a>
+      ) : (
+        // Not open yet: nowhere to go, but it can still be looked at (its billboard)
+        <div tabIndex={0} data-soon="" {...sign}>
+          {face}
+        </div>
+      )}
     </li>
   );
 });

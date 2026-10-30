@@ -22,6 +22,7 @@ const exploreLabel: Partial<Record<ShowcasePlatformName, string>> = {
 const footnote: Partial<Record<ShowcasePlatformName, string>> = {
   Forex: "Capital at risk",
   Crypto: "Capital at risk",
+  WorldSports: "Illustrative · 18+",
 };
 
 export function PlatformViewShell({
@@ -60,15 +61,23 @@ export function PlatformViewShell({
       </header>
       <SceneFit className={styles.scene}>{children}</SceneFit>
       <footer className={styles.footer}>
-        <a
-          href={detail.href}
-          target={detail.href.startsWith("https") ? "_blank" : undefined}
-          rel={detail.href.startsWith("https") ? "noreferrer" : undefined}
-          className={`${buttonVariants({ size: "lg" })} ${styles.link}`}
-        >
-          Explore {label}
-          <Icon name="arrow-up-right" size={20} tone="current" />
-        </a>
+        {detail.href ? (
+          <a
+            href={detail.href}
+            target={detail.href.startsWith("https") ? "_blank" : undefined}
+            rel={detail.href.startsWith("https") ? "noreferrer" : undefined}
+            className={`${buttonVariants({ size: "lg" })} ${styles.link}`}
+          >
+            Explore {label}
+            <Icon name="arrow-up-right" size={20} tone="current" />
+          </a>
+        ) : (
+          // Not open yet: no way in, so it says when instead
+          <p className={`${buttonVariants({ size: "lg", variant: "outline" })} ${styles.link} ${styles.soon}`}>
+            <Icon name="hourglass" size={20} tone="current" />
+            Coming soon
+          </p>
+        )}
         <span>
           {footnote[name] ?? "Sample preview"}
         </span>

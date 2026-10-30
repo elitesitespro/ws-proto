@@ -16,7 +16,8 @@ const TRADES = ["barber", "electrician", "tailor", "welder", "mechanic", "plumbe
 
 /**
  * Lifestyle St's billboard art. By default a high street at dusk whose four
- * windows light up as the car arrives; looking at an exit, that platform's
+ * windows light up as the car arrives (E-Embassy has no window: it's the
+ * way out of town); looking at an exit, that platform's
  * own picture in its own colours. Every layer stays mounted and crossfades.
  */
 export function LifestyleArt({ focus, lit }: ArtProps) {
@@ -106,6 +107,17 @@ export function LifestyleArt({ focus, lit }: ArtProps) {
           />
           <Image src="/assets/worldhealth/mark.svg" alt="" width={28} height={28} unoptimized className={styles.healthMark} />
           <span className={`${styles.chip} ${styles.doctor}`}>Dr Funmi Adebayo</span>
+        </div>
+      </div>
+
+      {/* E-Embassy: the city you're going to at blue hour, in an arch, a flight's path to it, the visa approved */}
+      <div className={`${styles.layer} ${styles.embassy}`}>
+        <svg className={styles.flightPath} viewBox="0 0 100 60" preserveAspectRatio="none">
+          <path d="M2 56 C 30 6, 70 4, 98 20" pathLength={1} />
+        </svg>
+        <div className={styles.gate}>
+          <Image src="/assets/embassy/lisbon.webp" alt="" fill sizes="(min-width: 1024px) 24vw, 60vw" className={styles.gateView} />
+          <span className={`${styles.chip} ${styles.approved}`}>Visa approved</span>
         </div>
       </div>
     </div>

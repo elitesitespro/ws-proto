@@ -24,12 +24,13 @@
     opacity 450ms var(--cx-ease, cubic-bezier(0.22, 1, 0.36, 1)),
     transform 600ms var(--cx-ease, cubic-bezier(0.22, 1, 0.36, 1));
 }
-.art:not([data-focus="WorldStore"]):not([data-focus="WorkWorld"]):not([data-focus="Academy"]):not([data-focus="WorldHealth"])
+.art:not([data-focus="WorldStore"]):not([data-focus="WorkWorld"]):not([data-focus="Academy"]):not([data-focus="WorldHealth"]):not([data-focus="E-Embassy"])
   .street,
 .art[data-focus="WorldStore"] .store,
 .art[data-focus="WorkWorld"] .work,
 .art[data-focus="Academy"] .school,
-.art[data-focus="WorldHealth"] .health {
+.art[data-focus="WorldHealth"] .health,
+.art[data-focus="E-Embassy"] .embassy {
   opacity: 1;
   transform: none;
 }
@@ -570,6 +571,50 @@
    words (street-section.module.css), wider than it's tall, so each picture
    fills the band, sized by its height, kept off its foot, where it fades
    into the words' ground ---- */
+/* E-Embassy: blue hour, the city in an arch, a flight's dashed path in
+   from the words' side */
+.embassy {
+  background:
+    radial-gradient(ellipse 70% 90% at 82% 8%, rgba(142, 183, 255, 0.35), transparent 70%),
+    linear-gradient(160deg, #10224a 0%, #0b1226 60%, #070b17 100%);
+}
+.gate {
+  position: absolute;
+  right: 8%;
+  top: 8%;
+  width: 26%;
+  height: 82%;
+  overflow: hidden;
+  border-radius: 999px 999px 18px 18px;
+  box-shadow:
+    0 0 0 max(3px, 0.5cqw) rgba(142, 183, 255, 0.35),
+    0 4cqh 10cqh -3cqh rgba(4, 80, 192, 0.6);
+}
+.gateView {
+  object-fit: cover;
+  object-position: 50% 45%;
+}
+.approved {
+  left: 50%;
+  bottom: 7%;
+  translate: -50% 0;
+  color: #fff;
+  background: #0450c0;
+}
+.flightPath {
+  position: absolute;
+  right: 33%;
+  top: 14%;
+  width: 34%;
+  height: 46%;
+  overflow: visible;
+  fill: none;
+  stroke: rgba(142, 183, 255, 0.7);
+  stroke-width: 2px;
+  stroke-dasharray: 0.02 0.02;
+  vector-effect: non-scaling-stroke;
+}
+
 @media (max-width: 639px) {
   /* The high street: the shopfront across the band, its four windows tall */
   .street {
@@ -705,6 +750,21 @@
   .doctor {
     left: 12px;
     bottom: 12px;
+  }
+}
+
+@media (max-width: 639px) {
+  /* E-Embassy: the arch in the middle, over the words' band */
+  .gate {
+    right: auto;
+    left: 50%;
+    top: 6%;
+    width: min(44cqw, 52cqh);
+    height: 86cqh;
+    translate: -50% 0;
+  }
+  .flightPath {
+    display: none;
   }
 }
 

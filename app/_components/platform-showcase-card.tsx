@@ -43,9 +43,13 @@ export function PlatformShowcaseCard({ name, category }: { name: ShowcasePlatfor
           <Icon name={paused ? "play" : "pause"} size={18} tone="current" /> {paused ? "Resume" : "Pause"}
         </Button>}
       </div>
-      <a href={detail.href} className={cn(buttonVariants({ size: "lg" }), "self-start")}>
-        {detail.action}<Icon name="arrow-up-right" size={18} tone="current" />
-      </a>
+      {detail.href ? (
+        <a href={detail.href} className={cn(buttonVariants({ size: "lg" }), "self-start")}>
+          {detail.action}<Icon name="arrow-up-right" size={18} tone="current" />
+        </a>
+      ) : (
+        <p className={cn(buttonVariants({ size: "lg", variant: "outline" }), "pointer-events-none self-start")}>{detail.action}</p>
+      )}
     </article>
   );
 }

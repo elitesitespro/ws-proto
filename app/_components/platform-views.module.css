@@ -66,6 +66,12 @@
   text-align: right;
   max-width: 200px;
 }
+/* A platform that isn't open yet: the button's place, saying so, not pressable */
+.soon {
+  pointer-events: none;
+  color: var(--hue-ink, currentColor);
+  box-shadow: inset 0 0 0 1px rgba(var(--hue-rgb), 0.45);
+}
 
 @media (min-width: 1024px) and (max-height: 850px) {
   .view {
@@ -665,6 +671,77 @@
 }
 @media (max-width: 1023px) and (max-height: 740px) {
   .Crypto .eyebrow { display: none; }
+}
+
+/* E-Embassy (embassy/), as worldstreetgold.com dresses it: an ink sheet in
+   passport blue, its line in a serif, then a trip to follow. The way in is
+   its blue. */
+.E-Embassy {
+  --stage-height: min(680px, calc(100svh - 200px));
+  grid-template-areas: "title title" "visual visual" "footer footer";
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  color: var(--cx-text);
+}
+.E-Embassy[data-hue] {
+  --hue: #8eb7ff;
+  --hue-rgb: 142, 183, 255;
+  --hue-ink: #8eb7ff;
+}
+.E-Embassy .scene { display: block; height: auto; min-height: 0; }
+.E-Embassy .intro h3 { font-size: var(--text-3xl); line-height: 1.02; }
+.E-Embassy .intro { margin-bottom: 16px; }
+.E-Embassy .link {
+  --cx-ember: #0450c0;
+  --cx-ember-press: #033c91;
+  --cx-on-primary: #fff;
+  --cx-glow-cta: 0 12px 28px -10px rgba(4, 80, 192, 0.7);
+}
+@media (min-width: 1024px) and (max-height: 850px) {
+  .E-Embassy .intro h3 { font-size: var(--text-2xl); }
+}
+@media (max-width: 1023px) {
+  .composition.E-Embassy { --stage-height: min(720px, calc(100svh - 280px)); }
+  .E-Embassy .intro h3 { font-size: var(--text-2xl); }
+  .E-Embassy .intro { margin-bottom: 0; }
+}
+@media (max-width: 600px), (max-height: 740px) {
+  .E-Embassy .intro h3 { font-size: var(--text-xl); }
+}
+@media (max-width: 1023px) and (max-height: 740px) {
+  .E-Embassy .eyebrow { display: none; }
+}
+
+/* WorldSports (worldsports/), coming soon, as worldstreetgold.com dresses
+   it: a black sheet, its trophy on the pitch's green, then the pitch and a
+   player's share. No way in yet: "Coming soon" stands in its place. */
+.WorldSports {
+  --stage-height: min(680px, calc(100svh - 200px));
+  grid-template-areas: "title title" "visual visual" "footer footer";
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  color: var(--cx-text);
+}
+.WorldSports[data-hue] {
+  --hue: #10b981;
+  --hue-rgb: 16, 185, 129;
+  --hue-ink: #34d399;
+}
+.WorldSports .scene { display: block; height: auto; min-height: 0; }
+.WorldSports .intro h3 { font-size: var(--text-3xl); font-weight: 600; letter-spacing: -0.05em; line-height: 1.02; }
+.WorldSports .intro h3 > span { opacity: 1; }
+.WorldSports .intro { margin-bottom: 16px; }
+@media (min-width: 1024px) and (max-height: 850px) {
+  .WorldSports .intro h3 { font-size: var(--text-2xl); }
+}
+@media (max-width: 1023px) {
+  .composition.WorldSports { --stage-height: min(720px, calc(100svh - 280px)); }
+  .WorldSports .intro h3 { font-size: var(--text-2xl); }
+  .WorldSports .intro { margin-bottom: 0; }
+}
+@media (max-width: 600px), (max-height: 740px) {
+  .WorldSports .intro h3 { font-size: var(--text-xl); }
+}
+@media (max-width: 1023px) and (max-height: 740px) {
+  .WorldSports .eyebrow { display: none; }
 }
 
 /* Prediction (prediction/), as worldstreetgold.com dresses it: cream and

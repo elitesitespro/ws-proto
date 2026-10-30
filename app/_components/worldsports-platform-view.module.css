@@ -1,0 +1,35 @@
+/* WorldSports' mark (its trophy, ink on the pitch's green), its name, that
+   it's coming soon and when the next season kicks off. */
+.brand {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  font-size: var(--text-sm);
+  font-weight: 500;
+  letter-spacing: -0.02em;
+}
+.mark {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  color: #0a0a0a;
+  background: #10b981;
+}
+.soon {
+  padding: 3px 9px;
+  border: 1px solid rgba(16, 185, 129, 0.4);
+  border-radius: 999px;
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #10b981;
+}
+.when {
+  font-size: 12px;
+  letter-spacing: 0.04em;
+  color: #a3a3a3;
+}

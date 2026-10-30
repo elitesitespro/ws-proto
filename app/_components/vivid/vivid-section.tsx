@@ -5,9 +5,9 @@ import styles from "./vivid-section.module.css";
 
 /**
  * Vivid, after the wallet. First it's introduced: the dashboard's Ask Vivid
- * globe lifts off, wakes with all thirteen platforms wired to it, and comes
+ * globe lifts off, wakes with every platform wired to it, and comes
  * back down into the ask pill that rides at the foot of the screen
- * (./vivid-intro). Then what that means: thirteen platforms is a lot to keep
+ * (./vivid-intro). Then what that means: that many platforms is a lot to keep
  * in your head, so you don't; a switchboard of real questions and the
  * platforms that answer them, all of it readable at a glance. Then what it
  * does free, and with Pro.
@@ -25,7 +25,7 @@ export function VividSection() {
               id="vivid-heading"
               className="text-3xl leading-[1.1] font-normal tracking-[-0.035em] text-balance md:text-4xl lg:text-display-sm"
             >
-              You don’t have to remember all thirteen.
+              You don’t have to remember every platform.
             </h2>
           </div>
           <p className={styles.lede}>

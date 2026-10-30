@@ -1,0 +1,429 @@
+/* WorldSports (worldsports-share.tsx), as worldstreetgold.com dresses it:
+   a mown green pitch, shirts in ink and white, WorldStreet's gold for the
+   player you're looking at and the way to buy, on the night's stone. */
+.desk {
+  --pitch: #10b981;
+  --mow: #0ea472;
+  --gold: #ffcc2d;
+  --up: #34d399;
+  --down: #f87171;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 12px;
+  color: #f6f3ec;
+}
+@media (min-width: 760px) {
+  .desk {
+    grid-template-columns: minmax(0, 1.25fr) minmax(280px, 1fr);
+    align-items: stretch;
+    gap: 16px;
+  }
+}
+
+/* ── The pitch ───────────────────────────────────────────────────────── */
+
+.pitch {
+  position: relative;
+  aspect-ratio: 16 / 10;
+  overflow: hidden;
+  border-radius: 24px;
+  /* Mown in bands across it */
+  background: repeating-linear-gradient(90deg, var(--pitch) 0 10%, var(--mow) 10% 20%);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.12), 0 30px 60px -30px rgba(16, 185, 129, 0.45);
+}
+@media (min-width: 760px) {
+  .pitch {
+    aspect-ratio: auto;
+    min-height: 300px;
+  }
+}
+.lines {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  fill: none;
+  stroke: rgba(255, 255, 255, 0.55);
+  stroke-width: 0.6;
+  vector-effect: non-scaling-stroke;
+}
+.lines * {
+  vector-effect: non-scaling-stroke;
+  stroke-width: 1.5px;
+}
+/* A shirt on the pitch, its number on it, jogging on the spot */
+.dot {
+  position: absolute;
+  display: grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  margin: -13px 0 0 -13px;
+  padding: 0;
+  border: 1.5px solid rgba(254, 199, 46, 0.5);
+  border-radius: 50%;
+  font: inherit;
+  font-size: 11px;
+  font-weight: 700;
+  color: #fec72e;
+  background: #0c0a09;
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.35);
+  animation: jog var(--t) ease-in-out infinite;
+}
+.dot[data-away] {
+  border-color: rgba(12, 10, 9, 0.15);
+  color: #0c0a09;
+  background: #fff;
+}
+/* The ones you can pick: a little bigger, a ring that says so */
+.dot[data-tradable] {
+  width: 34px;
+  height: 34px;
+  margin: -17px 0 0 -17px;
+  font-size: 13px;
+  cursor: pointer;
+  box-shadow: 0 0 0 4px rgba(255, 204, 45, 0.18), 0 6px 12px rgba(0, 0, 0, 0.35);
+  transition: background-color 0.2s, color 0.2s, box-shadow 0.2s;
+}
+.dot[data-tradable]:hover {
+  box-shadow: 0 0 0 6px rgba(255, 204, 45, 0.3), 0 6px 12px rgba(0, 0, 0, 0.35);
+}
+.dot[data-picked] {
+  z-index: 2;
+  border-color: #0c0a09;
+  color: #0c0a09;
+  background: var(--gold);
+  box-shadow: 0 0 0 10px rgba(255, 204, 45, 0.25), 0 6px 12px rgba(0, 0, 0, 0.35);
+}
+.dot[data-tradable]:focus-visible {
+  outline: 2px solid #fff;
+  outline-offset: 4px;
+}
+.tag {
+  position: absolute;
+  bottom: calc(100% + 10px);
+  left: 50%;
+  translate: -50% 0;
+  padding: 5px 10px;
+  border-radius: 999px;
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  white-space: nowrap;
+  color: #fff;
+  background: #0c0a09;
+  pointer-events: none;
+}
+.tag b {
+  margin-left: 4px;
+  color: var(--gold);
+}
+
+@keyframes jog {
+  0%,
+  100% {
+    transform: translate(0, 0);
+  }
+  50% {
+    transform: translate(var(--dx), var(--dy));
+  }
+}
+
+/* ── The share ───────────────────────────────────────────────────────── */
+
+.card {
+  display: grid;
+  gap: 14px;
+  align-content: start;
+  padding: 18px;
+  border-radius: 24px;
+  background: #0c0a09;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.08), 0 40px 80px -30px rgba(0, 0, 0, 0.8);
+}
+.cardTag {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  justify-self: start;
+  padding: 5px 10px;
+  border-radius: 999px;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #f2eee6;
+  background: rgba(255, 255, 255, 0.06);
+}
+.cardTag i {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--gold);
+}
+.who {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+/* The photo (or the shirt) in a gold ring, the number on its corner */
+.face {
+  position: relative;
+  flex: none;
+  width: 72px;
+  height: 72px;
+  padding: 4px;
+  border-radius: 50%;
+  background: conic-gradient(var(--gold), #8a6400, var(--gold));
+}
+.face > :first-child {
+  position: absolute;
+  inset: 4px;
+  overflow: hidden;
+  border: 3px solid #0c0a09;
+  border-radius: 50%;
+  background: #141210;
+}
+.photo.photo {
+  object-fit: cover;
+  object-position: 50% 18%;
+  scale: 1.18;
+}
+.shirt {
+  display: grid;
+  place-items: center;
+  font-size: 26px;
+  font-weight: 800;
+  color: #fec72e;
+  background: radial-gradient(circle at 50% 30%, #2a2318, #0c0a09);
+}
+.badge {
+  position: absolute;
+  right: -2px;
+  bottom: -2px;
+  display: grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  border: 3px solid #0c0a09;
+  border-radius: 50%;
+  font-size: 12px;
+  font-weight: 800;
+  color: #0c0a09;
+  background: var(--gold);
+}
+.whoText {
+  display: grid;
+  gap: 2px;
+}
+.whoText b {
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+}
+.whoText small {
+  font-size: 13px;
+  color: #c9c2b8;
+}
+.priceRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+.price {
+  font-size: 36px;
+  font-weight: 700;
+  letter-spacing: -0.04em;
+  font-variant-numeric: tabular-nums;
+}
+.change {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 10px;
+  border-radius: 999px;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--up);
+  background: rgba(16, 185, 129, 0.12);
+}
+.change[data-down] {
+  color: var(--down);
+  background: rgba(248, 113, 113, 0.12);
+}
+/* The fortnight, a bar a day, today's in gold */
+.bars {
+  display: flex;
+  align-items: flex-end;
+  gap: 3px;
+  height: 40px;
+}
+.bars i {
+  flex: 1;
+  border-radius: 2px;
+  background: rgba(16, 185, 129, 0.35);
+  transition: height 0.5s var(--cx-ease, ease);
+}
+.bars i:nth-last-child(-n + 3) {
+  background: var(--pitch);
+}
+.bars i[data-now] {
+  background: var(--gold);
+}
+.trade {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+.buy,
+.sell {
+  height: 46px;
+  border-radius: 999px;
+  font: inherit;
+  font-size: 15px;
+  font-weight: 650;
+  cursor: pointer;
+  transition: transform 0.15s, background-color 0.2s, opacity 0.2s;
+}
+.buy {
+  border: 0;
+  color: #0c0a09;
+  background: var(--gold);
+}
+.buy:hover {
+  background: #ffd84f;
+}
+.sell {
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  color: #fff;
+  background: none;
+}
+.sell:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+.buy:active,
+.sell:not(:disabled):active {
+  transform: scale(0.97);
+}
+.buy:focus-visible,
+.sell:focus-visible,
+.copy:focus-visible {
+  outline: 2px solid #fff;
+  outline-offset: 3px;
+}
+.foot {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding-top: 12px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  font-size: 13px;
+  color: #c9c2b8;
+}
+.copy {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0;
+  border: 0;
+  font: inherit;
+  font-size: 13px;
+  color: #c9c2b8;
+  background: none;
+  cursor: pointer;
+}
+.copy:hover,
+.copy[aria-pressed="true"] {
+  color: var(--gold);
+}
+
+/* On a phone it fits the panel: a wider pitch, and the price beside the
+   player rather than under him */
+@media (max-width: 759px) {
+  /* A height, not a shape: drawn smaller to fit (scene-fit), a shape across
+     the full width would come back as tall */
+  .pitch {
+    aspect-ratio: auto;
+    height: 176px;
+  }
+  .dot {
+    width: 22px;
+    height: 22px;
+    margin: -11px 0 0 -11px;
+    font-size: 10px;
+  }
+  .dot[data-tradable] {
+    width: 28px;
+    height: 28px;
+    margin: -14px 0 0 -14px;
+    font-size: 12px;
+  }
+  .card {
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 10px 12px;
+    padding: 14px;
+  }
+  .cardTag {
+    display: none;
+  }
+  .face {
+    width: 52px;
+    height: 52px;
+  }
+  .whoText b {
+    font-size: 17px;
+  }
+  .whoText small {
+    font-size: 12px;
+  }
+  .priceRow {
+    flex-direction: column;
+    align-items: flex-end;
+    justify-content: center;
+    gap: 4px;
+  }
+  .price {
+    font-size: 24px;
+  }
+  .change {
+    padding: 3px 8px;
+    font-size: 11px;
+  }
+  .bars,
+  .trade,
+  .foot {
+    grid-column: 1 / -1;
+  }
+  .bars {
+    height: 24px;
+  }
+  .buy,
+  .sell {
+    height: 42px;
+  }
+  .foot {
+    padding-top: 8px;
+    font-size: 12px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dot {
+    animation: none;
+  }
+}
+
+/* A short phone (an SE, or bars showing): a shallower pitch, and the share
+   down to the player, his price and the way to buy */
+@media (max-width: 759px) and (max-height: 740px) {
+  .pitch {
+    height: 132px;
+  }
+  .foot {
+    display: none;
+  }
+}

@@ -150,7 +150,8 @@ const YES = CROWD[CROWD.length - 1];
  * towers that are candles climbing like a chart, their windows coming on and
  * the close drawing itself across their tops as the car arrives, under an
  * LED ticker. Looking at an exit, that platform's own look: Forex's paper and
- * flags, Crypto's coins in orbit, Prediction's crowd chance. Prices and
+ * flags, Crypto's coins in orbit, a WorldSports player's share over the
+ * pitch, Prediction's crowd chance. Prices and
  * chances are illustrative.
  */
 export function MarketsArt({ focus, lit }: ArtProps) {
@@ -317,6 +318,27 @@ export function MarketsArt({ focus, lit }: ArtProps) {
         {COINS.filter((c) => !c.far).map((c) => (
           <Coin key={c.id} {...c} />
         ))}
+      </div>
+
+      {/* WorldSports, coming soon: a player's share over the pitch, his price up on the fortnight */}
+      <div className={`${styles.scene} ${styles.sports}`}>
+        <svg className={styles.pitchLines} viewBox="0 0 160 100" preserveAspectRatio="xMaxYMid slice">
+          <line x1="80" y1="0" x2="80" y2="100" />
+          <circle cx="80" cy="50" r="16" />
+          <rect x="138" y="26" width="30" height="48" />
+        </svg>
+        <div className={styles.share}>
+          <span className={styles.shareFace}>
+            <Image src="/assets/sports/player-adeyemi.webp" alt="" fill sizes="96px" className={styles.sharePhoto} />
+          </span>
+          <span className={styles.shareText}>
+            <b>D. Adeyemi</b>
+            <span>
+              ₦1,240 <em>+6.8%</em>
+            </span>
+          </span>
+        </div>
+        <span className={styles.soon}>Coming soon</span>
       </div>
 
       {/* Prediction: the crowd's chance climbing to 62%, on a night-teal card over its cream */}

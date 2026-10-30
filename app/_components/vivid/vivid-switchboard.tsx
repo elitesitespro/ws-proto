@@ -76,7 +76,7 @@ const ROUTES: readonly Route[] = [
   },
 ];
 
-// All thirteen, round the globe on a phone
+// Every platform, round the globe on a phone
 const PLATFORMS = Object.keys(platformDetails) as ShowcasePlatformName[];
 
 // The globe's dots across its face
@@ -105,7 +105,7 @@ const easeInOut = (t: number) => (t < 0.5 ? 4 * t ** 3 : 1 - (-2 * t + 2) ** 3 /
 type Wires = { w: number; h: number; ins: string[]; outs: string[]; stem: string };
 
 /**
- * Vivid as the way through all thirteen platforms. Questions come in from
+ * Vivid as the way through every platform. Questions come in from
  * the left, in people's own words; each runs into Vivid's globe and out to
  * the right, to the platform that answers it, in that platform's colour,
  * with what Vivid says. Everything's on the page at once, so nothing waits
@@ -114,7 +114,7 @@ type Wires = { w: number; h: number; ins: string[]; outs: string[]; stem: string
  *
  * On a phone or a tablet the board stands up and holds the screen while you
  * scroll through it, like a switchboard being worked: the four questions
- * over the globe, each on a jack, the thirteen platforms round the globe and
+ * over the globe, each on a jack, the platforms round the globe and
  * the answer under it. Scrolling plugs each question in in turn: its wire
  * lights into the globe, the platform that answers lights on the ring, and
  * its answer comes up. Tap a question to go straight to it. Its foot is kept
@@ -448,7 +448,12 @@ export function VividSwitchboard() {
           <div ref={slotRef} className={styles.slot}>
             {/* Standing up, every platform goes round it, the one it's sending
                 you to lit */}
-            <span aria-hidden="true" className={styles.orbit} data-all={ROUTES[shown].everywhere || undefined}>
+            <span
+              aria-hidden="true"
+              className={styles.orbit}
+              data-all={ROUTES[shown].everywhere || undefined}
+              style={{ "--n": PLATFORMS.length } as CSSProperties}
+            >
               {PLATFORMS.map((name, k) => {
                 const hue = hueAttrs(name);
                 return (

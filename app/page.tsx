@@ -19,7 +19,7 @@ export default function Home() {
       <GlobePreviewSection />
       <PlatformTimelineSection
         intro="Discover WorldStreet"
-        introLine="Thirteen platforms, one account. Scroll to turn the dial."
+        introLine="Every platform, one account. Scroll to turn the dial."
       />
       <StreetToWallet />
       <VividSection />

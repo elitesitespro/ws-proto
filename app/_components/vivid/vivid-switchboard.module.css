@@ -290,7 +290,7 @@
 /* On a phone or a tablet the board stands up and holds the screen while you
    scroll through it, a stretch of scroll for each route (the track's
    height): the four questions over the globe, each on a jack at its right
-   whose wire runs down and into the globe; the thirteen platforms round it;
+   whose wire runs down and into the globe; the platforms platforms round it;
    the answer under it. The lit question is the one the scroll's at. Its
    foot is kept clear for the ask pill riding at the bottom of the screen
    (--pill, its height, from vivid-handoff.ts), so the answer's never under it. */
@@ -385,7 +385,7 @@
     grid-row: 5;
     margin-block: 34px;
   }
-  /* The thirteen, each in its colour, going slowly round; the one the
+  /* The platforms, each in its colour, going slowly round; the one the
      answer's from comes up bright, and for the wallet they all do */
   .orbit {
     position: absolute;
@@ -406,7 +406,7 @@
     border-radius: 50%;
     background: var(--hue);
     opacity: 0.4;
-    transform: rotate(calc(var(--k) * 1turn / 13)) translateY(calc(var(--globe) / -2 - 16px)) scale(var(--s));
+    transform: rotate(calc(var(--k) * 1turn / var(--n))) translateY(calc(var(--globe) / -2 - 16px)) scale(var(--s));
     transition:
       opacity 400ms ease,
       transform 400ms var(--cx-ease),

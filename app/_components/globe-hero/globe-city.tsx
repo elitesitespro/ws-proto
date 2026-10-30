@@ -135,14 +135,15 @@ export function GlobeCityLayer({ layer, globe, hovered, open, onClose }: GlobeCi
             <ul className="flex flex-col p-1 pt-0">
               {LINES.map((line) => {
                 const detail = platformDetails[line.platform];
-                const external = detail.href.startsWith("https");
+                const href = detail.href ?? undefined;
+                const external = !!href?.startsWith("https");
                 const hue = hueAttrs(line.platform);
                 const [lo, hi] = line.range;
                 const n = Math.round(lo + seeded(`${open.name}:${line.platform}`) * (hi - lo));
                 return (
                   <li key={line.platform}>
                     <a
-                      href={detail.href}
+                      href={href}
                       target={external ? "_blank" : undefined}
                       rel={external ? "noreferrer" : undefined}
                       {...hue}

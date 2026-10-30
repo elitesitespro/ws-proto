@@ -12,6 +12,8 @@ import { ForexPlatformView } from "./forex-platform-view";
 import { CryptoPlatformView } from "./crypto-platform-view";
 import { XtreamPlatformView } from "./xtream-platform-view";
 import { PredictionPlatformView } from "./prediction-platform-view";
+import { EmbassyPlatformView } from "./embassy-platform-view";
+import { WorldsportsPlatformView } from "./worldsports-platform-view";
 
 const views = {
   WorldSpace: WorldspacePlatformView,
@@ -23,9 +25,11 @@ const views = {
   WorkWorld: WorkworldPlatformView,
   Academy: AcademyPlatformView,
   WorldHealth: WorldhealthPlatformView,
+  "E-Embassy": EmbassyPlatformView,
   Forex: ForexPlatformView,
   Crypto: CryptoPlatformView,
   XStream: XtreamPlatformView,
+  WorldSports: WorldsportsPlatformView,
   Prediction: PredictionPlatformView,
 };
 

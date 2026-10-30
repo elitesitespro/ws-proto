@@ -1,5 +1,5 @@
 /* Vivid's intro (vivid-intro.tsx): the dashboard's globe lifts off into the
-   night, wakes with all thirteen platforms wired to it, then comes down into
+   night, wakes with every platform wired to it, then comes down into
    the ask pill at the foot of the screen. A stage held while you scroll
    (sticky, so the browser holds it, not script) that paints to the screen's
    real foot (lvh), under a phone browser's floating bar, with everything that
@@ -38,7 +38,7 @@
   overflow: clip;
 }
 
-/* The thirteen, their filaments and the light round the globe, placed from
+/* The platforms, their filaments and the light round the globe, placed from
    the stage's corner by the script (transforms only) */
 .orbit {
   position: absolute;
@@ -421,7 +421,7 @@
 }
 
 /* Reduced motion: one still picture in the page's flow, nothing held or
-   flown: the name, the globe with the thirteen wired round it, what it is,
+   flown: the name, the globe with the platforms wired round it, what it is,
    and the last line */
 @media (prefers-reduced-motion: reduce) {
   .track {

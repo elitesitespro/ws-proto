@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { PlatformView } from "./platform-view";
 import { PlatformBackdrop } from "./platform-backdrop";
 import { hueAttrs } from "./platform-showcase-content";
+import { SkyClouds, type Cloud } from "./sky-clouds";
 import styles from "./platform-timeline-section.module.css";
 import {
   AnimatePresence,
@@ -39,8 +40,10 @@ export const platforms = [
   { name: "WorkWorld", label: "Worldwork", category: "Lifestyle", icon: "briefcase" },
   { name: "Academy", label: "Mastery Academy", category: "Lifestyle", icon: "graduation" },
   { name: "WorldHealth", label: "WorldHealth", category: "Lifestyle", icon: "heart-pulse" },
+  { name: "E-Embassy", label: "E-Embassy", category: "Lifestyle", icon: "id-card" },
   { name: "Forex", label: "Forex", category: "Markets", icon: "chart-up" },
   { name: "Crypto", label: "Crypto", category: "Markets", icon: "bitcoin" },
+  { name: "WorldSports", label: "WorldSports", category: "Markets", icon: "trophy" },
   { name: "Prediction", label: "Prediction", category: "Markets", icon: "target" },
 ] as const satisfies readonly {
   name: string;
@@ -66,8 +69,10 @@ const scenes: Partial<Record<Platform["name"], "dark" | `#${string}`>> = {
   WorkWorld: "dark",
   Academy: "dark",
   WorldHealth: "#f4f8f7",
+  "E-Embassy": "dark",
   Forex: "#f5f1e8",
   Crypto: "dark",
+  WorldSports: "dark",
   Prediction: "#f6f3ec",
 };
 
@@ -93,7 +98,7 @@ const cardAngleStep = 36;
 // On a phone or tablet the dial lies across the foot of the screen, centred
 // under its pointer, on a wider ring with the platforms closer round it: the
 // one at the pointer has a neighbour either side, the next ones peek in at
-// the screen's edges, and all thirteen fit once round, so no two share a place
+// the screen's edges, and all of them fit once round, so no two share a place
 const PHONE_STEP = 18;
 const LAST = platforms.length - 1;
 // How far the page scrolls from one platform to the next, in screen heights
@@ -125,6 +130,27 @@ const INTRO_VH = 150;
 // filled the screen, then takes over just before the stage lets go, as the
 // section's top passes DIVE_OVERLAP from the bottom of the screen.
 const DIVE_OVERLAP = 0.6;
+
+// The sky the dive came out into is still full of cloud: coming down
+// through it, the clouds rise past, the far ones (thin wisps, small puffs)
+// slowly, the near ones faster and growing, round the heading and behind it.
+// Two pass close in front, low at the sides and clear of the words, and are
+// gone as the heading holds. They drift over the section rising and the pinned intro both
+// (`arrive` then `entered`, 0 to 2).
+const SKY_CLOUDS: readonly Cloud[] = [
+  { kind: "wisp", x: 22, y: 26, w: 46, dy: -8, opacity: 0.85 },
+  { kind: "wisp", x: 82, y: 15, w: 38, dy: -6, flip: true, opacity: 0.7 },
+  { kind: "puff", x: 87, y: 62, w: 18, dy: -14, opacity: 0.9 },
+  { kind: "puff", x: 11, y: 56, w: 14, dy: -12, flip: true, opacity: 0.85 },
+  { kind: "bank", x: 18, y: 90, w: 54, dy: -30 },
+  { kind: "tall", x: 84, y: 100, w: 46, dy: -36, flip: true },
+  { kind: "tall", x: 10, y: 150, w: 76, dy: -80, grow: 0.25 },
+  { kind: "bank", x: 78, y: 172, w: 92, dy: -95, grow: 0.25, flip: true },
+];
+const NEAR_CLOUDS: readonly Cloud[] = [
+  { kind: "bank", x: -12, y: 114, w: 72, dx: -16, dy: -52, grow: 0.4 },
+  { kind: "puff", x: 112, y: 120, w: 42, dx: 14, dy: -60, grow: 0.4, flip: true },
+];
 
 /** How far `v` is through the span [from, to], 0 to 1. */
 const along = (v: number, from: number, to: number) => Math.min(Math.max((v - from) / (to - from), 0), 1);
@@ -210,7 +236,7 @@ function IntroWord({
   index: number;
   arrive: MotionValue<number>;
 }) {
-  const start = 0.5 + index * 0.15;
+  const start = 0.35 + index * 0.15;
   const opacity = useTransform(arrive, [start, start + 0.35], [0, 1]);
   const y = useTransform(arrive, [start, start + 0.35], [40, 0]);
   const blur = useTransform(arrive, [start, start + 0.25], [16, 0]);
@@ -299,7 +325,7 @@ function OrbitCard({
   });
 
   return (
-    // Thirteen platforms go more than once round the ring: the hidden ones
+    // The platforms go more than once round the ring: the hidden ones
     // lie over the visible ones and must let their clicks through
     <motion.li
       className={`absolute left-1/2 top-1/2 ${near ? "" : "pointer-events-none"}`}
@@ -343,7 +369,7 @@ export function PlatformTimelineSection({ intro, introLine }: PlatformTimelineSe
   const sectionRef = useRef<HTMLElement>(null);
   usePauseOffscreen(sectionRef);
   // The platforms one under another, for short windows and reduced motion:
-  // only there, so its thirteen scenes aren't all playing out of sight
+  // only there, so its scenes aren't all playing out of sight
   const stacked = useMediaQuery("(max-height: 560px), (prefers-reduced-motion: reduce)");
   // A phone's or tablet's dial: across the foot of the screen, its platforms closer round a wider ring
   const narrow = useMediaQuery("(max-width: 1023px)");
@@ -404,6 +430,17 @@ export function PlatformTimelineSection({ intro, introLine }: PlatformTimelineSe
     offset: [`start ${Math.round((1.07 - DIVE_OVERLAP) * 100) / 100}`, `start ${Math.round((1 - DIVE_OVERLAP) * 100) / 100}`],
   });
   const skyOpacity = useTransform([skyIn, entered], ([shown, v]: number[]) => shown * (1 - along(v, 0.62, 0.7)));
+  // The clouds' drift, over the section rising and then the pinned intro
+  const cloudDrift = useTransform([arrive, entered], ([a, v]: number[]) => a + v);
+  // Rising over the dive's sky, this sky's top edge is soft (its clouds and
+  // the dive's aren't the same, so the section's edge, which clips it 80px
+  // down, would show as a line), and none once it's covered the screen
+  const skyEdge = useTransform(arrive, (a) => {
+    const edge = 40 * (1 - along(a, 0.7, 1));
+    return edge > 0 ? `linear-gradient(to bottom, transparent 80px, #000 calc(80px + ${edge.toFixed(1)}%))` : "none";
+  });
+  // The two close in front are gone as the heading holds
+  const nearCloudOpacity = useTransform(entered, [0.15, 0.4], [1, 0]);
   // Leaving the last platform, the dial and its scene fade out at their foot
   // instead of being cut off by the section's edge, so the tour's cream runs
   // straight on into the street's
@@ -554,7 +591,11 @@ export function PlatformTimelineSection({ intro, introLine }: PlatformTimelineSe
     >
       {intro && (
         <div aria-hidden="true" className={styles.sky} {...firstHue}>
-          <motion.div className={styles.skyFill} style={{ opacity: skyOpacity }}>
+          <motion.div
+            className={styles.skyFill}
+            style={{ opacity: skyOpacity, maskImage: skyEdge, WebkitMaskImage: skyEdge }}
+          >
+            <SkyClouds clouds={SKY_CLOUDS} progress={cloudDrift} />
             <motion.div className={styles.nightfall} style={{ y: nightfall }} />
           </motion.div>
         </div>
@@ -590,6 +631,9 @@ export function PlatformTimelineSection({ intro, introLine }: PlatformTimelineSe
               </motion.p>
             )}
           </div>
+          <motion.div className={styles.nearClouds} style={{ opacity: nearCloudOpacity }}>
+            <SkyClouds clouds={NEAR_CLOUDS} progress={cloudDrift} />
+          </motion.div>
         </div>
       ) : (
         <h2 id="platform-timeline-heading" className="sr-only">
@@ -762,8 +806,8 @@ export function PlatformTimelineSection({ intro, introLine }: PlatformTimelineSe
             style={{ opacity: navOpacity, y: navY }}
           >
             <p className="cx-liquid cx-liquid--pill flex h-[48px] items-center px-cx-5 text-xs tabular-nums">
-              {String(activeIndex + 1).padStart(2, "0")} / {platforms.length}{" "}
-              platforms
+              {/* Where you are and what part of WorldStreet, not out of how many: there are always more coming */}
+              {String(activeIndex + 1).padStart(2, "0")} · {activePlatform.category}
             </p>
             <div className="cx-liquid cx-liquid-dock">
               <Button

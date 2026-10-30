@@ -35,7 +35,7 @@ const MIN_RUN = 28;
 // The beats, over the stretch the stage is held (0 to 1; before it, -1 to 0
 // is the lift-off, as the stage comes up the screen). It never waits: as you
 // scroll, something is always on the move.
-// The thirteen come in one after another, each over ARRIVE_EACH
+// The platforms come in one after another, each over ARRIVE_EACH
 const ARRIVE_FROM = 0.03;
 const ARRIVE_STAGGER = 0.018;
 const ARRIVE_EACH = 0.17;
@@ -75,13 +75,16 @@ const SWIRL_OUT = 1.1;
 // Where the glide is at zero: the orbit as it's measured, and as it's shown still
 const SETTLED = 0.5;
 
-// The thirteen round the globe, a step apart from the top, each nudged round
+// The platforms round the globe, a step apart from the top, each nudged round
 // (radians) and in or out (a share of the orbit), so they read as a
-// constellation more than a clock face
-const NUDGE = [0, 0.07, -0.05, 0.04, -0.08, 0.05, 0, -0.04, 0.08, -0.05, 0.03, -0.07, 0.05];
-const REACH = [1, 0.88, 0.97, 0.87, 1, 0.92, 0.86, 0.99, 0.9, 1, 0.87, 0.95, 0.9];
+// constellation more than a clock face (the patterns repeat for however many there are)
+const NUDGES = [0, 0.07, -0.05, 0.04, -0.08, 0.05, 0, -0.04, 0.08, -0.05, 0.03, -0.07, 0.05];
+const REACHES = [1, 0.88, 0.97, 0.87, 1, 0.92, 0.86, 0.99, 0.9, 1, 0.87, 0.95, 0.9];
+const REACH = platforms.map((_, k) => REACHES[k % REACHES.length]);
 const NEAREST = Math.min(...REACH);
-const ANGLES = platforms.map((_, k) => -Math.PI / 2 + (k * 2 * Math.PI) / platforms.length + NUDGE[k]);
+const ANGLES = platforms.map(
+  (_, k) => -Math.PI / 2 + (k * 2 * Math.PI) / platforms.length + NUDGES[k % NUDGES.length],
+);
 
 const clamp = (v: number) => Math.min(Math.max(v, 0), 1);
 const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
@@ -97,7 +100,7 @@ type Geo = {
   /** The globe's size as it arrives from the dock, its biggest; and the canvas's, with room. */
   big: number;
   canvas: number;
-  /** Its size with the thirteen round it. */
+  /** Its size with the platforms round it. */
   wake: number;
   /** The orbit's centre and radii, on the stage (and so on the screen, while it's held). */
   cx: number;
@@ -116,7 +119,7 @@ type Geo = {
 /**
  * Vivid, introduced. The wallet's Ask Vivid globe lifts out of its dock as
  * the lights go down, and rises into the middle of the night, big. It wakes:
- * all thirteen platforms swirl in from the edges into an orbit round it, each
+ * every platform swirl in from the edges into an orbit round it, each
  * on a filament, with light running in and out along them, because all of
  * WorldStreet runs through it. Then they fold into it, and it falls to the
  * foot of the screen trailing light, back into the ask pill that rides along
@@ -126,7 +129,7 @@ type Geo = {
  * Scrubbed by the scroll, start to finish, on a stage held by the browser
  * (sticky); every frame is transforms and opacity from one handler, and one
  * canvas for the globe, drawn at its biggest and scaled down. With reduced
- * motion it's a still picture: the globe with the thirteen round it.
+ * motion it's a still picture: the globe with the platforms round it.
  */
 export function VividIntro() {
   const reduce = useReducedMotion();
@@ -241,7 +244,7 @@ export function VividIntro() {
       // A change of speed bends the turn rather than jumping it
       pace += (look.paceTo - pace) * 0.05;
       turn = (turn + dt / lerp(TURN_IDLE, TURN_ACTIVE, pace)) % 1;
-      // Awake, it swells and brightens as if talking; taking the thirteen in, it flares
+      // Awake, it swells and brightens as if talking; taking the platforms in, it flares
       const target = look.awake * (0.14 + talking(now) * 0.5) + look.flare * 0.5 + look.lift;
       level += (target - level) * 0.12;
       paint();
@@ -258,7 +261,7 @@ export function VividIntro() {
     };
 
     /**
-     * The thirteen and their filaments at `p`, round a globe `w` across at
+     * The platforms and their filaments at `p`, round a globe `w` across at
      * `ox`, `oy` (the orbit's middle, until it starts down); `pulse`: how
      * much light runs.
      */
@@ -359,7 +362,7 @@ export function VividIntro() {
       veil.style.visibility = dim > 0 ? "visible" : "hidden";
 
       // The globe: out of the dock, quickly clear of it and growing as it
-      // comes to the middle; then drawing back as the thirteen gather; then
+      // comes to the middle; then drawing back as the platforms gather; then
       // down, shrinking, into the pill (it falls, so it gathers speed)
       let x = g.cx;
       let y = g.cy;
@@ -445,7 +448,7 @@ export function VividIntro() {
       }
       lastFall = fall;
 
-      // The light round it, and the ring it sends out to the thirteen
+      // The light round it, and the ring it sends out to the platforms
       haze.style.opacity = String(q < 1 ? 0 : span(p, 0.08, 0.4) * (1 - span(p, DROP[0], DROP[0] + 0.14)));
       const ring = q < 1 ? 0 : clamp((p - WAVE[0]) / (WAVE[1] - WAVE[0]));
       if (ring > 0 && ring < 1) {
@@ -454,14 +457,14 @@ export function VividIntro() {
         wave.style.opacity = String(0.6 * Math.min(1, ring * 6) * (1 - ring));
       } else wave.style.opacity = "0";
 
-      // The thirteen; the light only runs (and its animations only play) while it shows
+      // The platforms; the light only runs (and its animations only play) while it shows
       const live = q >= 1 && p > LIVE[0] && p < LIVE[3];
       if (live !== orbit.hasAttribute("data-live")) orbit.toggleAttribute("data-live", live);
       const pulse = clamp((p - LIVE[0]) / (LIVE[1] - LIVE[0])) * (1 - clamp((p - LIVE[2]) / (LIVE[3] - LIVE[2])));
       placeMarks(q < 1 ? 0 : p, w, pulse, x, y);
     };
 
-    /** Reduced motion: the picture, still: the globe awake with the thirteen round it. */
+    /** Reduced motion: the picture, still: the globe awake with the platforms round it. */
     const settle = () => {
       if (!g) return;
       dockLift.set(0);
@@ -494,7 +497,7 @@ export function VividIntro() {
       const cx = n.left - s.left + n.width / 2;
       const cy = n.top - s.top + n.height / 2;
       // Big as it arrives (a phone's two-thirds across; a laptop's half its
-      // height), then back enough that the nearest of the thirteen has a
+      // height), then back enough that the nearest of the platforms has a
       // filament's length to spare
       const big = Math.round(
         sw >= 1024
@@ -575,7 +578,7 @@ export function VividIntro() {
       <div ref={veilRef} aria-hidden="true" className={styles.veil} />
 
       <div ref={stageRef} className={styles.stage}>
-        {/* The thirteen, wired to the globe, laid out by the script from the stage's corner */}
+        {/* The platforms, wired to the globe, laid out by the script from the stage's corner */}
         <div ref={orbitRef} aria-hidden="true" className={styles.orbit}>
           <span ref={hazeRef} className={styles.haze} />
           <span ref={waveRef} className={styles.wave} />
@@ -633,7 +636,7 @@ export function VividIntro() {
               once you say yes.
             </p>
           </motion.div>
-          {/* The orbit's room: the script measures it, and the thirteen go round its middle */}
+          {/* The orbit's room: the script measures it, and the platforms go round its middle */}
           <div ref={netRef} className={styles.net} />
           <motion.p className={styles.handoff} style={reduce ? undefined : { opacity: handoffOpacity, y: handoffY }}>
             <span className={styles.handoffLine}>Now it rides with you.</span>
@@ -641,7 +644,7 @@ export function VividIntro() {
           </motion.p>
           <motion.p className={styles.readout} style={reduce ? undefined : { opacity: readoutOpacity }}>
             <i aria-hidden="true" className={styles.live} />
-            13 platforms · 1 wallet · always on
+            Every platform · 1 wallet · always on
           </motion.p>
         </div>
       </div>

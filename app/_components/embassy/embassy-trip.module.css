@@ -1,0 +1,429 @@
+/* E-Embassy (embassy-trip.tsx), as worldstreetgold.com dresses it: the city
+   at blue hour in an arch, and the trip in its passport blue, sky and slate
+   on the night's stone. */
+.desk {
+  --blue: #0450c0;
+  --sky: #8eb7ff;
+  --slate: #9aa8c7;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 12px;
+  color: #f6f3ec;
+}
+@media (min-width: 760px) {
+  .desk {
+    grid-template-columns: minmax(220px, 0.8fr) minmax(0, 1.2fr);
+    align-items: stretch;
+    gap: 18px;
+  }
+}
+
+/* ── The city, in an arch ────────────────────────────────────────────── */
+
+.arch {
+  position: relative;
+  min-height: 180px;
+  margin: 0;
+  overflow: hidden;
+  border-radius: 200px 200px 24px 24px;
+  background: #0b1226;
+  box-shadow: inset 0 0 0 1px rgba(142, 183, 255, 0.18), 0 40px 80px -36px rgba(4, 80, 192, 0.6);
+}
+@media (max-width: 759px) {
+  /* Across the top on a phone: the arch's curve over a wide picture */
+  /* A height, not a shape: drawn smaller to fit (scene-fit), a shape across
+     the full width would come back as tall */
+  .arch {
+    min-height: 0;
+    height: 150px;
+    border-radius: 120px 120px 20px 20px;
+  }
+}
+.photo.photo {
+  object-fit: cover;
+  object-position: 50% 45%;
+  opacity: 0;
+  transition: opacity 0.6s ease;
+}
+.photo[data-shown] {
+  opacity: 1;
+}
+/* The weather there now, floating at the top */
+.weather {
+  position: absolute;
+  top: 18%;
+  left: 50%;
+  display: grid;
+  justify-items: center;
+  gap: 2px;
+  padding: 10px 16px;
+  translate: -50% 0;
+  border-radius: 18px;
+  text-align: center;
+  white-space: nowrap;
+  background: rgba(8, 14, 32, 0.55);
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.14);
+  animation: float 6s ease-in-out infinite;
+}
+@media (max-width: 759px) {
+  .weather {
+    top: 28%;
+    padding: 6px 12px;
+  }
+}
+.where {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  color: var(--sky);
+}
+.temp {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 26px;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+}
+.sky {
+  font-size: 12px;
+  color: #dbe5ff;
+}
+.approved {
+  position: absolute;
+  right: 12px;
+  bottom: 12px;
+  left: 12px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0;
+  padding: 10px 14px;
+  border-radius: 16px;
+  color: #fff;
+  background: rgba(4, 80, 192, 0.85);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  box-shadow: 0 12px 30px -12px rgba(4, 80, 192, 0.8);
+  animation: rise 0.5s var(--cx-ease, ease) both;
+}
+.approved span {
+  display: grid;
+  gap: 1px;
+}
+.approved b {
+  font-size: 14px;
+  font-weight: 650;
+}
+.approved small {
+  font-size: 11.5px;
+  color: #dbe5ff;
+}
+
+/* ── The trip ────────────────────────────────────────────────────────── */
+
+.card {
+  display: grid;
+  gap: 14px;
+  align-content: start;
+  padding: 18px;
+  border-radius: 24px;
+  background: #0c0a09;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.08), 0 40px 80px -30px rgba(0, 0, 0, 0.8);
+}
+.whereTo {
+  display: grid;
+  gap: 8px;
+}
+.label {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--slate);
+}
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.chip {
+  height: 36px;
+  padding: 0 14px;
+  border: 0;
+  border-radius: 999px;
+  font: inherit;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: #dbe5ff;
+  background: rgba(142, 183, 255, 0.08);
+  box-shadow: inset 0 0 0 1px rgba(142, 183, 255, 0.22);
+  cursor: pointer;
+  transition: background-color 0.2s, color 0.2s, box-shadow 0.2s;
+}
+.chip:hover {
+  background: rgba(142, 183, 255, 0.16);
+}
+.chip[aria-pressed="true"] {
+  color: #fff;
+  background: var(--blue);
+  box-shadow: none;
+}
+.chip:focus-visible {
+  outline: 2px solid var(--sky);
+  outline-offset: 2px;
+}
+/* Lagos to there, the plane between */
+.route {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  border-radius: 16px;
+  background: rgba(142, 183, 255, 0.06);
+}
+.leg {
+  display: grid;
+  gap: 1px;
+}
+.leg:last-child {
+  text-align: right;
+}
+.leg b {
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+.leg small {
+  font-size: 12px;
+  color: var(--slate);
+}
+.flight {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--sky);
+}
+.flight i {
+  flex: 1;
+  height: 0;
+  border-top: 1.5px dashed rgba(142, 183, 255, 0.45);
+}
+.flight :global(svg) {
+  rotate: 45deg;
+}
+/* The steps, a line through their dots: done ticked, the one it's on lit */
+.steps {
+  display: grid;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.step {
+  position: relative;
+  display: grid;
+  grid-template-columns: 20px minmax(0, 1fr) auto;
+  align-items: start;
+  gap: 12px;
+  padding-bottom: 14px;
+}
+.step:last-child {
+  padding-bottom: 0;
+}
+.step:not(:last-child)::before {
+  content: "";
+  position: absolute;
+  top: 22px;
+  bottom: 2px;
+  left: 9.25px;
+  width: 1.5px;
+  background: rgba(142, 183, 255, 0.18);
+}
+.step[data-state="done"]::before {
+  background: var(--sky);
+}
+.stepDot {
+  display: grid;
+  place-items: center;
+  width: 20px;
+  height: 20px;
+  margin-top: 1px;
+  border-radius: 50%;
+  box-shadow: inset 0 0 0 1.5px rgba(142, 183, 255, 0.35);
+}
+.step[data-state="done"] .stepDot {
+  color: #0b1226;
+  background: var(--sky);
+  box-shadow: none;
+}
+.step[data-state="now"] .stepDot {
+  background: var(--blue);
+  box-shadow: 0 0 0 5px rgba(4, 80, 192, 0.35);
+  animation: pulse 2s ease-in-out infinite;
+}
+.stepText {
+  display: grid;
+  gap: 2px;
+}
+.stepText b {
+  font-size: 14.5px;
+  font-weight: 600;
+}
+.step[data-state="next"] .stepText b {
+  color: var(--slate);
+}
+.stepText small {
+  font-size: 12.5px;
+  color: var(--slate);
+}
+.stepState {
+  padding-top: 2px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: var(--slate);
+}
+.step[data-state="now"] .stepState {
+  color: var(--sky);
+}
+.consultant {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0;
+  padding-top: 12px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  font-size: 13px;
+  line-height: 1.45;
+  color: #c9d3ea;
+}
+.consultant b {
+  color: #fff;
+  font-weight: 600;
+}
+.avatar {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  font-size: 14px;
+  font-weight: 700;
+  color: #fff;
+  background: linear-gradient(135deg, var(--blue), #3b82f6);
+}
+
+/* On a phone the trip fits the panel: each step's title and where it's at
+   (its detail, and the consultant's line, are for a bigger screen) */
+@media (max-width: 759px) {
+  .card {
+    gap: 10px;
+    padding: 14px;
+  }
+  .whereTo {
+    gap: 6px;
+  }
+  .chip {
+    height: 32px;
+    padding: 0 12px;
+    font-size: 13px;
+  }
+  .route {
+    padding: 8px 12px;
+  }
+  .leg b {
+    font-size: 16px;
+  }
+  .leg small {
+    display: none;
+  }
+  .step {
+    align-items: center;
+    padding-bottom: 8px;
+  }
+  .step:not(:last-child)::before {
+    top: 20px;
+  }
+  .stepText small,
+  .consultant {
+    display: none;
+  }
+  .stepText b {
+    font-size: 13.5px;
+  }
+  .weather {
+    top: 22%;
+  }
+  .temp {
+    font-size: 20px;
+  }
+  .approved {
+    padding: 6px 10px;
+  }
+}
+
+@keyframes float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-6px);
+  }
+}
+@keyframes pulse {
+  0%,
+  100% {
+    box-shadow: 0 0 0 4px rgba(4, 80, 192, 0.35);
+  }
+  50% {
+    box-shadow: 0 0 0 8px rgba(4, 80, 192, 0.15);
+  }
+}
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .weather,
+  .step[data-state="now"] .stepDot,
+  .approved {
+    animation: none;
+  }
+  .photo.photo {
+    transition: none;
+  }
+}
+
+/* A short phone (an SE, or bars showing): the arch slimmer, and the trip
+   down to where to and its steps */
+@media (max-width: 759px) and (max-height: 740px) {
+  .arch {
+    height: 100px;
+    border-radius: 90px 90px 16px 16px;
+  }
+  .weather {
+    top: 12%;
+    padding: 4px 10px;
+  }
+  .where,
+  .sky {
+    display: none;
+  }
+  .approved small {
+    display: none;
+  }
+  .label,
+  .route {
+    display: none;
+  }
+  .step {
+    padding-bottom: 6px;
+  }
+}

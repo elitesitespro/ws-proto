@@ -47,7 +47,7 @@ const SECTION_ASK: Record<string, Ask> = {
     ],
   },
   discover: {
-    label: "Thirteen platforms",
+    label: "The platforms",
     qs: ["Which platform is for me?", "What’s the difference between Xtream and Vision?", "Where should I start?"],
   },
   street: {
@@ -158,6 +158,10 @@ const DIAL_ASK: Record<string, Ask> = {
     label: "WorldHealth",
     qs: ["How do I see a doctor online?", "How do I pay for a visit?", "Is WorldHealth for emergencies?"],
   },
+  embassy: {
+    label: "E-Embassy",
+    qs: ["Can E-Embassy help me get a visa?", "How do I renew my passport?", "Who handles my trip?"],
+  },
   forex: {
     label: "Forex",
     qs: ["What is forex, in plain words?", "What’s a pip?", "When is the forex market open?"],
@@ -165,6 +169,10 @@ const DIAL_ASK: Record<string, Ask> = {
   crypto: {
     label: "Crypto",
     qs: ["What is USDT?", "What’s the difference between spot and perps?", "How do I buy my first crypto?"],
+  },
+  sports: {
+    label: "WorldSports",
+    qs: ["When is WorldSports coming?", "How do player shares work?", "Who will be able to use WorldSports?"],
   },
   prediction: {
     label: "Prediction",

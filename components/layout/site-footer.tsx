@@ -100,18 +100,29 @@ function PlatformGroups() {
         <div key={district.id} className="min-w-0">
           <h2 className="mb-1 font-medium">{categoryNames[district.id]}</h2>
           <ul className="flex flex-col gap-1 max-md:gap-0">
-            {district.exits.map((exit) => (
-              <li key={exit.name}>
-                <a href={platformDetails[exit.name].href} target="_blank" rel="noreferrer" className={linkClass}>
-                  <span
-                    aria-hidden="true"
-                    {...hueAttrs(exit.name)}
-                    className="size-1 shrink-0 rounded-full bg-(--hue)"
-                  />
-                  {exit.label}
-                </a>
-              </li>
-            ))}
+            {district.exits.map((exit) => {
+              const href = platformDetails[exit.name].href;
+              const dot = (
+                <span aria-hidden="true" {...hueAttrs(exit.name)} className="size-1 shrink-0 rounded-full bg-(--hue)" />
+              );
+              return (
+                <li key={exit.name}>
+                  {href ? (
+                    <a href={href} target="_blank" rel="noreferrer" className={linkClass}>
+                      {dot}
+                      {exit.label}
+                    </a>
+                  ) : (
+                    // Not open yet: listed, with nowhere to go
+                    <span className={linkClass}>
+                      {dot}
+                      {exit.label}
+                      <span className="text-xs opacity-60">Soon</span>
+                    </span>
+                  )}
+                </li>
+              );
+            })}
           </ul>
         </div>
       ))}
