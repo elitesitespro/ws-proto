@@ -6,6 +6,7 @@ import { cn } from "cn";
 import { NightGlobe, type GlobePlacement, type NightGlobeHandle } from "@/components/globe/night-globe";
 import { usePauseOffscreen } from "@/lib/use-pause-offscreen";
 import { hueAttrs, type ShowcasePlatformName } from "@/app/_components/platform-showcase-content";
+import { SkyClouds, type Cloud } from "@/app/_components/sky-clouds";
 import { GlobeIntro } from "./globe-intro";
 import { GlobePins } from "./globe-pins";
 import { GlobeCityLayer, useGlobeCity } from "./globe-city";
@@ -47,6 +48,20 @@ const RISE_SPIN = -0.4; // a little more turn as it rises, then it holds still f
 const SKY = hueAttrs("WorldSpace");
 const SKY_OPENS = [3.12, 3.45];
 const SKY_FILLS = [3.3, 3.5];
+// Breaking out through the bottom of the cloud: a bank of real cumulus
+// gathers over the planet's own cloud as the camera reaches it, then parts
+// round you and is gone past the edges as the sky opens behind it, so there's
+// never a blank screen between the cloud and the sky
+const BREAK_GATHERS = [2.75, 3.02];
+const BREAK_PARTS = [3.0, 3.5];
+const BREAKOUT: readonly Cloud[] = [
+  { kind: "bank", x: 30, y: 28, w: 115, dx: -70, dy: -48, grow: 1.4 },
+  { kind: "tall", x: 74, y: 30, w: 100, dx: 72, dy: -42, grow: 1.4, flip: true },
+  { kind: "tall", x: 26, y: 76, w: 105, dx: -66, dy: 52, grow: 1.5 },
+  { kind: "bank", x: 72, y: 78, w: 120, dx: 66, dy: 48, grow: 1.4, flip: true },
+  // The last of it, in the middle, swelling past you and thinning away
+  { kind: "puff", x: 50, y: 50, w: 80, dy: 6, grow: 2.6, fade: [0.25, 0.75] },
+];
 
 const mix = (a: GlobePlacement, b: GlobePlacement, k: number): GlobePlacement => ({
   x: a.x + (b.x - a.x) * k,
@@ -67,8 +82,9 @@ const along = (v: number, [from, to]: number[]) => Math.min(Math.max((v - from) 
 // Scrolling on, the globe stays on screen: the copy and cards leave, the
 // planet glides to the centre and sinks, and the statement rises over it.
 // Past the statement it rises whole, turns from night to a cloudy day in
-// its real colours, and the page dives down into it, through the clouds
-// and out into the sky the next section opens on.
+// its real colours, and the page dives down into it, through the clouds,
+// out through a bank of them that parts round you, and into the sky the next
+// section opens on.
 export function GlobePreviewSection() {
   const globeRef = useRef<NightGlobeHandle>(null);
   const pinsRef = useRef<HTMLDivElement>(null);
@@ -86,6 +102,8 @@ export function GlobePreviewSection() {
   const [away, setAway] = useState(false);
   // Diving: the planet stops its own turning, which would race past at that zoom
   const [diving, setDiving] = useState(false);
+  // Near the bottom of the dive: the cloud bank's pictures are wanted (not loaded before)
+  const [cloudy, setCloudy] = useState(false);
   const onWordChange = useCallback((platform: ShowcasePlatformName, rgb: string) => setActive({ platform, rgb }), []);
   const onLanded = useCallback(() => setLanded(true), []);
   // The loader: the planet showing, then the dark opening onto the hero (the
@@ -138,6 +156,8 @@ export function GlobePreviewSection() {
   const skyOpacity = useTransform(travel, (t) => along(t * DIVE_SCREENS, [SKY_OPENS[0], SKY_OPENS[0] + 0.2]));
   const skyScale = useTransform(travel, (t) => 0.4 + 2.4 * easeInOut(along(t * DIVE_SCREENS, SKY_OPENS)));
   const skyFill = useTransform(travel, (t) => along(t * DIVE_SCREENS, SKY_FILLS));
+  const breakOpacity = useTransform(travel, (t) => along(t * DIVE_SCREENS, BREAK_GATHERS));
+  const breakOut = useTransform(travel, (t) => easeInOut(along(t * DIVE_SCREENS, BREAK_PARTS)));
 
   // The globe glides to the centre and sinks as the statement arrives, turning
   // a little as it goes, and keeps turning gently while the words light. Then
@@ -166,6 +186,7 @@ export function GlobePreviewSection() {
     globe.daylight(easeInOut(along(v, SUNRISE)));
     globe.clouds(easeInOut(along(v, CLOUDS)));
     setDiving(v > DESCENT[0]);
+    if (v > DESCENT[0]) setCloudy(true);
   };
   useMotionValueEvent(arrive, "change", (v) => {
     setAway(v > 0.5);
@@ -233,6 +254,11 @@ export function GlobePreviewSection() {
             />
             <motion.div style={{ opacity: skyFill }} className="absolute inset-0 bg-[var(--hue)]" />
           </div>
+          {cloudy && (
+            <motion.div style={{ opacity: breakOpacity }} className="pointer-events-none absolute inset-0 motion-reduce:hidden">
+              <SkyClouds clouds={BREAKOUT} progress={breakOut} />
+            </motion.div>
+          )}
           <GlobePins
             platform={settled ? active?.platform : undefined}
             globe={globeRef}

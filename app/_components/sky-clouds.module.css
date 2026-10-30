@@ -1,0 +1,21 @@
+/* Clouds in the sky (sky-clouds.tsx): a layer the size of its box, each
+   cloud placed by its middle and moved by transform only */
+.layer {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+.cloud {
+  position: absolute;
+  /* In hundredths of the screen's width, or (a little less) of its height
+     on a tall phone, where the words take the width */
+  width: calc(var(--w) * max(1vw, 0.6vh));
+  will-change: transform, opacity;
+}
+.cloud img {
+  display: block;
+  width: 100%;
+  height: auto;
+  user-select: none;
+}
