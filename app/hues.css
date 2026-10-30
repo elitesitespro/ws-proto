@@ -90,6 +90,31 @@
   --hue-rgb: 202, 168, 111;
   --hue-ink: #ddc399;
 }
+/* AI Movie: orchid, from the violet of a projector's beam. */
+[data-hue="movie"] {
+  --hue: #d7a9dd;
+  --hue-rgb: 215, 169, 221;
+  --hue-ink: #edcdf0;
+}
+/* Worldwork: warm stone, its own black and white given a little warmth. */
+[data-hue="work"] {
+  --hue: #c9bfaf;
+  --hue-rgb: 201, 191, 175;
+  --hue-ink: #e2dacb;
+}
+/* Life and WorldHealth: mint, from its teal on pale mint. */
+[data-hue="life"],
+[data-hue="health"] {
+  --hue: #8cd5c0;
+  --hue-rgb: 140, 213, 192;
+  --hue-ink: #b4e8d8;
+}
+/* E-Embassy: periwinkle, its passport blue softened. */
+[data-hue="embassy"] {
+  --hue: #a3aef0;
+  --hue-rgb: 163, 174, 240;
+  --hue-ink: #c6cdfa;
+}
 
 /* On paper the colour as text needs its deep shade. */
 [data-theme="light"] [data-hue] { --hue-ink: #a16207; }
@@ -107,3 +132,8 @@
 [data-theme="light"] [data-hue="community"],
 [data-theme="light"] [data-hue="social"] { --hue-ink: #285d94; }
 [data-theme="light"] [data-hue="shop"] { --hue-ink: #7a5200; }
+[data-theme="light"] [data-hue="movie"] { --hue-ink: #7a3f84; }
+[data-theme="light"] [data-hue="work"] { --hue-ink: #5e5446; }
+[data-theme="light"] [data-hue="life"],
+[data-theme="light"] [data-hue="health"] { --hue-ink: #00695a; }
+[data-theme="light"] [data-hue="embassy"] { --hue-ink: #3c4aa0; }
