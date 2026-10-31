@@ -227,7 +227,11 @@
     width: 40px;
     height: 40px;
   }
+  /* scale shrinks the drawing, not the box it's laid out in, so the 56px
+     globe gives back what it's over the 40px orb (8px a side) and sits
+     centred in its ring instead of hanging off its corner */
   .voiceOrb > :last-child {
+    margin: -8px;
     scale: 0.72;
   }
   .voice small {
