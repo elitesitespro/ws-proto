@@ -122,6 +122,21 @@ const RIM_TICKS = Array.from({ length: LAST * (PHONE_STEP / 6) + 1 }, (_, index)
 // platforms start, in screen heights (vh): the heading holds, then the dial
 // and the details come in
 const INTRO_VH = 150;
+// A phone's (or tablet's) is shorter. Its dial is only a strip at the foot,
+// so on the laptop's pace the screen sat all but empty for a screen and more
+// between the words going and the first platform turning. The words hold
+// just as long (the first HOLD of the laptop's intro, at its pace); all that
+// comes after (the words going, night coming down, the dial and the first
+// platform's page coming up) runs three times as fast, and the dial turns on
+// straight after.
+const PHONE_INTRO_VH = 70;
+const HOLD = 0.2;
+// A phone's progress through its intro, as the laptop's (`entered`, so the
+// beats below are the same shares of it)
+function phonePace(v: number) {
+  const held = (HOLD * INTRO_VH) / PHONE_INTRO_VH;
+  return v < held ? (v / held) * HOLD : HOLD + ((v - held) / (1 - held)) * (1 - HOLD);
+}
 // With an intro, the section comes up over the last stretch of the dive
 // before it, in screen heights: the page above holds its stage (the dive,
 // ending in the sky) on screen until its own end, so the heading rises into
@@ -136,7 +151,7 @@ const DIVE_OVERLAP = 0.6;
 // slowly, the near ones faster and growing, round the heading and behind it.
 // Two pass close in front, low at the sides and clear of the words, and are
 // gone as the heading holds. They drift over the section rising and the pinned intro both
-// (`arrive` then `entered`, 0 to 2).
+// (`arrive` then `opening`, 0 to 2, less on a phone's shorter intro).
 const SKY_CLOUDS: readonly Cloud[] = [
   { kind: "wisp", x: 22, y: 26, w: 46, dy: -8, opacity: 0.85 },
   { kind: "wisp", x: 82, y: 15, w: 38, dy: -6, flip: true, opacity: 0.7 },
@@ -380,9 +395,10 @@ export function PlatformTimelineSection({ intro, introLine }: PlatformTimelineSe
   const shouldReduceMotion = useReducedMotion();
   const activePlatform = platforms[activeIndex];
   const visiblePlatforms = platforms;
+  const introVh = narrow ? PHONE_INTRO_VH : INTRO_VH;
   const { scrollYProgress } = useScroll({
     target: sectionRef,
-    offset: [intro ? `${INTRO_VH}vh 80px` : "start 80px", "end end"],
+    offset: [intro ? `${introVh}vh 80px` : "start 80px", "end end"],
   });
   // With an intro: 0 as the section's top comes up into view, 1 once it has
   // pinned; then `entered` runs 0 to 1 over the pinned intro. Without one,
@@ -393,9 +409,9 @@ export function PlatformTimelineSection({ intro, introLine }: PlatformTimelineSe
   });
   const { scrollYProgress: opening } = useScroll({
     target: sectionRef,
-    offset: ["start 80px", `${INTRO_VH}vh 80px`],
+    offset: ["start 80px", `${introVh}vh 80px`],
   });
-  const entered = useTransform(opening, (v) => (intro ? v : 1));
+  const entered = useTransform(opening, (v) => (intro ? (narrow ? phonePace(v) : v) : 1));
   // The heading holds, then the page carries on through it: it grows a
   // little and blurs away
   const headingOpacity = useTransform(entered, [0.25, 0.55], [1, 0]);
@@ -430,8 +446,9 @@ export function PlatformTimelineSection({ intro, introLine }: PlatformTimelineSe
     offset: [`start ${Math.round((1.07 - DIVE_OVERLAP) * 100) / 100}`, `start ${Math.round((1 - DIVE_OVERLAP) * 100) / 100}`],
   });
   const skyOpacity = useTransform([skyIn, entered], ([shown, v]: number[]) => shown * (1 - along(v, 0.62, 0.7)));
-  // The clouds' drift, over the section rising and then the pinned intro
-  const cloudDrift = useTransform([arrive, entered], ([a, v]: number[]) => a + v);
+  // The clouds' drift, over the section rising and then the pinned intro, at
+  // the page's own pace (a phone's quicker beats would hurry them on)
+  const cloudDrift = useTransform([arrive, opening], ([a, v]: number[]) => a + (v * introVh) / INTRO_VH);
   // Rising over the dive's sky, this sky's top edge is soft (its clouds and
   // the dive's aren't the same, so the section's edge, which clips it 80px
   // down, would show as a line), and none once it's covered the screen
@@ -508,7 +525,7 @@ export function PlatformTimelineSection({ intro, introLine }: PlatformTimelineSe
     if (!section || window.matchMedia("(max-height: 560px)").matches) return null;
     const view = document.documentElement.clientHeight;
     // The platforms start after the intro, if there is one
-    const lead = intro ? (INTRO_VH / 100) * view : 0;
+    const lead = intro ? (introVh / 100) * view : 0;
     const start = window.scrollY + section.getBoundingClientRect().top - 80 + lead;
     const travel = section.offsetHeight - view + 80 - lead;
     return platforms.map((_, index) => start + (travel * index) / LAST);
@@ -585,7 +602,7 @@ export function PlatformTimelineSection({ intro, introLine }: PlatformTimelineSe
           backgroundColor: activeColours.fill,
           color: activeColours.text,
           "--timeline-background": "var(--hue)",
-          "--timeline-height": `${100 + (intro ? INTRO_VH : 0) + LAST * STEP_VH}svh`,
+          "--timeline-height": `${100 + (intro ? introVh : 0) + LAST * STEP_VH}svh`,
         } as CSSProperties
       }
     >
