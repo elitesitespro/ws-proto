@@ -97,11 +97,36 @@ function toRgb(value?: string): Rgb {
   return parts?.length === 3 && parts.every(Number.isFinite) ? (parts as Rgb) : GOLD_RGB;
 }
 
-const EARTH_SRC = "/assets/globe/black-marble-2016.jpg";
-// The day: loaded once the night is showing. Phones take the smaller images.
-const DAY_SRC = ["/assets/globe/blue-marble-day.jpg", "/assets/globe/blue-marble-day-2k.jpg"] as const;
-const CLOUDS_SRC = ["/assets/globe/clouds.jpg", "/assets/globe/clouds-2k.jpg"] as const;
-const WATER_SRC = "/assets/globe/water-mask.png";
+// The night, which the planet (and so the hero) waits on. A phone draws it
+// at under half the size, so it takes the 2k one: under a quarter of the
+// bytes, which on a slow connection is most of the wait for the hero to open.
+// Its colour is kept at full resolution and its city lights part-pooled in
+// the shrink, or the small ones would average away below the lights' cut-off.
+const EARTH_SRC = { wide: "/assets/globe/black-marble-2016.jpg", phone: "/assets/globe/black-marble-2k.jpg" } as const;
+const PHONE = "(max-width: 767px)";
+// The day: loaded once the night is showing. Phones take the smaller images,
+// as AVIF (under half the bytes, for a slow connection), or the JPEGs and
+// the PNG where the browser can't read it. Each is a list to try in turn.
+const DAY_SRC = [["/assets/globe/blue-marble-day.jpg"], ["/assets/globe/blue-marble-day-2k.avif", "/assets/globe/blue-marble-day-2k.jpg"]] as const;
+const CLOUDS_SRC = [["/assets/globe/clouds.jpg"], ["/assets/globe/clouds-2k.avif", "/assets/globe/clouds-2k.jpg"]] as const;
+const WATER_SRC = [["/assets/globe/water-mask.png"], ["/assets/globe/water-mask-2k.avif", "/assets/globe/water-mask.png"]] as const;
+
+// Settled once a globe has the day's image for its sunrise, or can't have
+// it: what's fetched for further down the page waits on it, so on a slow
+// connection the sunrise isn't kept waiting
+let settleDayImage = () => {};
+const dayImage = new Promise<void>((resolve) => (settleDayImage = resolve));
+
+/** Calls `then` once the globe's day image is in (or won't be), e.g. to
+ *  fetch what the page wants next. Returns a cancel. */
+export function afterDayImage(then: () => void) {
+  let live = true;
+  void dayImage.then(() => live && then());
+  return () => {
+    live = false;
+  };
+}
+
 const MAX_DPR = 1.75;
 // Below this lens the view is flat (and the sums stay exact)
 const MIN_LENS = 0.001;
@@ -117,10 +142,12 @@ const SUN_DAY = unit([0.55, 0.45, 0.62]);
 const CLOUD_DRIFT = 0.004;
 // Heights above the surface, in planet radii, that match the shader's: the
 // arcs fade out above ARC_FADE, the marched cloud deck takes over between
-// DEEP_FROM and DEEP_TO, and the air thickens from HAZE_FROM down
+// DEEP_FROM and DEEP_TO, the camera goes into it over INSIDE (the shader's
+// DECK_HI + 0.001 to DECK_HI - 0.0025), and the air thickens from HAZE_FROM down
 const ARC_FADE = [0.95, 0.5] as const;
 const DEEP_FROM = 0.05;
 const DEEP_TO = 0.025;
+const INSIDE = [0.0155, 0.012] as const;
 const HAZE_FROM = 1.2;
 // The cloud below thickens and more forms as the camera comes down from
 // GATHER_FROM to GATHER_TO (radius about 0.5 to 5 at lens 1), at an even
@@ -286,7 +313,9 @@ export function NightGlobe({
 }: NightGlobeProps) {
   // The Earth image is the one thing the planet waits on: asked for from the
   // page's head, it downloads alongside the scripts rather than after them
-  preload(EARTH_SRC, { as: "image", fetchPriority: "high" });
+  // (each screen fetches only its own)
+  preload(EARTH_SRC.wide, { as: "image", fetchPriority: "high", media: "(min-width: 768px)" });
+  preload(EARTH_SRC.phone, { as: "image", fetchPriority: "high", media: PHONE });
   const canvasRef = useRef<HTMLCanvasElement>(null);
   // The live handle, set up with the GL state; the one given out forwards to it
   const apiRef = useRef<NightGlobeHandle | null>(null);
@@ -336,6 +365,7 @@ export function NightGlobe({
     if (!gl) {
       canvas.dataset.fallback = "true";
       onReadyRef.current?.();
+      settleDayImage();
       return;
     }
 
@@ -788,8 +818,13 @@ export function NightGlobe({
       gl.uniform1f(u.waterReady, shown.water);
       gl.uniform1f(u.noiseReady, shown.noise);
       gl.uniform1f(u.drift, drift);
-      // The deck is only marched through near it, and only with clouds to march
-      gl.uniform1f(u.deep, smooth(DEEP_FROM, DEEP_TO, altitude) * Math.min(cloudCover * 4, 1) * shown.clouds);
+      // The deck is only marched through near it, and only with clouds to
+      // march. Should the cloud map be late on a slow connection, the
+      // camera still goes into the deck's fog at the bottom (from the noise
+      // alone) rather than on into a bare planet; with no tops to show, only
+      // scattered specks, it comes in just as the camera goes into it
+      const deckShown = Math.max(shown.clouds, smooth(INSIDE[0], INSIDE[1], altitude));
+      gl.uniform1f(u.deep, smooth(DEEP_FROM, DEEP_TO, altitude) * Math.min(cloudCover * 4, 1) * deckShown);
       gl.uniform1f(u.haze, smooth(HAZE_FROM, 0, altitude) * daylight);
       // (by the altitude's log: each halving of the height gathers as much)
       const gather = smooth(Math.log(GATHER_FROM), Math.log(GATHER_TO), Math.log(altitude));
@@ -890,29 +925,38 @@ export function NightGlobe({
     }
 
     /** Once loaded, an image into a texture on its unit, with mipmaps; one
-     *  channel for `mono` (the clouds, the water). */
-    const loadInto = (unit: number, target: WebGLTexture | null, src: string, mono: boolean, key: keyof typeof loaded) => {
-      const img = new Image();
-      img.decoding = "async";
-      img.onload = () => {
-        if (disposed) return;
-        gl.activeTexture(gl.TEXTURE0 + unit);
-        gl.bindTexture(gl.TEXTURE_2D, target);
-        gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, false);
-        if (mono) gl.texImage2D(gl.TEXTURE_2D, 0, gl.R8, gl.RED, gl.UNSIGNED_BYTE, img);
-        else gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, gl.RGB, gl.UNSIGNED_BYTE, img);
-        gl.generateMipmap(gl.TEXTURE_2D);
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_LINEAR);
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.REPEAT);
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-        const aniso = gl.getExtension("EXT_texture_filter_anisotropic");
-        if (aniso) gl.texParameterf(gl.TEXTURE_2D, aniso.TEXTURE_MAX_ANISOTROPY_EXT, 8);
-        gl.activeTexture(gl.TEXTURE0);
-        arrived(key);
-      };
-      img.src = src;
-    };
+     *  channel for `mono` (the clouds, the water). Tries each source in turn
+     *  (a format the browser can't read falls through to the next); settles
+     *  either way. */
+    const loadInto = (unit: number, target: WebGLTexture | null, srcs: readonly string[], mono: boolean, key: keyof typeof loaded) =>
+      new Promise<void>((settle) => {
+        const img = new Image();
+        img.decoding = "async";
+        let tried = 0;
+        img.onerror = () => {
+          if (++tried < srcs.length && !disposed) img.src = srcs[tried];
+          else settle();
+        };
+        img.onload = () => {
+          settle();
+          if (disposed) return;
+          gl.activeTexture(gl.TEXTURE0 + unit);
+          gl.bindTexture(gl.TEXTURE_2D, target);
+          gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, false);
+          if (mono) gl.texImage2D(gl.TEXTURE_2D, 0, gl.R8, gl.RED, gl.UNSIGNED_BYTE, img);
+          else gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, gl.RGB, gl.UNSIGNED_BYTE, img);
+          gl.generateMipmap(gl.TEXTURE_2D);
+          gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_LINEAR);
+          gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+          gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.REPEAT);
+          gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+          const aniso = gl.getExtension("EXT_texture_filter_anisotropic");
+          if (aniso) gl.texParameterf(gl.TEXTURE_2D, aniso.TEXTURE_MAX_ANISOTROPY_EXT, 8);
+          gl.activeTexture(gl.TEXTURE0);
+          arrived(key);
+        };
+        img.src = srcs[0];
+      });
 
     /** Something for the day has arrived: it fades in, or shows at once when the loop is stopped. */
     function arrived(key: keyof typeof loaded) {
@@ -926,9 +970,16 @@ export function NightGlobe({
     /** The day's images and the noise, fetched once the night is showing so the hero isn't held up. */
     const loadDay = () => {
       const small = width / dpr < 768 ? 1 : 0;
-      loadInto(1, dayTexture, DAY_SRC[small], false, "day");
-      loadInto(2, cloudTexture, CLOUDS_SRC[small], true, "clouds");
-      loadInto(3, waterTexture, WATER_SRC, true, "water");
+      // One at a time, so on a slow line each is in as soon as it can be
+      // rather than all late together: the day for the sunrise (then the
+      // page's next pictures may start), its clouds, then the water mask
+      // (until it's in, the night image's land stands in for it)
+      void loadInto(1, dayTexture, DAY_SRC[small], false, "day")
+        .then(() => {
+          settleDayImage();
+          return loadInto(2, cloudTexture, CLOUDS_SRC[small], true, "clouds");
+        })
+        .then(() => loadInto(3, waterTexture, WATER_SRC[small], true, "water"));
       // The noise isn't needed until the camera comes in close
       noiseTimer = window.setTimeout(makeNoise, 1200);
     };
@@ -1021,7 +1072,7 @@ export function NightGlobe({
       loadDay();
       onReadyRef.current?.();
     };
-    image.src = EARTH_SRC;
+    image.src = window.matchMedia(PHONE).matches ? EARTH_SRC.phone : EARTH_SRC.wide;
 
     resize();
     draw();

@@ -12,10 +12,39 @@
      on a tall phone, where the words take the width */
   width: calc(var(--w) * max(1vw, 0.6vh));
   will-change: transform, opacity;
+  --haze: 0.85;
 }
+.cloud[data-kind="wisp"] {
+  --haze: 0.4;
+}
+/* Until its picture is in, the cloud is a soft white haze of its size, so a
+   slow connection still shows cloud where it should be; the haze gives way
+   as the picture fades in over it */
+.cloud::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  inset: 10% 6%;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, rgb(255 255 255 / var(--haze)), rgb(255 255 255 / calc(var(--haze) * 0.55)) 55%, transparent);
+  transition: opacity 0.6s ease-out;
+}
+.cloud[data-decoded]::before {
+  opacity: 0;
+}
+.cloud picture {
+  display: block;
+}
+/* Hidden until decoded, then faded in: a late cloud drifts in rather than
+   popping (or drawing down in strips) */
 .cloud img {
   display: block;
   width: 100%;
   height: auto;
   user-select: none;
+  opacity: 0;
+  transition: opacity 0.6s ease-out;
+}
+.cloud[data-decoded] img {
+  opacity: 1;
 }
