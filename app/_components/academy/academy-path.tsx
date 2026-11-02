@@ -131,7 +131,7 @@ export function AcademyPath() {
               data-done={(done[s.id] ?? 0) >= PATH.length || undefined}
               onClick={() => setAt(i)}
             >
-              <Image src={`/assets/academy/${s.id}.webp`} alt="" fill sizes="64px" />
+              <Image src={`/assets/academy/${s.id}.webp`} alt="" fill sizes="(max-width: 767px) 40px, 64px" />
               {(done[s.id] ?? 0) > 0 && (
                 <i style={{ "--p": (done[s.id] ?? 0) / PATH.length } as CSSProperties} aria-hidden="true" />
               )}

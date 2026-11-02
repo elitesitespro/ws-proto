@@ -171,7 +171,7 @@ export function VisionParty() {
           {[{ id: "you", name: "You", city: "Home", face: "" }, ...friends].map((friend) => (
             <li key={friend.id}>
               <div className={styles.mini} data-paused={!playing || undefined}>
-                <Image src={art} alt="" fill sizes="96px" className={styles.art} style={drift} />
+                <Image src={art} alt="" fill sizes="(max-width: 767px) 80px, 96px" className={styles.art} style={drift} />
                 {!playing && <Icon name="pause" size={16} tone="current" />}
               </div>
               <span className={styles.who}>
@@ -214,7 +214,7 @@ export function VisionParty() {
                     data-copy={copy || undefined}
                     onClick={() => pick(title)}
                   >
-                    <Image src={`/assets/vision/${title.id}.webp`} alt="" fill sizes="160px" />
+                    <Image src={`/assets/vision/${title.id}.webp`} alt="" fill sizes="(max-width: 767px) 96px, (max-width: 1023px) 120px, 160px" />
                     <span className={styles.tag}>{title.tag}</span>
                     <strong>{title.title}</strong>
                     {current.id === title.id && <span className={styles.watching}>Watching</span>}

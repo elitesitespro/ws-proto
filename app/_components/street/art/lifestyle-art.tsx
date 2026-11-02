@@ -50,14 +50,14 @@ export function LifestyleArt({ focus, lit }: ArtProps) {
         <div className={styles.stand} data-item="vase">
           <span className={`${styles.beam} ${styles.spot}`} />
           <div className={styles.find}>
-            <Image src="/assets/worldstore/vase.webp" alt="" fill sizes="(min-width: 1024px) 14vw, 40vw" className={styles.cutout} />
+            <Image src="/assets/worldstore/vase.webp" alt="" fill sizes="(min-width: 1024px) 14vw, 17vw" className={styles.cutout} />
           </div>
           <span className={styles.plinth} />
         </div>
         <div className={styles.stand} data-item="perfume">
           <span className={`${styles.beam} ${styles.spot}`} />
           <div className={styles.find}>
-            <Image src="/assets/worldstore/perfume.webp" alt="" fill sizes="(min-width: 1024px) 18vw, 50vw" className={styles.cutout} />
+            <Image src="/assets/worldstore/perfume.webp" alt="" fill sizes="(min-width: 1024px) 18vw, 23vw" className={styles.cutout} />
           </div>
           <span className={styles.plinth} />
         </div>
@@ -116,7 +116,7 @@ export function LifestyleArt({ focus, lit }: ArtProps) {
           <path d="M2 56 C 30 6, 70 4, 98 20" pathLength={1} />
         </svg>
         <div className={styles.gate}>
-          <Image src="/assets/embassy/lisbon.webp" alt="" fill sizes="(min-width: 1024px) 24vw, 60vw" className={styles.gateView} />
+          <Image src="/assets/embassy/lisbon.webp" alt="" fill sizes="(min-width: 1024px) 24vw, 26vw" className={styles.gateView} />
           <span className={`${styles.chip} ${styles.approved}`}>Visa approved</span>
         </div>
       </div>

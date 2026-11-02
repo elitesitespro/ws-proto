@@ -70,7 +70,7 @@ export function EntertainmentArt({ focus, lit }: ArtProps) {
                       src={`/assets/vision/${id}.webp`}
                       alt=""
                       fill
-                      sizes="(min-width: 1024px) 13vw, 26vw"
+                      sizes="(min-width: 1024px) 13vw, (min-width: 768px) 23vw, 20vw"
                       className={styles.photo}
                     />
                   </span>
@@ -89,7 +89,7 @@ export function EntertainmentArt({ focus, lit }: ArtProps) {
               src="/assets/vision/owambe.webp"
               alt=""
               fill
-              sizes="(min-width: 1024px) 16vw, 34vw"
+              sizes="(min-width: 1024px) 16vw, 23vw"
               className={styles.photo}
             />
             <span className={styles.live}>Live</span>
@@ -102,7 +102,7 @@ export function EntertainmentArt({ focus, lit }: ArtProps) {
         </div>
 
         <span className={styles.pad}>
-          <Image src="/assets/arcade/controller.webp" alt="" fill sizes="(min-width: 1024px) 14vw, 34vw" />
+          <Image src="/assets/arcade/controller.webp" alt="" fill sizes="(min-width: 1024px) 14vw, 28vw" />
         </span>
       </div>
 
@@ -114,7 +114,7 @@ export function EntertainmentArt({ focus, lit }: ArtProps) {
               src="/assets/images/xtream-live.webp"
               alt=""
               fill
-              sizes="(min-width: 1024px) 13vw, 40vw"
+              sizes="(min-width: 1024px) 13vw, 28vw"
               className={styles.photo}
             />
             <span className={styles.live}>Live</span>
@@ -124,7 +124,7 @@ export function EntertainmentArt({ focus, lit }: ArtProps) {
               src="/assets/xtream/kojo.webp"
               alt=""
               fill
-              sizes="(min-width: 1024px) 13vw, 40vw"
+              sizes="(min-width: 1024px) 13vw, 28vw"
               className={styles.photo}
             />
           </span>

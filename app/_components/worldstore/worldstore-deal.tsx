@@ -132,7 +132,7 @@ export function WorldstoreDeal() {
               data-photo={item.photo || undefined}
               onClick={() => pick(item)}
             >
-              <Image src={item.image} alt="" fill sizes="64px" />
+              <Image src={item.image} alt="" fill sizes="(max-width: 1023px) 40px, 64px" />
             </button>
           ))}
         </div>

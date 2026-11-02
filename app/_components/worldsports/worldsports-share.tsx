@@ -142,7 +142,7 @@ export function WorldsportsShare() {
         <div className={styles.who}>
           <span className={styles.face}>
             {player.photo ? (
-              <Image src={player.photo} alt="" fill sizes="96px" className={styles.photo} />
+              <Image src={player.photo} alt="" fill sizes="(max-width: 1023px) 60px, 96px" className={styles.photo} />
             ) : (
               <span className={styles.shirt} aria-hidden="true">
                 {player.number}

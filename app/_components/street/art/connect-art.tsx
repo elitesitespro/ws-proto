@@ -176,7 +176,8 @@ export function ConnectArt({ focus, lit }: ArtProps) {
       data-talking={who === TALKING || undefined}
       style={{ left, top, "--i": i } as CSSProperties}
     >
-      <Image src={face(who)} alt="" width={96} height={96} />
+      {/* Drawn at most 54px across (CSS sizes it): 64 here only picks the file */}
+      <Image src={face(who)} alt="" width={64} height={64} />
     </span>
   );
 
@@ -229,7 +230,8 @@ export function ConnectArt({ focus, lit }: ArtProps) {
                 data-only={wideOnly ? "wide" : undefined}
                 style={{ left: `${round(x / 3.6)}%`, top: `${round(y / 1.8)}%`, "--i": i } as CSSProperties}
               >
-                <Image src={face(who)} alt="" width={tag ? 192 : 96} height={tag ? 192 : 96} />
+                {/* At most 80px across (lead) or 56px: the props only pick the file */}
+                <Image src={face(who)} alt="" width={tag ? 96 : 64} height={tag ? 96 : 64} />
                 {tag && <span className={styles.tag}>{tag}</span>}
               </span>
             );
@@ -250,7 +252,7 @@ export function ConnectArt({ focus, lit }: ArtProps) {
           {SEATS.filter((s) => !s.near).map(seat)}
           <div className={styles.float}>
             <div className={styles.bob}>
-              <Image src="/assets/worldspace/helmet.webp" alt="" width={512} height={512} />
+              <Image src="/assets/worldspace/helmet.webp" alt="" width={512} height={512} sizes="(min-width: 768px) 18vw, 32vw" />
             </div>
           </div>
           <Rings near />

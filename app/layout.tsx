@@ -53,11 +53,12 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         {/* Icon gradients, defined once inside the brand so they take its golds */}
         <IconDefs />
         <IconDefs brand="worldstreet" />
+        {/* No disableTransitionOnChange: nothing here switches the theme, and on load it slipped a stylesheet over
+            every element and took it off again, restyling the whole page twice as it hydrated */}
         <ThemeProvider
           attribute={["class", "data-theme"]}
           defaultTheme="dark"
           enableSystem
-          disableTransitionOnChange
         >
           <SmoothScroll />
           <SiteHeader />

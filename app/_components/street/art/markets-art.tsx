@@ -329,7 +329,7 @@ export function MarketsArt({ focus, lit }: ArtProps) {
         </svg>
         <div className={styles.share}>
           <span className={styles.shareFace}>
-            <Image src="/assets/sports/player-adeyemi.webp" alt="" fill sizes="96px" className={styles.sharePhoto} />
+            <Image src="/assets/sports/player-adeyemi.webp" alt="" fill sizes="(max-width: 1023px) 56px, 96px" className={styles.sharePhoto} />
           </span>
           <span className={styles.shareText}>
             <b>D. Adeyemi</b>

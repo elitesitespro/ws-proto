@@ -1,3 +1,7 @@
+"use client";
+
+import { useRef } from "react";
+import { usePauseOffscreen } from "@/lib/use-pause-offscreen";
 import { VividGlobe } from "./vivid-globe";
 import { VIVID_URL } from "./vivid-links";
 import styles from "./vivid-section.module.css";
@@ -8,8 +12,11 @@ import styles from "./vivid-section.module.css";
  * to swipe to.
  */
 export function VividPlans() {
+  // The voice orb's breath holds still while the plans are well off the screen
+  const wrapRef = useRef<HTMLDivElement>(null);
+  usePauseOffscreen(wrapRef);
   return (
-    <div className={styles.plansWrap}>
+    <div ref={wrapRef} className={styles.plansWrap}>
       <div className={styles.plans}>
         <article className={styles.plan}>
           <p className={styles.planName}>

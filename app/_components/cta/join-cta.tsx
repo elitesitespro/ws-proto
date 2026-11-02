@@ -360,7 +360,17 @@ export function JoinCta() {
       sample();
       if (still) draw(0);
     };
-    img.src = MASK_SRC;
+    // The map is the foot of a long page: fetched as it comes within a couple of screens, not with the page, where
+    // it would hold up what's at the top on a slow connection
+    const near = new IntersectionObserver(
+      ([entry]) => {
+        if (!entry.isIntersecting) return;
+        near.disconnect();
+        img.src = MASK_SRC;
+      },
+      { rootMargin: "200% 0px" },
+    );
+    near.observe(canvas);
 
     const io = new IntersectionObserver(([entry]) => {
       if (entry.isIntersecting && !raf) raf = requestAnimationFrame(draw);
@@ -374,6 +384,7 @@ export function JoinCta() {
       then = 0;
       cancelAnimationFrame(raf);
       io.disconnect();
+      near.disconnect();
       resized.disconnect();
       img.onload = null;
     };
