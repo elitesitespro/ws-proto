@@ -2,6 +2,14 @@
   height: var(--timeline-height);
   overflow: clip;
 }
+/* A phone's or tablet's intro is shorter (PHONE_INTRO_VH): picked here
+   rather than by the script, which only knows the screen once the page has
+   hydrated, so the section is its real height from the first paint */
+@media (max-width: 1023px) {
+  .section {
+    height: var(--timeline-phone-height);
+  }
+}
 
 /* With an intro, it comes up over the end of the dive before it (that
    page's stage holds on screen until its own end), so the heading arrives

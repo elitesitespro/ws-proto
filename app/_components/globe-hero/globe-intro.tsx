@@ -51,7 +51,8 @@ type GlobeIntroProps = {
  * dim behind it. The section holds on screen while the page scrolls through
  * it, and the words light up in a wave as it goes (a stack of the platforms'
  * app icons popping in beside "platforms"), then lifts away into a blur as
- * the globe rises past it.
+ * the globe rises past it. On a phone or tablet it holds a little less: the
+ * lit line's moment before the dive is shorter (LIT, globe-preview-section).
  */
 export function GlobeIntro({ sectionRef, reveal, leave }: GlobeIntroProps) {
   const opacity = useTransform(leave, [0, 1], [1, 0]);
@@ -69,7 +70,7 @@ export function GlobeIntro({ sectionRef, reveal, leave }: GlobeIntroProps) {
     <section
       ref={sectionRef}
       aria-labelledby="globe-intro-heading"
-      className="pointer-events-none relative h-[240svh] text-foreground motion-reduce:h-auto"
+      className="pointer-events-none relative h-[240svh] text-foreground motion-reduce:h-auto max-lg:h-[220svh] max-lg:motion-reduce:h-auto"
     >
       <div className="sticky top-0 flex h-svh items-center justify-center px-3 motion-reduce:static motion-reduce:h-auto motion-reduce:py-12 md:px-6">
         <motion.h2

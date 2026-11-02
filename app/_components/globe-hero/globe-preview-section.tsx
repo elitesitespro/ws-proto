@@ -3,10 +3,11 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { motion, useMotionValueEvent, useScroll, useTransform, type MotionStyle } from "motion/react";
 import { cn } from "cn";
-import { NightGlobe, type GlobePlacement, type NightGlobeHandle } from "@/components/globe/night-globe";
+import { afterDayImage, NightGlobe, type GlobePlacement, type NightGlobeHandle } from "@/components/globe/night-globe";
+import { useMediaQuery } from "@/lib/use-media-query";
 import { usePauseOffscreen } from "@/lib/use-pause-offscreen";
 import { hueAttrs, type ShowcasePlatformName } from "@/app/_components/platform-showcase-content";
-import { SkyClouds, type Cloud } from "@/app/_components/sky-clouds";
+import { preloadSkyClouds, SkyClouds, type Cloud } from "@/app/_components/sky-clouds";
 import { GlobeIntro } from "./globe-intro";
 import { GlobePins } from "./globe-pins";
 import { GlobeCityLayer, useGlobeCity } from "./globe-city";
@@ -23,6 +24,14 @@ const SETTLED = { wide: { x: 0.5, y: 1.22, radius: 0.7 }, narrow: { x: 0.5, y: 1
 // while its words light, so the line reads clear of the planet
 const SETTLED_OPACITY = 0.35;
 const LIT_OPACITY = 0.22;
+// How far through the statement's hold (from just before it settles until it
+// lets go) its words are all lit. They light over 1.2 screens of scroll, of
+// the hold's 1.5 (the section is 240svh), so the whole line holds lit for a
+// moment. A phone's or tablet's section is 220svh (globe-intro.tsx), a hold
+// of 1.3: the words light just as fast, and the lit line holds a tenth of a
+// screen before the dive, not three tenths, so a thumb isn't left waiting
+const LIT = 0.8;
+const PHONE_LIT = 1.2 / 1.3;
 // How far scrolling turns the planet on top of its own turning, the way it
 // already goes (radians): about 30° on the way down, 15° more while the words light
 const ARRIVE_SPIN = -0.52;
@@ -35,7 +44,11 @@ const CENTRE = { wide: { x: 0.5, y: 0.5, radius: 0.34, lens: 1 }, narrow: { x: 0
 // How close the dive gets: the screen is all cloud from about 10.3
 const DIVE_RADIUS = 10.6;
 // The dive's scroll, in screen heights from the moment the statement lets go
-// (the spacer below is DIVE_SCREENS tall: keep the two in step)
+// (the spacer below is DIVE_SCREENS tall: keep the two in step). On a phone
+// or tablet the spacer is half as tall, and the beats below are the same
+// shares of it, so the dive plays out just the same, twice as fast: at the
+// laptop's length a thumb spent three screens and more in it before the
+// platforms came up
 const DIVE_SCREENS = 3.5;
 const RISE = [0, 1]; // the globe rises to the middle as the statement leaves
 const SUNRISE = [0.45, 1.7]; // night to day
@@ -102,8 +115,11 @@ export function GlobePreviewSection() {
   const [away, setAway] = useState(false);
   // Diving: the planet stops its own turning, which would race past at that zoom
   const [diving, setDiving] = useState(false);
-  // Near the bottom of the dive: the cloud bank's pictures are wanted (not loaded before)
+  // Near the bottom of the dive: the cloud bank is mounted. Its pictures
+  // are fetched long before, once the globe has its sunrise's image, so on
+  // a slow connection they're in by the time the bank gathers
   const [cloudy, setCloudy] = useState(false);
+  useEffect(() => afterDayImage(preloadSkyClouds), []);
   const onWordChange = useCallback((platform: ShowcasePlatformName, rgb: string) => setActive({ platform, rgb }), []);
   const onLanded = useCallback(() => setLanded(true), []);
   // The loader: the planet showing, then the dark opening onto the hero (the
@@ -124,9 +140,11 @@ export function GlobePreviewSection() {
   // 0 with the hero up, 1 once the statement has risen to the middle
   const { scrollYProgress: arrive } = useScroll({ target: introRef, offset: ["start end", "start start"] });
   // From just before it settles until it lets go; the words are all lit a
-  // little before the end, so the whole line holds for a moment
+  // little before the end, so the whole line holds for a moment (a shorter
+  // one on a phone or tablet, the timeline's breakpoint)
   const { scrollYProgress: hold } = useScroll({ target: introRef, offset: ["start 0.1", "end end"] });
-  const reveal = useTransform(hold, [0, 0.8], [0, 1]);
+  const lit = useMediaQuery("(max-width: 1023px)") ? PHONE_LIT : LIT;
+  const reveal = useTransform(hold, [0, lit], [0, 1]);
   // 0 as the statement lets go, 1 at the end of the dive
   const { scrollYProgress: travel } = useScroll({ target: diveRef, offset: ["start end", "end end"] });
   const leave = useTransform(travel, [0, 0.55 / DIVE_SCREENS], [0, 1]);
@@ -143,7 +161,7 @@ export function GlobePreviewSection() {
   const globeOpacity = useTransform([arrive, hold, travel], ([a, h, t]: number[]) => {
     // Back to full strength as it rises out from behind the statement
     if (t > 0) return LIT_OPACITY + (1 - LIT_OPACITY) * along(t * DIVE_SCREENS, [0, 0.8]);
-    return a < 1 ? 1 + (SETTLED_OPACITY - 1) * a : SETTLED_OPACITY + (LIT_OPACITY - SETTLED_OPACITY) * Math.min(h / 0.8, 1);
+    return a < 1 ? 1 + (SETTLED_OPACITY - 1) * a : SETTLED_OPACITY + (LIT_OPACITY - SETTLED_OPACITY) * Math.min(h / lit, 1);
   });
   // The planet's lower half dissolves into the canvas while it sits low, so
   // it never meets the edge of the screen hard; gone again once it rises
@@ -256,7 +274,7 @@ export function GlobePreviewSection() {
           </div>
           {cloudy && (
             <motion.div style={{ opacity: breakOpacity }} className="pointer-events-none absolute inset-0 motion-reduce:hidden">
-              <SkyClouds clouds={BREAKOUT} progress={breakOut} />
+              <SkyClouds clouds={BREAKOUT} progress={breakOut} eager />
             </motion.div>
           )}
           <GlobePins
@@ -292,8 +310,8 @@ export function GlobePreviewSection() {
 
       <GlobeIntro sectionRef={introRef} reveal={reveal} leave={leave} />
       {/* The dive's scroll: nothing in it but the globe on the stage behind.
-          DIVE_SCREENS tall; under reduced motion there's no dive. */}
-      <div ref={diveRef} aria-hidden="true" className="h-[350svh] motion-reduce:hidden" />
+          DIVE_SCREENS tall, half that on a phone or tablet; under reduced motion there's no dive. */}
+      <div ref={diveRef} aria-hidden="true" className="h-[350svh] max-lg:h-[175svh] motion-reduce:hidden" />
     </div>
   );
 }

@@ -123,13 +123,14 @@ const RIM_TICKS = Array.from({ length: LAST * (PHONE_STEP / 6) + 1 }, (_, index)
 // and the details come in
 const INTRO_VH = 150;
 // A phone's (or tablet's) is shorter. Its dial is only a strip at the foot,
-// so on the laptop's pace the screen sat all but empty for a screen and more
-// between the words going and the first platform turning. The words hold
-// just as long (the first HOLD of the laptop's intro, at its pace); all that
-// comes after (the words going, night coming down, the dial and the first
-// platform's page coming up) runs three times as fast, and the dial turns on
-// straight after.
-const PHONE_INTRO_VH = 70;
+// so on the laptop's pace the screen sat all but empty between the words
+// going and the first platform turning, and a thumb was left wondering what
+// came next. The words hold just as long (the first HOLD of the laptop's
+// intro, at its pace: with the heading's rise into place, about half a
+// screen to read it); all that comes after (the words going, night coming
+// down, the dial and the first platform's page coming up) runs six times as
+// fast, in a fifth of a screen, and the dial turns on straight after.
+const PHONE_INTRO_VH = 50;
 const HOLD = 0.2;
 // A phone's progress through its intro, as the laptop's (`entered`, so the
 // beats below are the same shares of it)
@@ -602,7 +603,10 @@ export function PlatformTimelineSection({ intro, introLine }: PlatformTimelineSe
           backgroundColor: activeColours.fill,
           color: activeColours.text,
           "--timeline-background": "var(--hue)",
-          "--timeline-height": `${100 + (intro ? introVh : 0) + LAST * STEP_VH}svh`,
+          // A laptop's height and a phone's: the stylesheet picks one by the
+          // screen's width, so the page is its real length from the first paint
+          "--timeline-height": `${100 + (intro ? INTRO_VH : 0) + LAST * STEP_VH}svh`,
+          "--timeline-phone-height": `${100 + (intro ? PHONE_INTRO_VH : 0) + LAST * STEP_VH}svh`,
         } as CSSProperties
       }
     >
