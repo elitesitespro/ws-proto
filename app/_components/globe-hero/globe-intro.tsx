@@ -5,14 +5,14 @@ import { motion, useMotionTemplate, useMotionValueEvent, useTransform, type Moti
 import { PlatformMarkStack } from "@/components/ui/platform-mark-stack";
 
 const statement =
-  "WorldStreet isn’t one platform trying to do everything. It’s a network of purpose-built platforms designed to work together.";
+  "WorldStreet isn’t just a platform doing everything. It is a network of purpose-built innovations designed to work for you.";
 const words = statement.split(" ");
 // Each word's reveal overlaps the next ones, so the line lights up as a wave rather than word by word
 const WINDOW = 0.2;
 const SPREAD = 1 - WINDOW;
-// The platforms' app icons pop in beside "platforms" as it finishes lighting,
+// The platforms' app icons pop in beside "innovations" as it finishes lighting,
 // and tuck away again a little before it dims, so they don't flicker on the edge
-const PLATFORMS = words.indexOf("platforms");
+const PLATFORMS = words.indexOf("innovations");
 const POP_IN = (PLATFORMS / (words.length - 1)) * SPREAD + WINDOW * 0.75;
 const POP_OUT = POP_IN - 0.04;
 
@@ -50,7 +50,7 @@ type GlobeIntroProps = {
  * The statement after the hero, centred over the globe as it settles low and
  * dim behind it. The section holds on screen while the page scrolls through
  * it, and the words light up in a wave as it goes (a stack of the platforms'
- * app icons popping in beside "platforms"), then lifts away into a blur as
+ * app icons popping in beside "innovations"), then lifts away into a blur as
  * the globe rises past it. On a phone or tablet it holds a little less: the
  * lit line's moment before the dive is shorter (LIT, globe-preview-section).
  */

@@ -7,7 +7,7 @@
   overflow: hidden;
   padding: 96px 0 112px;
   border-radius: 32px;
-  background: linear-gradient(180deg, #facc15 0%, #eab308 55%, #ca8a04 100%);
+  background: linear-gradient(180deg, #d9f25a 0%, #c6e82b 55%, #9dbc12 100%);
   color: #1c1917;
 }
 /* Opening out of the street: pinned behind its end for the room the circle
@@ -67,15 +67,15 @@
   fill: none;
 }
 .rim circle:nth-child(1) {
-  stroke: rgba(250, 204, 21, 0.12);
+  stroke: rgba(217, 242, 90, 0.12);
   stroke-width: 26px;
 }
 .rim circle:nth-child(2) {
-  stroke: rgba(250, 204, 21, 0.3);
+  stroke: rgba(217, 242, 90, 0.3);
   stroke-width: 14px;
 }
 .rim circle:nth-child(3) {
-  stroke: rgba(253, 230, 138, 0.95);
+  stroke: rgba(238, 249, 176, 0.95);
   stroke-width: 2px;
 }
 .backdrop {
@@ -103,7 +103,7 @@
   bottom: 10%;
   width: 55%;
   height: 50%;
-  background: radial-gradient(closest-side, rgba(253, 230, 138, 0.6), transparent);
+  background: radial-gradient(closest-side, rgba(238, 249, 176, 0.6), transparent);
   animation: drift-b 22s ease-in-out infinite alternate;
 }
 .mark {
@@ -136,7 +136,7 @@
   padding: 0 16px 0 12px;
   border-radius: 999px;
   background: #1c1917;
-  color: #fde68a;
+  color: #eef9b0;
   font-size: 14px;
   font-weight: 500;
 }
@@ -186,8 +186,8 @@
   width: 36px;
   height: 36px;
   border-radius: 50%;
-  background: #fde68a;
-  box-shadow: 0 0 0 2px #fde68a;
+  background: #eef9b0;
+  box-shadow: 0 0 0 2px #eef9b0;
   transition: translate 200ms ease;
 }
 .disc + .disc {
@@ -202,7 +202,7 @@
 }
 .more {
   background: #1c1917;
-  color: #fde68a;
+  color: #eef9b0;
 }
 .more svg {
   width: 20px;

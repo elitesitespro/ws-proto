@@ -12,8 +12,8 @@
   --d-line-hi: rgba(246, 243, 236, 0.16);
   --d-text: #f6f3ec;
   --d-dim: rgba(246, 243, 236, 0.6);
-  --d-gold: #eab308;
-  --d-gold-hi: #facc15;
+  --d-gold: #c6e82b;
+  --d-gold-hi: #d9f25a;
   position: relative;
   overflow: hidden;
   border-radius: 20px;
@@ -30,7 +30,7 @@
   position: absolute;
   inset: auto 0 0;
   height: 60%;
-  background: radial-gradient(70% 70% at 50% 100%, rgba(234, 179, 8, 0.2), transparent 70%);
+  background: radial-gradient(70% 70% at 50% 100%, rgba(198, 232, 43, 0.2), transparent 70%);
   pointer-events: none;
 }
 
@@ -309,7 +309,7 @@
 .card[data-on] {
   box-shadow:
     inset 0 0 0 1.5px var(--d-gold),
-    0 0 28px -8px rgba(234, 179, 8, 0.55);
+    0 0 28px -8px rgba(198, 232, 43, 0.55);
 }
 .cardLabel {
   display: flex;
@@ -390,7 +390,7 @@
   box-shadow: inset 0 0 0 1px var(--d-line-hi);
 }
 .chip[aria-pressed="true"] {
-  background: rgba(234, 179, 8, 0.1);
+  background: rgba(198, 232, 43, 0.1);
   box-shadow: inset 0 0 0 1.5px var(--d-gold);
 }
 .chip:focus-visible,
@@ -470,13 +470,13 @@
   color: var(--ink);
 }
 .banner[data-look="kash"] {
-  --bg: #facc15;
+  --bg: #d9f25a;
   --ink: #422006;
-  --shade: #fde68a;
+  --shade: #eef9b0;
 }
 .banner[data-look="countdown"] {
   --bg: #123b33;
-  --ink: #f5ebd3;
+  --ink: #f1f4da;
   --shade: #18473e;
 }
 .banner[data-look="xtream"] {
@@ -656,7 +656,7 @@
 .tile[aria-pressed="true"] {
   box-shadow:
     inset 0 0 0 1.5px var(--d-gold),
-    0 0 28px -10px rgba(234, 179, 8, 0.6);
+    0 0 28px -10px rgba(198, 232, 43, 0.6);
 }
 .tileIcon {
   display: grid;
@@ -665,7 +665,7 @@
   height: 36px;
   margin-bottom: 16px;
   border-radius: 10px;
-  background: rgba(var(--hue-rgb, 234, 179, 8), 0.14);
+  background: rgba(var(--hue-rgb, 198, 232, 43), 0.14);
 }
 .tile b {
   font-size: 16px;
@@ -697,7 +697,7 @@
 .vivid:hover,
 .vivid:focus-visible {
   box-shadow:
-    inset 0 0 0 1px rgba(234, 179, 8, 0.5),
+    inset 0 0 0 1px rgba(198, 232, 43, 0.5),
     0 20px 40px -16px rgba(0, 0, 0, 0.8);
 }
 .vivid:focus-visible {
@@ -1014,8 +1014,8 @@
     border: 7px solid #050403;
     border-radius: 50px;
     box-shadow:
-      0 0 0 1.5px #8a6a1c,
-      0 0 0 3px #2a1f0b,
+      0 0 0 1.5px #839228,
+      0 0 0 3px #2a2d0f,
       inset 0 0 0 1px rgba(246, 243, 236, 0.06),
       0 60px 120px -40px rgba(66, 32, 6, 0.75),
       0 24px 48px -32px rgba(0, 0, 0, 0.6);

@@ -24,7 +24,7 @@
 }
 .eyebrow {
   margin-bottom: 16px;
-  color: #facc15;
+  color: #d9f25a;
   font-size: 14px;
   font-weight: 500;
   line-height: 20px;
@@ -56,9 +56,9 @@
 }
 .pro {
   background:
-    radial-gradient(90% 70% at 100% 0%, rgba(234, 179, 8, 0.12), transparent 70%),
+    radial-gradient(90% 70% at 100% 0%, rgba(198, 232, 43, 0.12), transparent 70%),
     rgba(255, 255, 255, 0.03);
-  box-shadow: inset 0 0 0 1px rgba(234, 179, 8, 0.4);
+  box-shadow: inset 0 0 0 1px rgba(198, 232, 43, 0.4);
 }
 .planName {
   display: flex;
@@ -75,11 +75,11 @@
   font-weight: 500;
 }
 .badge {
-  background: rgba(234, 179, 8, 0.14);
-  color: #facc15;
+  background: rgba(198, 232, 43, 0.14);
+  color: #d9f25a;
 }
 .badgePro {
-  background: #eab308;
+  background: #c6e82b;
   color: #1c1917;
 }
 .plan h3 {
@@ -110,7 +110,7 @@
   width: 6px;
   height: 6px;
   border-radius: 50%;
-  background: #eab308;
+  background: #c6e82b;
 }
 /* Voice, Pro's: the globe as a press-to-talk control, breathing */
 .voice {
@@ -128,10 +128,10 @@
   transition: box-shadow 200ms ease;
 }
 .voice:hover {
-  box-shadow: inset 0 0 0 1px rgba(234, 179, 8, 0.6);
+  box-shadow: inset 0 0 0 1px rgba(198, 232, 43, 0.6);
 }
 .voice:focus-visible {
-  outline: 2px solid #facc15;
+  outline: 2px solid #d9f25a;
   outline-offset: 3px;
 }
 .voice > span:last-child {
@@ -155,7 +155,7 @@
   position: absolute;
   inset: -3px;
   border-radius: 50%;
-  box-shadow: 0 0 0 1px rgba(234, 179, 8, 0.5);
+  box-shadow: 0 0 0 1px rgba(198, 232, 43, 0.5);
   animation: breath 2.4s cubic-bezier(0.22, 1, 0.36, 1) infinite;
 }
 @keyframes breath {

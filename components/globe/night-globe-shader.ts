@@ -60,10 +60,10 @@ out vec4 outColor;
 
 const float PI = 3.14159265359;
 const vec3 STONE = vec3(0.047, 0.039, 0.035);      // #0C0A09
-const vec3 GOLD = vec3(0.918, 0.702, 0.031);       // #EAB308
-const vec3 GOLD_HI = vec3(0.980, 0.800, 0.082);    // #FACC15
-const vec3 GOLD_PALE = vec3(0.992, 0.902, 0.541);  // #FDE68A
-const vec3 GOLD_DEEP = vec3(0.631, 0.384, 0.027);  // #A16207
+const vec3 GOLD = vec3(0.776, 0.910, 0.169);       // #C6E82B
+const vec3 GOLD_HI = vec3(0.851, 0.949, 0.353);    // #D9F25A
+const vec3 GOLD_PALE = vec3(0.933, 0.976, 0.690);  // #EEF9B0
+const vec3 GOLD_DEEP = vec3(0.369, 0.478, 0.031);  // #5E7A08
 
 // The night's ground and cloud: neutral charcoal, a touch cool, so the gold
 // laid over it stays gold (over a warm grey it would go brown)
@@ -71,9 +71,10 @@ const vec3 NIGHT_SEA = vec3(0.019, 0.019, 0.022);
 const vec3 NIGHT_LAND = vec3(0.071, 0.073, 0.079);
 const vec3 NIGHT_CLOUD = vec3(0.060, 0.062, 0.068);
 
-// The day, graded warm so it sits with the gold
+// The day, graded a touch warm, as sunlight is
 const vec3 SUNLIGHT = vec3(1.0, 0.95, 0.87);   // the full sun, a touch warm
 const vec3 LOW_SUN = vec3(1.0, 0.68, 0.30);    // the sun low over the terminator
+const vec3 SUN_PALE = vec3(0.992, 0.902, 0.541); // the sun's pale warm light at dusk (sunlight, not the brand)
 const vec3 OCEAN = vec3(0.012, 0.05, 0.13);    // open sea, before the Blue Marble arrives
 
 // Gold light of strength k, to add over the dark: the gold's own hue where
@@ -612,7 +613,7 @@ void main() {
     cloudLit = smoothstep(-0.12, 0.25, cdl);
     // Cloud takes the sunlight whiter than the ground does, and the low
     // sun's warmth only in a narrow band at the terminator
-    vec3 sunCol = mix(LOW_SUN, mix(GOLD_PALE, mix(SUNLIGHT, vec3(1.0), 0.4), dayMix), smoothstep(0.0, 0.24, cdl));
+    vec3 sunCol = mix(LOW_SUN, mix(SUN_PALE, mix(SUNLIGHT, vec3(1.0), 0.4), dayMix), smoothstep(0.0, 0.24, cdl));
     float high = 0.58 + 0.46 * pow(max(cdl, 0.0), 0.5);
     // From afar: white, a touch shaded by the relief
     vec3 lit = vec3(0.99, 0.98, 0.97) * sunCol * (0.86 + 0.14 * relief) * high;
@@ -678,10 +679,15 @@ void main() {
     vec3 lightPale = mix(lightRich, vec3(1.0), 0.3);
     vec3 lightDeep = lightRich * 0.7;
     vec3 core = mix(lightRich, lightPale, smoothstep(0.45, 1.0, lights));
-    surface += core * lights * 1.7 * tw * night;
-    surface += lightRich * lightsNear * 0.75 * tw * night;
-    surface += mix(lightDeep, lightRich, lightsBlur) * lightsBlur * 0.85 * night;
-    surface += lightDeep * lightsWide * 0.6 * night;
+    vec3 glow = core * lights * 1.7 * tw * night
+      + lightRich * lightsNear * 0.75 * tw * night
+      + mix(lightDeep, lightRich, lightsBlur) * lightsBlur * 0.85 * night
+      + lightDeep * lightsWide * 0.6 * night;
+    // Past full brightness a city keeps its colour, paling towards white the
+    // brighter it is, rather than clip channel by channel (clipped, the
+    // lemon lime's red and green both max out and it shows as plain yellow)
+    float glowPeak = max(glow.r, max(glow.g, glow.b));
+    surface += mix(glow / max(glowPeak, 1.0), vec3(1.0), smoothstep(1.0, 3.0, glowPeak) * 0.6);
     vec3 nightSide = surface;
     // The crescent lit in gold light, the land in it brighter than the sea:
     // the gold's own hue, paling only where it's bright (see goldLight), and
@@ -760,7 +766,7 @@ void main() {
       vec3 albedo = mix(soil, sea, water);
       // (the low sun's amber only in a narrow band at the terminator: wider,
       // it browns the land and sea all down that side)
-      vec3 sunCol = mix(LOW_SUN, mix(GOLD_PALE, SUNLIGHT, dayMix), smoothstep(0.0, 0.26, ndl));
+      vec3 sunCol = mix(LOW_SUN, mix(SUN_PALE, SUNLIGHT, dayMix), smoothstep(0.0, 0.26, ndl));
       float diffuse = pow(clamp(ndl * 1.04 + 0.02, 0.0, 1.0), 0.8);
       vec3 lit = albedo * sunCol * diffuse * 1.3 * (1.0 - shade);
       // The sun's glint off the water: a soft gold sheen round a pale core
@@ -1065,8 +1071,8 @@ in float vSeed;
 in float vVisible;
 uniform float uTime;
 out vec4 outColor;
-const vec3 GOLD = vec3(0.918, 0.702, 0.031);
-const vec3 GOLD_PALE = vec3(0.992, 0.902, 0.541);
+const vec3 GOLD = vec3(0.776, 0.910, 0.169);
+const vec3 GOLD_PALE = vec3(0.933, 0.976, 0.690);
 
 void main() {
   float head = fract(uTime * (0.09 + 0.05 * vSeed) + vSeed * 7.0) * 1.4 - 0.2;
@@ -1093,8 +1099,8 @@ in float vVisible;
 uniform float uTime;
 uniform float uTravel;
 out vec4 outColor;
-const vec3 GOLD = vec3(0.918, 0.702, 0.031);
-const vec3 GOLD_PALE = vec3(0.992, 0.902, 0.541);
+const vec3 GOLD = vec3(0.776, 0.910, 0.169);
+const vec3 GOLD_PALE = vec3(0.933, 0.976, 0.690);
 
 void main() {
   float since = uTime - vSeed - vT * uTravel;    // how long ago the head passed this point
@@ -1118,8 +1124,8 @@ in float vVisible;
 uniform float uTime;
 uniform float uTravel;
 out vec4 outColor;
-const vec3 GOLD_HI = vec3(0.980, 0.800, 0.082);
-const vec3 GOLD_PALE = vec3(0.992, 0.902, 0.541);
+const vec3 GOLD_HI = vec3(0.851, 0.949, 0.353);
+const vec3 GOLD_PALE = vec3(0.933, 0.976, 0.690);
 
 void main() {
   float since = uTime - vSeed - vT * uTravel;

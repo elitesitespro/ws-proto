@@ -102,7 +102,7 @@ export function AiMovieSet() {
         <dl className={styles.slate}>
           <div>
             <dt>Prod.</dt>
-            <dd>AI Movie</dd>
+            <dd>AI Studio</dd>
           </div>
           <div>
             <dt>Scene</dt>

@@ -305,7 +305,7 @@ export function VividSwitchboard() {
       const size = slot.clientWidth;
       const c = side / 2;
       // Rings off it as it starts to talk
-      ctx.strokeStyle = "#eab308";
+      ctx.strokeStyle = "#c6e82b";
       ctx.lineWidth = 1;
       for (const at of rings) {
         const age = t - at;

@@ -34,19 +34,27 @@ export function PlatformBackdrop({ name }: { name: string }) {
       className={`${styles.backdrop} ${styles[name.replaceAll(" ", "")] ?? ""}`}
     >
       {name === "WorldSpace" && (
-        <svg className={styles.sky}>
-          {STARS.map((star, index) => (
-            <circle
-              key={index}
-              cx={star.x}
-              cy={star.y}
-              r={star.r}
-              opacity={star.opacity}
-              className={star.beat ? styles.twinkle : undefined}
-              style={star.beat}
-            />
-          ))}
-        </svg>
+        <>
+          {/* The still stars, painted once */}
+          <svg className={styles.sky}>
+            {STARS.map((star, index) =>
+              star.beat ? null : <circle key={index} cx={star.x} cy={star.y} r={star.r} opacity={star.opacity} />,
+            )}
+          </svg>
+          {/* The nearest, which twinkle: each a dot of its own, so the
+              browser fades it on the GPU, instead of restyling and
+              repainting the whole sky every frame as it did when they were
+              circles in it */}
+          {STARS.map((star, index) =>
+            star.beat ? (
+              <i
+                key={index}
+                className={styles.twinkle}
+                style={{ ...star.beat, left: star.x, top: star.y, width: star.r * 2, height: star.r * 2 }}
+              />
+            ) : null,
+          )}
+        </>
       )}
       {name === "XStream" && (
         <div className={styles.signal}>

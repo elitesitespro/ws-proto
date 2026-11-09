@@ -105,7 +105,7 @@ export const platformDetails = {
     headline: "Pick what happens. Get paid if you're right.",
     description: "Sports, politics and the Nigerian music charts, every outcome with its % chance. For adults 18 and over.",
     features: ["Sports", "Politics", "Music charts"],
-    action: "Open Prediction", href: "https://prediction.worldstreetgold.com/", preview: "prediction",
+    action: "Open Prediction Market", href: "https://prediction.worldstreetgold.com/", preview: "prediction",
   },
 } satisfies Record<string, PlatformDetail>;
 

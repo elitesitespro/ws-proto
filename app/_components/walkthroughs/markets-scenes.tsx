@@ -45,7 +45,7 @@ export function MarketsScene({ step }: { step: number }) {
   return (
     <Walkthrough
       brand={
-        ["Forex", "Market orders", "Crypto", "Market calendar", "Prediction"][
+        ["Forex", "Market orders", "Crypto", "Market calendar", "Prediction Market"][
           step
         ]
       }

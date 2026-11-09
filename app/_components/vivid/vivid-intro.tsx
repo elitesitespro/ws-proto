@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, type CSSProperties } from "react";
-import { motion, useMotionValue, useScroll, useTransform } from "motion/react";
+import { motion, useMotionValue, useScroll, useTransform, type MotionValue } from "motion/react";
 import { Icon } from "@/components/icon";
 import { useMediaQuery } from "@/lib/use-media-query";
 import { usePauseOffscreen } from "@/lib/use-pause-offscreen";
@@ -11,6 +11,7 @@ import { hueAttrs } from "../platform-showcase-content";
 import { platforms } from "../platform-timeline-section";
 import { FIRST_TURN, TURN_ACTIVE, TURN_IDLE, acrossFor, dotsFor, drawGlobe, globePoints, talking } from "./globe-draw";
 import { PILL_H, dockLift, pillDock } from "./vivid-handoff";
+import { SHAPES, createField, type Field, type Shape } from "./vivid-field";
 import { SPHERE } from "./vivid-pill-shape";
 import styles from "./vivid-intro.module.css";
 
@@ -19,22 +20,55 @@ import styles from "./vivid-intro.module.css";
 const DOCK = 40;
 const DOCK_SEEN = 0.72;
 const MIN_LIFT = 0.6;
-// Dots across the big globe's face: globe-draw's most, so up close it's the
-// same object as the dock's, only nearer
-const BIG_DOTS = 18;
+// Up close it's a field of light (./vivid-field), its dots this fine (a share
+// of the globe's size), and more of them the bigger it's drawn
+const FIELD_DOT = 0.0055;
+const fieldDots = (big: number) => (big >= 420 ? 1600 : big >= 300 ? 1150 : 820);
 // Shrinking toward a small globe (the dock's, the pill's), the small one's
 // coarser dots take over across this many px
 const HANDOVER = 64;
-// The canvas has room past the globe's rim for its dots as they swell
-const PAD = 1.1;
+// The canvas has room past the globe's rim for its dots as they swell, and
+// as they swing out on their way into a shape
+const PAD = 1.35;
 // Between the globe's rim and a filament, and a filament and its mark (px);
 // and the shortest filament light runs along
 const GAP = 6;
 const MIN_RUN = 28;
 
-// The beats, over the stretch the stage is held (0 to 1; before it, -1 to 0
-// is the lift-off, as the stage comes up the screen). It never waits: as you
-// scroll, something is always on the move.
+// First, as the stage is held, it shows what it is: over MORPH screens of
+// scroll (the CSS's --morph) its dots stream from the sphere into each shape
+// in turn and back, each over its share: in, held a while, out again
+const MORPH = 2.4;
+const MORPH_IN = [0.04, 0.36] as const;
+const MORPH_OUT = [0.64, 0.98] as const;
+// Beside each shape, what it says about Vivid: in as the shape forms, out as
+// it gathers back (shares of the shape's stretch). The last stays on as the
+// platforms gather, until the claim takes over. On a phone the name gives way
+// to the first, in the same place, as the dots spell it out.
+const WORDS_IN = [0.08, 0.26] as const;
+const WORDS_OUT = [0.74, 0.92] as const;
+const NAME_GOES = [0.02, 0.12] as const;
+const SHAPE_WORDS: readonly { line: string; fine: string }[] = [
+  // vivid
+  {
+    line: "Your own AI, built into WorldStreet.",
+    fine: "Ask it anything in plain words, about a platform, a market term or something new to you, and get a straight answer.",
+  },
+  // the globe
+  {
+    line: "It brings every platform together.",
+    fine: "Trading, streaming, shopping, learning: each works its own way. Vivid knows them all, so you never have to learn WorldStreet one platform at a time.",
+  },
+  // the W
+  {
+    line: "All of WorldStreet, at your word.",
+    fine: "Find anything on any platform and, with Pro, check your balances, set price alerts and send money once you say yes.",
+  },
+];
+
+// Then the beats, over the rest of the stretch the stage is held (0 to 1;
+// before it, -1 to 0 is the lift-off, as the stage comes up the screen). It
+// never waits: as you scroll, something is always on the move.
 // The platforms come in one after another, each over ARRIVE_EACH
 const ARRIVE_FROM = 0.03;
 const ARRIVE_STAGGER = 0.018;
@@ -96,6 +130,54 @@ const span = (v: number, a: number, b: number) => easeInOut(clamp((v - a) / (b -
 /** Up and back down again between `a` and `b`. */
 const bump = (v: number, a: number, b: number) => Math.sin(Math.PI * clamp((v - a) / (b - a)));
 
+/**
+ * What Vivid is, beside one of the shapes its dots take: in as the shape
+ * forms, out as it gathers back (the last, as the claim comes in), all of it
+ * readable at once while it shows. Still under reduced motion.
+ */
+function ShapeWords({
+  k,
+  line,
+  fine,
+  shaped,
+  time,
+  claimAt,
+  still,
+}: {
+  k: number;
+  line: string;
+  fine: string;
+  shaped: MotionValue<number>;
+  time: MotionValue<number>;
+  claimAt: number[];
+  still: boolean;
+}) {
+  const last = k === SHAPES.length - 1;
+  // A share of this shape's stretch, as a share of the whole of the shapes
+  const at = (into: number) => (k + into) / SHAPES.length;
+  const phase = ([m, t]: number[]) => {
+    const shown = clamp((m - at(WORDS_IN[0])) / (at(WORDS_IN[1]) - at(WORDS_IN[0])));
+    const gone = last
+      ? clamp((t - claimAt[0]) / (claimAt[1] - claimAt[0]))
+      : clamp((m - at(WORDS_OUT[0])) / (at(WORDS_OUT[1]) - at(WORDS_OUT[0])));
+    return { shown, gone };
+  };
+  const opacity = useTransform([shaped, time], (v: number[]) => {
+    const { shown, gone } = phase(v);
+    return shown * (1 - gone);
+  });
+  const y = useTransform([shaped, time], (v: number[]) => {
+    const { shown, gone } = phase(v);
+    return shown < 1 ? 24 * (1 - easeOut(shown)) : -24 * gone;
+  });
+  return (
+    <motion.div className={styles.shapeWords} style={still ? undefined : { opacity, y }}>
+      <p className={styles.claimLine}>{line}</p>
+      <p className={styles.claimFine}>{fine}</p>
+    </motion.div>
+  );
+}
+
 type Geo = {
   /** The globe's size as it arrives from the dock, its biggest; and the canvas's, with room. */
   big: number;
@@ -112,7 +194,8 @@ type Geo = {
   far: number;
   /** The ring's size at full stretch. */
   wave: number;
-  /** How far the stage is held (px). */
+  /** How far the stage is held for the shapes, then for the beats (px). */
+  morph: number;
   pin: number;
 };
 
@@ -125,6 +208,9 @@ type Geo = {
  * foot of the screen trailing light, back into the ask pill that rides along
  * (it stood aside for the wallet), and a ring goes out as it settles there
  * (../vivid-handoff: dockLift as it leaves the dock, pillDock as it lands).
+ *
+ * Held big at first, it shows what it is (./vivid-field): its dots stream
+ * into the word, a globe and the W, gathering back into the sphere between.
  *
  * Scrubbed by the scroll, start to finish, on a stage held by the browser
  * (sticky); every frame is transforms and opacity from one handler, and one
@@ -152,11 +238,16 @@ export function VividIntro() {
   // Where the intro is: -1 to 0 lifting off, 0 to 1 held (see the beats above)
   const { scrollY } = useScroll();
   const time = useMotionValue(-1);
+  // How far through the shapes, 0 to 1 (it holds at 1 once they're done)
+  const shaped = useMotionValue(0);
   // The words, a block at a time. On a phone the name gives way to what it
   // is in the same place, one gone as the other comes; laid across, the two
   // stand together.
   const meetAt = wide ? [-0.5, -0.1, 0.6, 0.68] : [-0.5, -0.1, 0.27, 0.33];
-  const meetOpacity = useTransform(time, meetAt, [0, 1, 1, 0]);
+  const meetIn = useTransform(time, meetAt, [0, 1, 1, 0]);
+  const meetOpacity = useTransform([meetIn, shaped], ([o, m]: number[]) =>
+    wide ? o : o * (1 - clamp((m * SHAPES.length - NAME_GOES[0]) / (NAME_GOES[1] - NAME_GOES[0]))),
+  );
   const meetY = useTransform(time, meetAt, [32, 0, 0, -24]);
   const claimAt = wide ? [0.22, 0.34, 0.62, 0.7] : [0.33, 0.41, 0.6, 0.68];
   const claimOpacity = useTransform(time, claimAt, [0, 1, 1, 0]);
@@ -190,7 +281,6 @@ export function VividIntro() {
 
     // The big globe's dots, and the small globes' it hands over to at either
     // end, dot for dot as VividGlobe draws them at that size
-    const bigPts = globePoints(dotsFor(BIG_DOTS));
     const dockAcross = acrossFor(DOCK);
     const dockPts = globePoints(dotsFor(dockAcross));
     const pillAcross = acrossFor(SPHERE);
@@ -201,6 +291,15 @@ export function VividIntro() {
     // What the globe's doing, for its drawing to read: on screen or not, how
     // big it's shown, the small globe it's nearest, and how awake it is
     const look = { shown: false, w: DOCK, near: "dock" as "dock" | "pill", nearW: DOCK, awake: 0, flare: 0, lift: 0, paceTo: 0 };
+    // The shape the field is streaming into, and how far (0 the sphere)
+    const morph = { shape: null as Shape | null, amount: 0 };
+    // The field: made at the size it's drawn (measure), its shapes worked out
+    // ahead, one a task, as the globe lifts off
+    let field: Field | null = null;
+    let prepared = false;
+    const prepareTimers: number[] = [];
+    // The clock the field breathes by
+    let clock = 0;
     let turn = FIRST_TURN;
     let level = 0;
     let pace = 0;
@@ -235,12 +334,28 @@ export function VividIntro() {
       const handover = clamp((look.w - look.nearW) / HANDOVER);
       const dock = look.near === "dock";
       layer(dock ? dockPts : pillPts, dock ? dockAcross : pillAcross, 1 - handover);
-      layer(bigPts, BIG_DOTS, handover);
+      if (field && handover > 0) {
+        const dot = g.big * FIELD_DOT;
+        const radius = g.big / 2 - dot * 2 - (0.5 * g.big) / Math.max(look.w, 1);
+        field.draw(ctx, {
+          cx: g.canvas / 2,
+          cy: g.canvas / 2,
+          radius,
+          dot,
+          turn,
+          now: clock || performance.now(),
+          level,
+          fade: handover,
+          shape: morph.shape,
+          amount: morph.amount,
+        });
+      }
     };
 
     const step = (now: number) => {
       const dt = last ? Math.min(now - last, 100) : 16;
       last = now;
+      clock = now;
       // A change of speed bends the turn rather than jumping it
       pace += (look.paceTo - pace) * 0.05;
       turn = (turn + dt / lerp(TURN_IDLE, TURN_ACTIVE, pace)) % 1;
@@ -329,7 +444,28 @@ export function VividIntro() {
       const docked = !!dock && dock.width > 0;
       const toLift = Math.min(docked ? dock.top + dock.height / 2 - vh * DOCK_SEEN : Infinity, toPin - vh * MIN_LIFT);
       const q = clamp(-toLift / (toPin - toLift));
-      const p = clamp(-toPin / g.pin);
+      // Held: first the shapes, then the beats
+      const held = -toPin;
+      const through = q < 1 ? 0 : clamp(held / g.morph);
+      const p = clamp((held - g.morph) / g.pin);
+      shaped.set(through);
+      if (through > 0 && through < 1) {
+        const k = Math.min(SHAPES.length - 1, Math.floor(through * SHAPES.length));
+        const into = through * SHAPES.length - k;
+        morph.shape = SHAPES[k];
+        morph.amount =
+          clamp((into - MORPH_IN[0]) / (MORPH_IN[1] - MORPH_IN[0])) *
+          (1 - clamp((into - MORPH_OUT[0]) / (MORPH_OUT[1] - MORPH_OUT[0])));
+      } else {
+        morph.shape = null;
+        morph.amount = 0;
+      }
+      // The shapes are worked out before they're wanted: as the globe lifts off
+      if (q > 0 && field && !prepared) {
+        prepared = true;
+        const f = field;
+        SHAPES.forEach((shape, i) => prepareTimers.push(window.setTimeout(() => f.prepare(shape), 120 * (i + 1))));
+      }
       const at = q < 1 ? q - 1 : p;
       // The fall, 0 to 1, and on past 1 once it's landed (for the trail's tail)
       const fall = q < 1 ? 0 : (p - DROP[0]) / (DROP[1] - DROP[0]);
@@ -518,8 +654,15 @@ export function VividIntro() {
         half,
         far: Math.hypot(Math.max(cx, sw - cx), Math.max(cy, sh - cy)) + half * 2,
         wave: Math.round(2 * Math.max(rx, ry)),
-        pin: Math.max(track.offsetHeight - stage.offsetHeight, 1),
+        morph: reduce ? 0 : svh * MORPH,
+        pin: Math.max(track.offsetHeight - stage.offsetHeight - (reduce ? 0 : svh * MORPH), 1),
       };
+      // The field, as many dots as suit its size (made again only if that changes)
+      const dots = fieldDots(big);
+      if (!field || field.n !== dots) {
+        field = createField(dots);
+        prepared = false;
+      }
       // The canvas, at the biggest the globe gets, so it's only ever scaled down
       dpr = Math.min(window.devicePixelRatio || 1, 2);
       canvas.style.width = canvas.style.height = `${g.canvas}px`;
@@ -559,6 +702,7 @@ export function VividIntro() {
     document.addEventListener("visibilitychange", onVisibility);
     return () => {
       halt();
+      prepareTimers.forEach((timer) => window.clearTimeout(timer));
       unsubscribe();
       resized.disconnect();
       window.removeEventListener("resize", render);
@@ -571,7 +715,7 @@ export function VividIntro() {
       orbit.removeAttribute("data-live");
       for (const el of [...marks, ...spokes]) el?.style.removeProperty("opacity");
     };
-  }, [reduce, scrollY, time]);
+  }, [reduce, scrollY, time, shaped]);
 
   return (
     <div ref={trackRef} className={styles.track} style={{ "--pill": `${PILL_H}px` } as CSSProperties}>
@@ -629,12 +773,24 @@ export function VividIntro() {
             <span className={styles.meetSmall}>Meet</span>
             <span className={styles.meetBig}>Vivid.</span>
           </motion.h2>
+          {/* What it is, a block beside each shape its dots take */}
+          <div className={styles.shapes}>
+            {SHAPE_WORDS.map((words, k) => (
+              <ShapeWords
+                key={SHAPES[k]}
+                k={k}
+                line={words.line}
+                fine={words.fine}
+                shaped={shaped}
+                time={time}
+                claimAt={claimAt}
+                still={!!reduce}
+              />
+            ))}
+          </div>
           <motion.div className={styles.claim} style={reduce ? undefined : { opacity: claimOpacity, y: claimY }}>
             <p className={styles.claimLine}>The intelligence that runs all of WorldStreet.</p>
-            <p className={styles.claimFine}>
-              It knows every platform, answers in plain words and, with Pro, watches prices for you and sends money
-              once you say yes.
-            </p>
+            <p className={styles.claimFine}>Every platform is wired into it, so whatever you ask, it knows where to look.</p>
           </motion.div>
           {/* The orbit's room: the script measures it, and the platforms go round its middle */}
           <div ref={netRef} className={styles.net} />

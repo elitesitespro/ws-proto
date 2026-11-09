@@ -45,7 +45,7 @@ const actions = [
 export function EntertainmentScene({ step }: { step: number }) {
   return (
     <Walkthrough
-      brand={["Xtream", "Xtream studio", "Vsion", "AI Movie", "Arcade"][step]}
+      brand={["Xtream", "Xtream studio", "Vsion", "AI Studio", "Arcade"][step]}
       captions={captions[step]}
       actions={actions[step]}
       hue={["xtreme", "xtreme", "vision", "watch", "arcade"][step]}

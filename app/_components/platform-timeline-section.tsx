@@ -1,6 +1,6 @@
 "use client";
 
-import { Fragment, useRef, useState, type CSSProperties, type PointerEvent } from "react";
+import { Fragment, useEffect, useRef, useState, type CSSProperties, type PointerEvent, type ReactNode } from "react";
 import { useLenis } from "lenis/react";
 import { Icon, type IconName } from "@/components/icon";
 import { tick } from "@/lib/haptics";
@@ -19,6 +19,7 @@ import {
   useMotionValueEvent,
   useScroll,
   useSpring,
+  useIsPresent,
   useTransform,
   type MotionValue,
   type Variants,
@@ -34,7 +35,7 @@ export const platforms = [
   { name: "WorldMeet", label: "WorldMeet", category: "Connect", icon: "video" },
   { name: "XStream", label: "Xtream", category: "Entertainment", icon: "play" },
   { name: "Vsion", label: "Vision", category: "Entertainment", icon: "film" },
-  { name: "AI Movie", label: "AI Movie", category: "Entertainment", icon: "sparkle" },
+  { name: "AI Movie", label: "AI Studio", category: "Entertainment", icon: "sparkle" },
   { name: "Arcade", label: "Arcade", category: "Entertainment", icon: "gamepad" },
   { name: "WorldStore", label: "WorldStore", category: "Lifestyle", icon: "shopping-bag" },
   { name: "WorkWorld", label: "Worldwork", category: "Lifestyle", icon: "briefcase" },
@@ -44,7 +45,7 @@ export const platforms = [
   { name: "Forex", label: "Forex", category: "Markets", icon: "chart-up" },
   { name: "Crypto", label: "Crypto", category: "Markets", icon: "bitcoin" },
   { name: "WorldSports", label: "WorldSports", category: "Markets", icon: "trophy" },
-  { name: "Prediction", label: "Prediction", category: "Markets", icon: "target" },
+  { name: "Prediction", label: "Prediction Market", category: "Markets", icon: "target" },
 ] as const satisfies readonly {
   name: string;
   /** Its name in the product, where that differs from the key (Vsion is Vision). */
@@ -219,6 +220,31 @@ const page: Variants = {
     transition: { y: { duration: 0.7, ease: SLIDE }, opacity: { duration: 0.24, ease: "easeIn" } },
   }),
 };
+
+/**
+ * A platform's page in the details. Leaving, it's lifted out of the flow by a
+ * class, to slide away over the next one coming in. (AnimatePresence's
+ * popLayout did the same by adding a stylesheet to the page on every turn of
+ * the dial, and each one restyled the whole page: most of what made the dial
+ * stutter on a phone.)
+ */
+function DetailPage({ direction, still, color, children }: { direction: number; still: boolean; color: string; children: ReactNode }) {
+  const present = useIsPresent();
+  return (
+    <motion.div
+      custom={direction}
+      variants={still ? undefined : page}
+      initial="enter"
+      animate="centre"
+      exit="exit"
+      className={present ? "min-w-0" : "absolute inset-x-0 top-0 min-w-0"}
+      style={{ color }}
+    >
+      {children}
+    </motion.div>
+  );
+}
+
 // The colour and scene behind it don't slide past each other (two colours
 // would meet at a hard line): the next fades in over the last, which holds
 // still underneath until it's covered, both drifting a little the same way.
@@ -384,6 +410,23 @@ type PlatformTimelineSectionProps = {
 export function PlatformTimelineSection({ intro, introLine }: PlatformTimelineSectionProps = {}) {
   const sectionRef = useRef<HTMLElement>(null);
   usePauseOffscreen(sectionRef);
+  // Marks the section data-near once it's within three screens, for what it
+  // only needs to fetch then (the polar night under the dial). Set on the
+  // element, not in state, so this big component doesn't render again for it.
+  useEffect(() => {
+    const section = sectionRef.current;
+    if (!section) return;
+    const near = new IntersectionObserver(
+      ([entry]) => {
+        if (!entry.isIntersecting) return;
+        section.dataset.near = "";
+        near.disconnect();
+      },
+      { rootMargin: "300% 0px" },
+    );
+    near.observe(section);
+    return () => near.disconnect();
+  }, []);
   // The platforms one under another, for short windows and reduced motion:
   // only there, so its scenes aren't all playing out of sight
   const stacked = useMediaQuery("(max-height: 560px), (prefers-reduced-motion: reduce)");
@@ -790,7 +833,7 @@ export function PlatformTimelineSection({ intro, introLine }: PlatformTimelineSe
               className={`${styles.orbitLabel} absolute left-0 top-1/2 size-[var(--orbit-size)] -translate-x-1/2 -translate-y-1/2`}
               style={{ opacity: labelOpacity }}
             >
-              <div className="absolute left-[70%] top-1/2 h-12 w-1/2 -translate-x-1/2 -translate-y-1/2 overflow-hidden lg:left-3/4">
+              <div className="absolute left-[70%] top-1/2 h-14 w-1/2 -translate-x-1/2 -translate-y-1/2 overflow-hidden lg:left-3/4">
                 <AnimatePresence initial={false} custom={step.direction}>
                   <motion.div
                     key={activePlatform.name}
@@ -803,7 +846,9 @@ export function PlatformTimelineSection({ intro, introLine }: PlatformTimelineSe
                     className="absolute inset-0 flex flex-col items-center justify-center gap-0.5 text-center [text-shadow:0_1px_12px_rgba(12,10,9,0.9)]"
                   >
                     <span className="text-xs opacity-60">{activePlatform.category}</span>
-                    <span className="text-xs font-medium tracking-tight md:text-base lg:text-lg xl:text-xl">
+                    {/* A two-word name too long for the gap before the active tile
+                        (Mastery Academy, Prediction Market) takes two lines */}
+                    <span className="text-xs font-medium tracking-tight md:max-w-[6em] md:text-base md:text-balance md:leading-[1.1] lg:text-lg xl:text-xl">
                       {activePlatform.label}
                     </span>
                   </motion.div>
@@ -859,19 +904,15 @@ export function PlatformTimelineSection({ intro, introLine }: PlatformTimelineSe
             style={{ opacity: detailsOpacity, y: detailsY }}
           >
             <div className={styles.detailPages}>
-              <AnimatePresence mode="popLayout" initial={false} custom={step.direction}>
-                <motion.div
+              <AnimatePresence initial={false} custom={step.direction}>
+                <DetailPage
                   key={activePlatform.name}
-                  custom={step.direction}
-                  variants={shouldReduceMotion ? undefined : page}
-                  initial="enter"
-                  animate="centre"
-                  exit="exit"
-                  className="min-w-0"
-                  style={{ color: activeColours.text }}
+                  direction={step.direction}
+                  still={!!shouldReduceMotion}
+                  color={activeColours.text}
                 >
                   <PlatformView name={activePlatform.name} />
-                </motion.div>
+                </DetailPage>
               </AnimatePresence>
             </div>
           </motion.div>

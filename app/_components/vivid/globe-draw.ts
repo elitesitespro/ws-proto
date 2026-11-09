@@ -21,8 +21,8 @@ export const TURN_IDLE = 26_000;
 export const TURN_ACTIVE = 9_000;
 
 /** Rim to front: the brand gold warming to near-white where a dot faces you. */
-const RIM = [234, 179, 8]; // #EAB308
-const FRONT = [254, 243, 199]; // #FEF3C7
+const RIM = [198, 232, 43]; // #C6E82B
+const FRONT = [246, 252, 214]; // #F6FCD6
 const SHADES = Array.from({ length: 32 }, (_, i) => {
   const c = RIM.map((v, k) => Math.round(v + ((FRONT[k] - v) * i) / 31));
   return `rgb(${c[0]},${c[1]},${c[2]})`;

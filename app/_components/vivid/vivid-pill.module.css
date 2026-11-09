@@ -32,7 +32,7 @@
 
 .box {
   --pill-fill: var(--cx-elevated, #1c1917);
-  --pill-line: rgba(234, 179, 8, 0.24);
+  --pill-line: rgba(198, 232, 43, 0.24);
   --pill-ink: var(--cx-text, #ffffff);
   --pill-muted: var(--cx-text-muted, #a8a29e);
   --pill-subtle: var(--cx-text-3, rgba(255, 255, 255, 0.5));
@@ -104,7 +104,7 @@
 .thumb:focus-visible,
 .icon:focus-visible,
 .send:focus-visible {
-  outline: 2px solid var(--cx-peach, #fde68a);
+  outline: 2px solid var(--cx-peach, #eef9b0);
   outline-offset: 2px;
 }
 
@@ -155,7 +155,7 @@
   border: 0;
   background: transparent;
   color: var(--pill-ink);
-  caret-color: var(--cx-ember, #eab308);
+  caret-color: var(--cx-ember, #c6e82b);
   outline: none;
 }
 /* The kit rings whatever has keyboard focus (.cx-root :focus-visible), which
@@ -165,7 +165,7 @@
   box-shadow: none;
 }
 .box:has(.input:focus-visible) .body path {
-  stroke: rgba(234, 179, 8, 0.6);
+  stroke: rgba(198, 232, 43, 0.6);
 }
 
 .actions {
@@ -189,7 +189,7 @@
   height: 42px;
   place-items: center;
   border-radius: 50%;
-  background: var(--cx-ember, #eab308);
+  background: var(--cx-ember, #c6e82b);
   color: var(--cx-on-primary, #1c1917);
   transition: transform 0.2s var(--cx-ease, ease), background-color 0.2s;
 }
@@ -199,7 +199,7 @@
     background: var(--pill-well);
   }
   .send:hover {
-    background: var(--cx-flame, #facc15);
+    background: var(--cx-flame, #d9f25a);
   }
 }
 .icon:active,

@@ -38,9 +38,9 @@
   padding: 4px 12px;
   border-radius: 999px;
   background: rgba(28, 25, 23, 0.85);
-  box-shadow: inset 0 0 0 1px rgba(234, 179, 8, 0.5);
+  box-shadow: inset 0 0 0 1px rgba(198, 232, 43, 0.5);
   backdrop-filter: blur(6px);
-  color: #fde68a;
+  color: #eef9b0;
   font-size: 14px;
   font-weight: 500;
   white-space: nowrap;
@@ -62,9 +62,9 @@
   gap: 8px;
   padding: 6px 14px 6px 12px;
   border-radius: 999px;
-  background: rgba(234, 179, 8, 0.1);
-  box-shadow: inset 0 0 0 1px rgba(234, 179, 8, 0.25);
-  color: #fde68a;
+  background: rgba(198, 232, 43, 0.1);
+  box-shadow: inset 0 0 0 1px rgba(198, 232, 43, 0.25);
+  color: #eef9b0;
   font-size: 14px;
   font-weight: 500;
 }
@@ -73,14 +73,14 @@
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  background: #facc15;
+  background: #d9f25a;
 }
 .pulse::after {
   content: "";
   position: absolute;
   inset: 0;
   border-radius: 50%;
-  box-shadow: 0 0 0 1.5px #facc15;
+  box-shadow: 0 0 0 1.5px #d9f25a;
   animation: pulse 2.4s ease-out infinite;
 }
 @keyframes pulse {
@@ -113,8 +113,8 @@
 }
 .primary {
   box-shadow:
-    0 0 0 4px rgba(234, 179, 8, 0.18),
-    0 14px 40px -8px rgba(234, 179, 8, 0.8);
+    0 0 0 4px rgba(198, 232, 43, 0.18),
+    0 14px 40px -8px rgba(198, 232, 43, 0.8);
 }
 
 @media (max-width: 639px) {

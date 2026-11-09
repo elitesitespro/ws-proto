@@ -4,7 +4,7 @@ import { PredictionCall } from "./prediction/prediction-call";
 import styles from "./prediction-platform-view.module.css";
 
 /**
- * Prediction: its target mark and name, then a question from each of its
+ * Prediction Market: its target mark and name, then a question from each of its
  * topics with the crowd's chance moving live, and your own call to make on
  * it, every outcome with its % chance. For adults 18 and over.
  */
@@ -18,7 +18,7 @@ export function PredictionPlatformView() {
           <span className={styles.mark}>
             <Icon name="target" size={20} tone="current" />
           </span>
-          Prediction
+          Prediction Market
           <span className={styles.live}>3 questions live</span>
         </span>
       }

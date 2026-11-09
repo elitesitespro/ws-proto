@@ -32,17 +32,20 @@ const CITIES: readonly (readonly [number, number])[] = [
 
 // The hero globe's land and water map (equirectangular, land black). The land
 // is sampled from it at the planet's size, so the coastline stays sharp
-// however big the planet is drawn.
-const MASK_SRC = "/assets/globe/water-mask.png";
+// however big the planet is drawn. The same file the hero's globe took
+// (components/globe/night-globe.tsx, WATER_SRC), so it's already in the
+// browser's cache: on a phone the 32KB AVIF, else the PNG (and the PNG if
+// the AVIF can't be read).
+const MASK_SRC = { phone: "/assets/globe/water-mask-2k.avif", wide: "/assets/globe/water-mask.png" } as const;
 // The gap between land dots on screen (px)
 const PITCH = { wide: 9, narrow: 7 };
 
 const D2R = Math.PI / 180;
 const BG = [12, 10, 9];
-// Vivid's gold: the brand gold at the rim, warming to near-white facing you.
+// The brand's lemon lime at the rim, paling to near-white facing you.
 // Toward the edge the dots sink into the night instead of crowding.
-const RIM = [234, 179, 8];
-const FRONT = [254, 243, 199];
+const RIM = [198, 232, 43];
+const FRONT = [246, 252, 214];
 const SHADES = 24;
 const smooth = (a: number, b: number, v: number) => {
   const t = Math.min(Math.max((v - a) / (b - a), 0), 1);
@@ -208,7 +211,7 @@ export function JoinCta() {
       ctx.globalAlpha = 1;
 
       // The sky
-      ctx.fillStyle = "#fde68a";
+      ctx.fillStyle = "#eef9b0";
       for (const star of STARS) {
         ctx.globalAlpha = star.alpha * (0.6 + 0.4 * Math.sin(t / 1500 + star.phase));
         ctx.beginPath();
@@ -220,8 +223,8 @@ export function JoinCta() {
       // gold line round it, so the planet has a hard edge
       ctx.globalAlpha = rise;
       const air = ctx.createRadialGradient(cx, cy, R, cx, cy, R * 1.09);
-      air.addColorStop(0, "rgba(234,179,8,0.2)");
-      air.addColorStop(1, "rgba(234,179,8,0)");
+      air.addColorStop(0, "rgba(198,232,43,0.2)");
+      air.addColorStop(1, "rgba(198,232,43,0)");
       ctx.fillStyle = air;
       ctx.fillRect(0, 0, w, h);
       const face = ctx.createLinearGradient(0, cy - R, 0, cy - R + h * 0.4);
@@ -232,7 +235,7 @@ export function JoinCta() {
       ctx.arc(cx, cy, R, 0, Math.PI * 2);
       ctx.fill();
       ctx.lineWidth = 1;
-      ctx.strokeStyle = "rgba(250,204,21,0.55)";
+      ctx.strokeStyle = "rgba(217,242,90,0.55)";
       ctx.stroke();
 
       // The land, front half, in gold dots lying flat on the world: each
@@ -271,7 +274,7 @@ export function JoinCta() {
         const fade = p < 0.75 ? 1 : 1 - (p - 0.75) / 0.25;
         const last = Math.round(grown * (arc.path.length - 1));
         if (last < 1) continue;
-        ctx.strokeStyle = "#facc15";
+        ctx.strokeStyle = "#d9f25a";
         ctx.globalAlpha = 0.8 * fade * rise;
         ctx.beginPath();
         let head: readonly [number, number] | null = null;
@@ -304,7 +307,7 @@ export function JoinCta() {
       const py = cy - by * R;
       if (bz > 0) {
         ctx.lineWidth = 1.5;
-        ctx.strokeStyle = "#facc15";
+        ctx.strokeStyle = "#d9f25a";
         for (let k = 0; k < 3; k++) {
           const q = still ? 0.4 : (t / 2400 + k / 3) % 1;
           ctx.globalAlpha = (1 - q) * 0.7 * rise;
@@ -366,7 +369,11 @@ export function JoinCta() {
       ([entry]) => {
         if (!entry.isIntersecting) return;
         near.disconnect();
-        img.src = MASK_SRC;
+        img.onerror = () => {
+          img.onerror = null;
+          img.src = MASK_SRC.wide;
+        };
+        img.src = window.innerWidth < 768 ? MASK_SRC.phone : MASK_SRC.wide;
       },
       { rootMargin: "200% 0px" },
     );
@@ -387,6 +394,7 @@ export function JoinCta() {
       near.disconnect();
       resized.disconnect();
       img.onload = null;
+      img.onerror = null;
     };
   }, [rising]);
 

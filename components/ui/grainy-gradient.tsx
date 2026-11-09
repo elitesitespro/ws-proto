@@ -31,7 +31,7 @@ const palettes = {
   warm:
     "[--gradient-top:#ffc7a4] [--gradient-middle:#d47777] [--gradient-deep:#803054] [--gradient-bottom:#1c0719] [--gradient-left:#e16d5c] [--gradient-right:#ffaf7c]",
   yellow:
-    "[--gradient-top:#ffe375] [--gradient-middle:#e6a700] [--gradient-deep:#81500d] [--gradient-bottom:#241302] [--gradient-left:#ffc21f] [--gradient-right:#fff076]",
+    "[--gradient-top:#def68e] [--gradient-middle:#cbed14] [--gradient-deep:#868718] [--gradient-bottom:#262305] [--gradient-left:#c6e82b] [--gradient-right:#d5f78f]",
 } satisfies Record<GradientVariant, string>;
 
 const noiseImage =

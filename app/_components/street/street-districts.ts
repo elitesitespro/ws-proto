@@ -58,7 +58,7 @@ export const DISTRICTS: readonly District[] = [
     exits: [
       { name: "XStream", label: "Xtream", hook: "Live battles you can back", line: "Go live. Get backed. Get paid." },
       { name: "Vsion", label: "Vision", hook: "Our films, watched together", line: "Our films. Our shows. Watched together." },
-      { name: "AI Movie", label: "AI Movie", hook: "Direct your first film", line: "One studio for every film you want to make." },
+      { name: "AI Movie", label: "AI Studio", hook: "Direct your first film", line: "One studio for every film you want to make." },
       { name: "Arcade", label: "Arcade", hook: "Play for the streak", line: "Play for the streak. Stay for the rank." },
     ],
   },
@@ -88,7 +88,7 @@ export const DISTRICTS: readonly District[] = [
       { name: "Forex", label: "Forex", hook: "The pairs that move the world", line: "Trade the pairs that move the world.", light: true },
       { name: "Crypto", label: "Crypto", hook: "Spot and perps, round the clock", line: "Own the coins, not just the chart." },
       { name: "WorldSports", label: "WorldSports", hook: "Own sport like stock", line: "Own sport like stock." },
-      { name: "Prediction", label: "Prediction", hook: "Call it before it happens", line: "Call it before it happens.", light: true },
+      { name: "Prediction", label: "Prediction Market", hook: "Call it before it happens", line: "Call it before it happens.", light: true },
     ],
   },
 ];

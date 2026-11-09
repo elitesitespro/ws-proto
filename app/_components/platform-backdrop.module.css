@@ -114,6 +114,10 @@
   fill: #fff;
 }
 .twinkle {
+  position: absolute;
+  border-radius: 50%;
+  background: #fff;
+  translate: -50% -50%;
   animation: twinkle var(--t, 4s) ease-in-out var(--d, 0s) infinite;
 }
 .WorldSpace .shade {

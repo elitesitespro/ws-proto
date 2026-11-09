@@ -71,7 +71,7 @@ const SECTION_ASK: Record<string, Ask> = {
     qs: [
       "How do live battles work on Xtream?",
       "What’s a watch party on Vision?",
-      "Can I make a film with AI Movie?",
+      "Can I make a film with AI Studio?",
       "How do the weekly ranks work in Arcade?",
     ],
   },
@@ -135,7 +135,7 @@ const DIAL_ASK: Record<string, Ask> = {
     qs: ["What can I watch on Vision?", "How does a watch party work?", "Can I watch with friends far away?"],
   },
   studio: {
-    label: "AI Movie",
+    label: "AI Studio",
     qs: ["Can I make a film with AI?", "How do I direct an AI cast?", "What does the writing desk do?"],
   },
   arcade: {
@@ -175,8 +175,8 @@ const DIAL_ASK: Record<string, Ask> = {
     qs: ["When is WorldSports coming?", "How do player shares work?", "Who will be able to use WorldSports?"],
   },
   prediction: {
-    label: "Prediction",
-    qs: ["How do predictions work?", "What does an outcome’s chance mean?", "Who can use Prediction?"],
+    label: "Prediction Market",
+    qs: ["How do predictions work?", "What does an outcome’s chance mean?", "Who can use Prediction Market?"],
   },
 };
 

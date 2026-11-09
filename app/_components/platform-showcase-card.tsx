@@ -36,8 +36,7 @@ export function PlatformShowcaseCard({ name, category }: { name: ShowcasePlatfor
           <PlatformProductPreview kind={detail.preview} />
         </div>
       </WidgetMotionContext.Provider>
-      <div className="flex items-center justify-between gap-1 text-xs">
-        <p className="opacity-70">Sample preview</p>
+      <div className="flex items-center justify-end gap-1 text-xs">
         {/* Sits on the platform's colour, so it takes its text colour rather than the kit's light-on-stone. */}
         {hasAnimation && <Button variant="ghost" size="sm" className="text-inherit hover:bg-current/10 hover:text-inherit motion-reduce:hidden" onClick={() => setPaused(!paused)} aria-pressed={paused} aria-label={`${paused ? "Resume" : "Pause"} ${name} preview animations`}>
           <Icon name={paused ? "play" : "pause"} size={18} tone="current" /> {paused ? "Resume" : "Pause"}

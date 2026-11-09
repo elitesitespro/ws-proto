@@ -4,7 +4,7 @@ import { AiMovieSet } from "./ai-movie/ai-movie-set";
 import styles from "./ai-movie-platform-view.module.css";
 
 /**
- * AI Movie (movie.worldstreetgold.com), in its own night navy and gold: its
+ * AI Studio (movie.worldstreetgold.com), in its own night navy and gold: its
  * mark and its line, then a set you can direct (ai-movie/).
  */
 export function AiMoviePlatformView() {
@@ -17,7 +17,7 @@ export function AiMoviePlatformView() {
           <span className={styles.mark}>
             <Image src="/assets/ai-movie/mark.webp" alt="" width={24} height={14} />
           </span>
-          AI Movie
+          AI Studio
           <span className={styles.when}>Sun 14:30 · Day one on set</span>
         </span>
       }

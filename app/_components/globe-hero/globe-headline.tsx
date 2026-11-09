@@ -13,7 +13,7 @@ import entrance from "./hero-copy.module.css";
 const words: readonly { word: string; platform: ShowcasePlatformName; gold?: boolean }[] = [
   { word: "trading", platform: "Forex", gold: true },
   { word: "streaming", platform: "XStream" },
-  { word: "chatting", platform: "WorldSpace" },
+  { word: "communication", platform: "WorldSpace" },
   { word: "gaming", platform: "Arcade" },
   { word: "shopping", platform: "WorldStore" },
   { word: "learning", platform: "Academy" },

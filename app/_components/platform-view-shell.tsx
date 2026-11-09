@@ -15,13 +15,12 @@ const exploreLabel: Partial<Record<ShowcasePlatformName, string>> = {
   XStream: "Xtream",
   Vsion: "Vision",
   WorkWorld: "Worldwork",
+  "AI Movie": "AI Studio",
+  Prediction: "Prediction Market",
 };
-// The small print beside the way in, where the platform needs some: the
-// trading ones carry their risk (care and Prediction say theirs in the
-// scene). Short, so it stays one line beside the button on a phone.
+// The small print beside the way in, only where a platform needs some (most
+// have none). Short, so it stays one line beside the button on a phone.
 const footnote: Partial<Record<ShowcasePlatformName, string>> = {
-  Forex: "Capital at risk",
-  Crypto: "Capital at risk",
   WorldSports: "Illustrative · 18+",
 };
 
@@ -78,9 +77,7 @@ export function PlatformViewShell({
             Coming soon
           </p>
         )}
-        <span>
-          {footnote[name] ?? "Sample preview"}
-        </span>
+        {footnote[name] && <span>{footnote[name]}</span>}
       </footer>
     </article>
   );

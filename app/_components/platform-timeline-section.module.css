@@ -175,8 +175,19 @@
 .globe {
   position: absolute;
   inset: 0;
-  background: url("/assets/globe/night-polar.webp") center / cover no-repeat;
+  background: center / cover no-repeat;
   will-change: transform;
+}
+/* The polar night is fetched once the dial is within three screens
+   (data-near, set by the section), not with the page: on a phone the dial is
+   far below the hero, whose own maps should have the line first. AVIF where
+   the browser takes it (35KB against the WebP's 81KB). */
+[data-near] .globe {
+  background-image: url("/assets/globe/night-polar.webp");
+  background-image: image-set(
+    url("/assets/globe/night-polar.avif") type("image/avif"),
+    url("/assets/globe/night-polar.webp") type("image/webp")
+  );
 }
 
 /* Light that doesn't turn with the world: the limb falling into shadow, and
@@ -188,8 +199,8 @@
   border-radius: inherit;
   background: radial-gradient(circle, transparent 52%, rgba(12, 10, 9, 0.5) 84%, rgba(12, 10, 9, 0.85) 100%);
   box-shadow:
-    inset 0 0 0 1px rgba(234, 179, 8, 0.28),
-    inset 0 0 48px rgba(234, 179, 8, 0.14);
+    inset 0 0 0 1px rgba(198, 232, 43, 0.28),
+    inset 0 0 48px rgba(198, 232, 43, 0.14);
 }
 
 /* The bezel: a fine ring of marks that turns with the platforms */

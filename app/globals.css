@@ -94,7 +94,7 @@
 
 /* shadcn tokens at the document level. Everything inside <body> takes the
    brand's values; these only colour what sits outside it (the <html> canvas,
-   overscroll), as WorldStreet's own stone and gold so there's no seam. */
+   overscroll), as WorldStreet's own stone and lemon so there's no seam. */
 :root {
   --icon-size-min: 20px;
   --background: #ffffff;
@@ -103,7 +103,7 @@
   --card-foreground: #0c0a09;
   --popover: #ffffff;
   --popover-foreground: #0c0a09;
-  --primary: #eab308;
+  --primary: #c6e82b;
   --primary-foreground: #1c1917;
   --secondary: #f5f5f4;
   --secondary-foreground: #1c1917;
@@ -114,15 +114,15 @@
   --destructive: #b91c1c;
   --border: rgba(12, 10, 9, 0.1);
   --input: rgba(12, 10, 9, 0.14);
-  --ring: #ca8a04;
+  --ring: #9dbc12;
   --sidebar: #ffffff;
   --sidebar-foreground: #0c0a09;
-  --sidebar-primary: #eab308;
+  --sidebar-primary: #c6e82b;
   --sidebar-primary-foreground: #1c1917;
   --sidebar-accent: #f5f5f4;
   --sidebar-accent-foreground: #1c1917;
   --sidebar-border: rgba(12, 10, 9, 0.1);
-  --sidebar-ring: #ca8a04;
+  --sidebar-ring: #9dbc12;
 }
 
 .dark {
@@ -132,7 +132,7 @@
   --card-foreground: #ffffff;
   --popover: #1c1917;
   --popover-foreground: #ffffff;
-  --primary: #eab308;
+  --primary: #c6e82b;
   --primary-foreground: #1c1917;
   --secondary: rgba(255, 255, 255, 0.06);
   --secondary-foreground: #ffffff;
@@ -143,15 +143,15 @@
   --destructive: #ef4444;
   --border: rgba(255, 255, 255, 0.1);
   --input: rgba(255, 255, 255, 0.15);
-  --ring: #ca8a04;
+  --ring: #9dbc12;
   --sidebar: #0c0a09;
   --sidebar-foreground: #ffffff;
-  --sidebar-primary: #eab308;
+  --sidebar-primary: #c6e82b;
   --sidebar-primary-foreground: #1c1917;
   --sidebar-accent: rgba(255, 255, 255, 0.06);
   --sidebar-accent-foreground: #ffffff;
   --sidebar-border: rgba(255, 255, 255, 0.1);
-  --sidebar-ring: #ca8a04;
+  --sidebar-ring: #9dbc12;
 }
 
 /* The brand element. Manrope carries the type; Noto Sans only fills the ₦
@@ -160,6 +160,58 @@
 [data-brand="worldstreet"] {
   --cx-font: var(--font-manrope), var(--font-noto), system-ui, sans-serif;
   --font-sans: var(--cx-font);
+}
+
+/* WorldStreet's colour on the landing is lemon lime, not the system's gold
+   (Owen, 8 Nov 2026: "we are switching the brand color", on the landing page
+   only for now). The design system and the hub still wear gold, so the
+   switch is an override here, not in ds/. The kit sits in a cascade layer,
+   so these unlayered tokens win over it. Only the tokens that hold a literal
+   gold are re-set; the rest point at --ws-gold* and follow. Ink stays the
+   text on the colour (12.4:1), and the deep shade is the colour as text on
+   white (4.9:1). The token names keep "gold" because the kit's do. */
+[data-brand="worldstreet"] {
+  --ws-gold: #c6e82b;
+  --ws-gold-hi: #d9f25a;
+  --ws-gold-lo: #9dbc12;
+  --ws-gold-deep: #5e7a08;
+  --ws-gold-pale: #eef9b0;
+  --cx-ember-50: #c6e82b80;
+  --cx-brand-wash: rgba(198, 232, 43, 0.16);
+  --cx-wash: linear-gradient(124deg, #c6e82b 0%, rgba(198, 232, 43, 0.3) 100%);
+  --cx-halo: rgba(217, 242, 90, 0.32);
+  --cx-glow-cta: 0 8px 32px -6px rgba(198, 232, 43, 0.6);
+  --cx-focus-border: rgba(238, 249, 176, 0.6);
+  --cx-focus-halo: 0 0 0 3px rgba(198, 232, 43, 0.25);
+  --cx-aurora-core: rgba(246, 252, 214, 0.95);
+  --cx-aurora-mid: rgba(198, 232, 43, 0.75);
+  --cx-aurora-edge: rgba(94, 122, 8, 0.35);
+  --cx-ridge-line: #eef9b0;
+  --cx-spot: rgba(217, 242, 90, 0.14);
+  --cx-chart-1: #d9f25a;
+  --cx-chart-2: #c6e82b;
+  --cx-chart-3: #eef9b0;
+  --cx-chart-4: #9dbc12;
+  --cx-accent-rgb: 198, 232, 43;
+  --cx-accent-shade: 70, 95, 0;
+  --cx-metal-hi: #f6fcd6;
+  --cx-metal-top: #e4f77c;
+  --cx-metal: #c6e82b;
+  --cx-metal-lo: #5e7a08;
+  --cx-metal-chip: linear-gradient(135deg, #fbfee6, #b5cc52 45%, #eef8b8);
+}
+/* The kit's light theme, with the same lemon. It has to repeat every token
+   the block above sets that the kit's light block changes too, because an
+   unlayered token beats the layered light one. */
+[data-theme="light"] [data-brand="worldstreet"]:not([data-theme="dark"], [data-theme="dark"] *) {
+  --cx-ember: var(--ws-gold);
+  --cx-brand-wash: rgba(157, 188, 18, 0.12);
+  --cx-halo: rgba(217, 242, 90, 0.24);
+  --cx-aurora-core: rgba(217, 242, 90, 0.7);
+  --cx-aurora-mid: rgba(198, 232, 43, 0.4);
+  --cx-aurora-edge: rgba(157, 188, 18, 0.16);
+  --cx-ridge-line: var(--ws-gold-deep);
+  --cx-spot: rgba(157, 188, 18, 0.09);
 }
 
 @layer base {

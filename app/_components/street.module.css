@@ -107,11 +107,11 @@
   stroke-dasharray: calc(var(--shown, 0) * 1px) 2000px;
 }
 .light path:first-child {
-  stroke: rgba(250, 204, 21, 0.22);
+  stroke: rgba(217, 242, 90, 0.22);
   stroke-width: 12px;
 }
 .light path:last-child {
-  stroke: #fde68a;
+  stroke: #eef9b0;
   stroke-width: var(--dash-w);
 }
 /* A slip road off to an exit (a phone's or a tablet's), lit like the
@@ -125,7 +125,7 @@
   stroke-width: 10px;
 }
 .ramp path:last-child {
-  stroke: #fde68a;
+  stroke: #eef9b0;
   stroke-width: 2px;
   opacity: 0;
   transition: opacity 400ms ease;

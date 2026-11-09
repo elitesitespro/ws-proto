@@ -41,7 +41,7 @@ const SIDEBAR: { group: string; items: { label: string; icon: IconName | "orb" }
     items: [
       { label: "Forex", icon: "bars" },
       { label: "Crypto", icon: "trending-up" },
-      { label: "Prediction", icon: "target" },
+      { label: "Prediction Market", icon: "target" },
     ],
   },
   { group: "Learn", items: [{ label: "Academy", icon: "graduation" }] },
@@ -91,7 +91,7 @@ const BANNERS = [
 const ARRIVALS: { at: number; title: string; from: string; amount: number; icon: IconName; hue?: string }[] = [
   { at: 2600, title: "Creator earnings", from: "Xtream", amount: 180, icon: "broadcast", hue: "watch" },
   { at: 4600, title: "Project payment", from: "Worldwork", amount: 250, icon: "briefcase" },
-  { at: 6600, title: "Prediction payout", from: "Prediction", amount: 34.48, icon: "target", hue: "trade" },
+  { at: 6600, title: "Prediction payout", from: "Prediction Market", amount: 34.48, icon: "target", hue: "trade" },
 ];
 
 // What the dock asks, in turn: the hub's own for Home (components/home/vivid.tsx)

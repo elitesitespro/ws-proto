@@ -19,7 +19,7 @@ const faqItems: FaqItem[] = [
     id: "trading-platform",
     question: "Is WorldStreet a trading platform?",
     answer:
-      "No. Forex, Crypto and Prediction are specialized experiences within a much broader ecosystem.",
+      "No. Forex, Crypto and Prediction Market are specialized experiences within a much broader ecosystem.",
   },
   {
     id: "worldstreet-wallet",

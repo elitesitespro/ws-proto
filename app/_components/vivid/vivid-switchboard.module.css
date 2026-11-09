@@ -23,7 +23,7 @@
    platform, into the globe and out the other side */
 .wire {
   fill: none;
-  stroke: #eab308;
+  stroke: #c6e82b;
   stroke-width: 2.4px;
   stroke-linecap: round;
   stroke-dasharray: 0 9;
@@ -31,7 +31,7 @@
   transition: opacity 300ms var(--cx-ease);
 }
 .wire[data-on] {
-  stroke: #facc15;
+  stroke: #d9f25a;
   opacity: 0.95;
   animation: flow 600ms linear infinite;
 }
@@ -113,7 +113,7 @@
   box-shadow: inset 0 0 0 1px rgba(var(--hue-rgb), 0.45);
 }
 .card:focus-visible {
-  outline: 2px solid #facc15;
+  outline: 2px solid #d9f25a;
   outline-offset: 3px;
 }
 .tile {
@@ -137,7 +137,7 @@
 .pro {
   padding: 1px 8px;
   border-radius: 999px;
-  background: #eab308;
+  background: #c6e82b;
   color: #1c1917;
   font-size: 12px;
   font-weight: 500;
@@ -175,7 +175,7 @@
   position: absolute;
   inset: -40%;
   border-radius: 50%;
-  background: radial-gradient(closest-side, rgba(234, 179, 8, 0.14), rgba(234, 179, 8, 0.04) 55%, transparent);
+  background: radial-gradient(closest-side, rgba(198, 232, 43, 0.14), rgba(198, 232, 43, 0.04) 55%, transparent);
   pointer-events: none;
 }
 .canvas {
@@ -192,7 +192,7 @@
   border-radius: 50%;
 }
 .globeLink:focus-visible {
-  outline: 2px solid #facc15;
+  outline: 2px solid #d9f25a;
   outline-offset: 8px;
 }
 .tip {
@@ -203,8 +203,8 @@
   padding: 6px 14px;
   border-radius: 999px;
   background: rgba(28, 25, 23, 0.9);
-  box-shadow: inset 0 0 0 1px rgba(234, 179, 8, 0.4);
-  color: #fde68a;
+  box-shadow: inset 0 0 0 1px rgba(198, 232, 43, 0.4);
+  color: #eef9b0;
   font-size: 14px;
   font-weight: 500;
   white-space: nowrap;
@@ -239,7 +239,7 @@
 }
 .composer:focus-within {
   background: rgba(255, 255, 255, 0.09);
-  box-shadow: inset 0 0 0 1px rgba(234, 179, 8, 0.5);
+  box-shadow: inset 0 0 0 1px rgba(198, 232, 43, 0.5);
 }
 .input {
   flex: 1;
@@ -262,7 +262,7 @@
   height: 44px;
   border: 0;
   border-radius: 50%;
-  background: #eab308;
+  background: #c6e82b;
   color: #1c1917;
   cursor: pointer;
   transition: transform 120ms ease;
@@ -271,7 +271,7 @@
   transform: scale(0.95);
 }
 .send:focus-visible {
-  outline: 2px solid #facc15;
+  outline: 2px solid #d9f25a;
   outline-offset: 2px;
 }
 .fine {
@@ -345,7 +345,7 @@
     margin-top: -6px;
     border-radius: 50%;
     background: #0c0a09;
-    box-shadow: inset 0 0 0 2px rgba(234, 179, 8, 0.35);
+    box-shadow: inset 0 0 0 2px rgba(198, 232, 43, 0.35);
     transition:
       background 300ms ease,
       box-shadow 300ms ease;
@@ -354,10 +354,10 @@
     color: #fafaf9;
   }
   .route[data-on] .ask::after {
-    background: #facc15;
+    background: #d9f25a;
     box-shadow:
-      0 0 0 4px rgba(250, 204, 21, 0.16),
-      0 0 14px #facc15;
+      0 0 0 4px rgba(217, 242, 90, 0.16),
+      0 0 14px #d9f25a;
   }
   /* The answers share one place under the globe; the lit one's showing */
   .card {
@@ -392,7 +392,7 @@
     inset: -16px;
     display: block;
     border-radius: 50%;
-    box-shadow: inset 0 0 0 1px rgba(234, 179, 8, 0.12);
+    box-shadow: inset 0 0 0 1px rgba(198, 232, 43, 0.12);
     animation: orbit 80s linear infinite;
   }
   .orbit i {
