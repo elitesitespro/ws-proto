@@ -7,7 +7,7 @@
   overflow: hidden;
   padding: 96px 0 112px;
   border-radius: 32px;
-  background: linear-gradient(180deg, #d9f25a 0%, #c6e82b 55%, #9dbc12 100%);
+  background: linear-gradient(180deg, #facc15 0%, #eab308 55%, #ca8a04 100%);
   color: #1c1917;
 }
 /* Opening out of the street: pinned behind its end for the room the circle
@@ -44,39 +44,9 @@
   border-top-left-radius: 0;
   border-top-right-radius: 0;
 }
-/* The circle's rim, inside its edge: a fine gold line and, in from it, a
-   soft light (circles round its centre, sized in the TSX), on a layer of
-   its own */
-.rim {
-  position: absolute;
-  z-index: 3;
-  width: 0;
-  height: 0;
-  pointer-events: none;
-}
-.rim svg {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 1px;
-  height: 1px;
-  overflow: visible;
-  will-change: transform;
-}
-.rim circle {
-  fill: none;
-}
-.rim circle:nth-child(1) {
-  stroke: rgba(217, 242, 90, 0.12);
-  stroke-width: 26px;
-}
-.rim circle:nth-child(2) {
-  stroke: rgba(217, 242, 90, 0.3);
-  stroke-width: 14px;
-}
-.rim circle:nth-child(3) {
-  stroke: rgba(238, 249, 176, 0.95);
-  stroke-width: 2px;
+/* Once it's all open, nothing clips it: it scrolls on as any section */
+.section[data-open] {
+  clip-path: none !important;
 }
 .backdrop {
   position: absolute;
@@ -84,11 +54,12 @@
   z-index: -1;
   pointer-events: none;
 }
+/* Soft already (each a radial gradient to nothing), so no blur over them:
+   a blur that size, redrawn as they drift, costs a phone every frame */
 .glowA,
 .glowB {
   position: absolute;
   border-radius: 50%;
-  filter: blur(40px);
 }
 .glowA {
   top: -20%;
@@ -103,7 +74,7 @@
   bottom: 10%;
   width: 55%;
   height: 50%;
-  background: radial-gradient(closest-side, rgba(238, 249, 176, 0.6), transparent);
+  background: radial-gradient(closest-side, rgba(253, 230, 138, 0.6), transparent);
   animation: drift-b 22s ease-in-out infinite alternate;
 }
 .mark {
@@ -136,7 +107,7 @@
   padding: 0 16px 0 12px;
   border-radius: 999px;
   background: #1c1917;
-  color: #eef9b0;
+  color: #fde68a;
   font-size: 14px;
   font-weight: 500;
 }
@@ -186,8 +157,8 @@
   width: 36px;
   height: 36px;
   border-radius: 50%;
-  background: #eef9b0;
-  box-shadow: 0 0 0 2px #eef9b0;
+  background: #fde68a;
+  box-shadow: 0 0 0 2px #fde68a;
   transition: translate 200ms ease;
 }
 .disc + .disc {
@@ -202,7 +173,7 @@
 }
 .more {
   background: #1c1917;
-  color: #eef9b0;
+  color: #fde68a;
 }
 .more svg {
   width: 20px;

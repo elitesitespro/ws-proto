@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, type CSSProperties } from "react";
 import { motion, useMotionValue, useScroll, useTransform, type MotionValue } from "motion/react";
-import { Icon } from "@/components/icon";
+import { PlatformIcon } from "@/components/ui/platform-icon";
 import { useMediaQuery } from "@/lib/use-media-query";
 import { usePauseOffscreen } from "@/lib/use-pause-offscreen";
 import { useReducedMotion } from "@/lib/use-reduced-motion";
@@ -220,6 +220,8 @@ type Geo = {
 export function VividIntro() {
   const reduce = useReducedMotion();
   const wide = useMediaQuery("(min-width: 1024px)");
+  // The platforms' icons, a size up from a tablet (the CSS's .mark)
+  const markSize = useMediaQuery("(min-width: 768px)") ? 44 : 36;
   const trackRef = useRef<HTMLDivElement>(null);
   const stageRef = useRef<HTMLDivElement>(null);
   const frameRef = useRef<HTMLDivElement>(null);
@@ -307,6 +309,10 @@ export function VividIntro() {
     let last = 0;
     // Which stretch of the page the scroll was last in, well before or well past the intro
     let lastZone = "";
+    // Whether the page is anywhere near the intro (an observer says, so a
+    // scroll far from it costs nothing: measuring the track on every scroll
+    // forced the whole page's layout mid-frame, all down the street)
+    let near = false;
     // The dock's globe and the pill's marker, found once and kept while they're on the page
     let dockEl: Element | null = null;
     let anchorEl: Element | null = null;
@@ -424,6 +430,8 @@ export function VividIntro() {
 
     const render = () => {
       if (!g) return;
+      // Far off and already settled there: nothing to measure
+      if (!near && lastZone !== "" && lastZone !== "in") return;
       const vh = window.innerHeight;
       const box = track.getBoundingClientRect();
       // Reduced motion: no flight; the pill takes over once the intro's end is on screen
@@ -696,6 +704,16 @@ export function VividIntro() {
     resized.observe(stage);
     resized.observe(net);
     const unsubscribe = scrollY.on("change", render);
+    // Near: from well before the zone where it starts to change (2.5 screens
+    // ahead) to a screen past it, with room for a fast fling
+    const nearby = new IntersectionObserver(
+      ([entry]) => {
+        near = entry.isIntersecting;
+        render();
+      },
+      { rootMargin: "150% 0px 400% 0px" },
+    );
+    nearby.observe(track);
     // A phone's bars coming and going change the screen's height, and with it the lift-off
     window.addEventListener("resize", render);
     const onVisibility = () => (document.hidden ? halt() : run());
@@ -704,6 +722,7 @@ export function VividIntro() {
       halt();
       prepareTimers.forEach((timer) => window.clearTimeout(timer));
       unsubscribe();
+      nearby.disconnect();
       resized.disconnect();
       window.removeEventListener("resize", render);
       document.removeEventListener("visibilitychange", onVisibility);
@@ -758,7 +777,7 @@ export function VividIntro() {
                 data-hue={hue["data-hue"]}
                 style={hue.style}
               >
-                <Icon name={platform.icon} size={wide ? 24 : 20} tone="current" />
+                <PlatformIcon name={platform.name} size={markSize} />
               </span>
             );
           })}

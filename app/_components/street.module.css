@@ -65,15 +65,16 @@
   filter: drop-shadow(0 0 3px var(--cx-halo));
 }
 /* The street's mouth: the cream above narrowing into the road, between two
-   rounded corners on a laptop, down a long funnel on a phone or a tablet
-   (its shape is drawn in the TSX) */
+   rounded corners on a laptop, pouring down into the first lane in one long
+   curve on a phone or a tablet (its shape and place are worked out in the
+   TSX) */
 .mouth {
   position: absolute;
   top: 0;
   /* A little over the road's top, so none of the lit line's glow shows
      above it */
   margin-top: -6px;
-  transform: translateX(-50%);
+  overflow: visible;
   fill: var(--street);
 }
 /* The turn from one side to the other at the foot of a pinned story */
@@ -107,11 +108,11 @@
   stroke-dasharray: calc(var(--shown, 0) * 1px) 2000px;
 }
 .light path:first-child {
-  stroke: rgba(217, 242, 90, 0.22);
+  stroke: rgba(250, 204, 21, 0.22);
   stroke-width: 12px;
 }
 .light path:last-child {
-  stroke: #eef9b0;
+  stroke: #fde68a;
   stroke-width: var(--dash-w);
 }
 /* A slip road off to an exit (a phone's or a tablet's), lit like the
@@ -125,7 +126,7 @@
   stroke-width: 10px;
 }
 .ramp path:last-child {
-  stroke: #eef9b0;
+  stroke: #fde68a;
   stroke-width: 2px;
   opacity: 0;
   transition: opacity 400ms ease;

@@ -14,6 +14,7 @@ import {
 } from "motion/react";
 import { useReducedMotion } from "@/lib/use-reduced-motion";
 import { Icon, type IconName } from "@/components/icon";
+import { WorldSpaceLogo } from "@/components/ui/worldspace-logo";
 import { VividGlobe } from "../vivid/vivid-globe";
 import { dockLift } from "../vivid/vivid-handoff";
 import { Flag, KashDrawing, Timer, WorldStreetMark } from "./dashboard-art";
@@ -35,7 +36,7 @@ const WALLETS: Record<Currency, { name: string; symbol: string; perDollar: numbe
 const CURRENCIES = Object.keys(WALLETS) as Currency[];
 const START: Record<Currency, number> = { USD: 1250.4, NGN: 620000, KES: 64500, GBP: 437.8 };
 
-const SIDEBAR: { group: string; items: { label: string; icon: IconName | "orb" }[] }[] = [
+const SIDEBAR: { group: string; items: { label: string; icon: IconName | "orb" | "worldspace" }[] }[] = [
   {
     group: "Trade",
     items: [
@@ -48,7 +49,7 @@ const SIDEBAR: { group: string; items: { label: string; icon: IconName | "orb" }
   {
     group: "Enjoy",
     items: [
-      { label: "WorldSpace", icon: "chat" },
+      { label: "WorldSpace", icon: "worldspace" },
       { label: "Vision", icon: "monitor" },
       { label: "Xtream", icon: "broadcast" },
       { label: "Arcade", icon: "play" },
@@ -280,6 +281,8 @@ export function DashboardPreview({
                   <span key={item.label} className={styles.navItem}>
                     {item.icon === "orb" ? (
                       <VividGlobe size={20} still />
+                    ) : item.icon === "worldspace" ? (
+                      <WorldSpaceLogo size={20} />
                     ) : (
                       <Icon name={item.icon} size={20} tone="current" />
                     )}

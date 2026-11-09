@@ -58,9 +58,10 @@
   }
 }
 
-/* WorldSpace: its cloud and W, in cream, on its own cyan */
+/* WorldSpace: its helmet on its own night, lit a little behind the visor
+   (components/ui/worldspace-logo.tsx) */
 .worldspace {
-  --tile-fill: linear-gradient(160deg, #66d8ee 0%, #22b8d6 50%, #1390ad 100%);
+  --tile-fill: radial-gradient(circle at 50% 44%, #123a4c 0%, #081018 58%, #04060b 100%);
 }
 /* Xtream: its chilli on the dark of a live room, the heat coming up from below */
 .xtream {
@@ -86,10 +87,9 @@
 
 /* The marks inside: the two picture marks sized to the tile, the globe drawn
    on the app icon's own 32-unit grid */
-.cloud {
-  width: 76%;
+.helmet {
+  width: 90%;
   height: auto;
-  margin-top: 6%;
 }
 .chilli {
   width: 78%;

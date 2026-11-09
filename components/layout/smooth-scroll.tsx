@@ -1,6 +1,7 @@
 "use client";
 
 import { ReactLenis } from "lenis/react";
+import { useMediaQuery } from "@/lib/use-media-query";
 
 /**
  * Smooth scrolling for the whole page (Lenis, on the window). It only eases
@@ -10,8 +11,15 @@ import { ReactLenis } from "lenis/react";
  * scroll tracks the wheel 1:1 and jumps go straight to their target.
  * A scrolling area inside the page that should scroll on its own takes
  * data-lenis-prevent.
+ *
+ * Only with a mouse or trackpad: a finger's scroll is the browser's own (Lenis
+ * leaves touch alone), so on a phone it would only add a handler reading the
+ * scroll on every scroll event, a forced layout each time, for nothing. There,
+ * useLenis() is undefined and its callers glide natively instead.
  */
 export function SmoothScroll() {
+  const fine = useMediaQuery("(hover: hover) and (pointer: fine)");
+  if (!fine) return null;
   return (
     <ReactLenis
       root

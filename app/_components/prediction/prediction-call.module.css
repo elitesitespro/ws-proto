@@ -483,8 +483,12 @@
     grid-template-rows: auto auto;
     gap: 12px;
   }
+  /* Never squeezed past what's in them: let go to nothing, on a short phone
+     the question ran under the ticket and the ticket's 18+ under its way in,
+     and the scene still measured as fitting (scene-fit.tsx) */
   .market,
   .ticket {
+    min-height: auto;
     gap: 10px;
     padding: 14px;
     border-radius: 20px;
@@ -564,6 +568,39 @@
   }
   .market {
     grid-template-rows: auto minmax(44px, 1fr);
+  }
+}
+
+/* Shorter still: the question alone over the call (its chance is on the yes
+   and no, each on one line), what you'd win on one line, both cards tighter */
+@media (max-width: 600px) and (max-height: 640px) {
+  .market {
+    grid-template-rows: auto;
+  }
+  .now,
+  .chart {
+    display: none;
+  }
+  .market,
+  .ticket {
+    gap: 8px;
+    padding: 12px;
+  }
+  .payout {
+    flex-direction: row;
+    align-items: baseline;
+    justify-content: flex-end;
+    gap: 8px;
+  }
+  .sides button {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    padding: 8px 12px;
+  }
+  .go,
+  .again {
+    height: 40px;
   }
 }
 

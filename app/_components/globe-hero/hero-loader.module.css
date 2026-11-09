@@ -72,7 +72,7 @@
   border-radius: 50%;
   background: radial-gradient(circle at 64% 30%, #1f1a12, #120f0b 52%, #0c0a09 78%);
   box-shadow:
-    inset 0 0 0 1px rgba(217, 242, 90, 0.08),
+    inset 0 0 0 1px rgba(250, 204, 21, 0.08),
     inset -16px -20px 48px rgba(0, 0, 0, 0.45);
   transition: opacity 600ms var(--cx-ease);
 }
@@ -92,7 +92,7 @@
 
 /* The land's dots (drawn once, used by both layers below), dim */
 .dim {
-  stroke: #c6e82b;
+  stroke: #eab308;
 }
 
 /* The same dots, bright, inside a circle of light spreading from the hub */
@@ -103,7 +103,7 @@
     #000 calc(var(--spread) - 0.35 * var(--disc-r)),
     transparent var(--spread)
   );
-  stroke: #d9f25a;
+  stroke: #facc15;
   -webkit-mask-image: var(--light);
   mask-image: var(--light);
 }
@@ -112,7 +112,7 @@
    (from --load-at), and the city it reaches, lit as it lands */
 .arc {
   fill: none;
-  stroke: #eef9b0;
+  stroke: #fde68a;
   stroke-width: 1.1px;
   stroke-linecap: round;
   vector-effect: non-scaling-stroke;
@@ -121,16 +121,16 @@
 }
 
 .city {
-  fill: #f6fcd6;
+  fill: #fef3c7;
   opacity: clamp(0, ((var(--load) - var(--load-at)) * 6 - 0.9) * 10, 1);
 }
 
 .hub {
-  fill: #f6fcd6;
+  fill: #fef3c7;
 }
 
 .hubGlow {
-  fill: #d9f25a;
+  fill: #facc15;
   opacity: 0.35;
   transform-box: fill-box;
   transform-origin: center;
@@ -164,14 +164,14 @@
 
 .track {
   fill: none;
-  stroke: rgba(217, 242, 90, 0.14);
+  stroke: rgba(250, 204, 21, 0.14);
   stroke-width: 1.5px;
   vector-effect: non-scaling-stroke;
 }
 
 .progress {
   fill: none;
-  stroke: #d9f25a;
+  stroke: #facc15;
   stroke-width: 2px;
   stroke-linecap: round;
   vector-effect: non-scaling-stroke;
@@ -184,7 +184,7 @@
 }
 
 .head circle {
-  fill: #f6fcd6;
+  fill: #fef3c7;
 }
 
 /* A glint running round the edge: it keeps moving (on the compositor) even
@@ -193,7 +193,7 @@
   position: absolute;
   inset: -1px;
   border-radius: 50%;
-  background: conic-gradient(transparent 0 80%, rgba(246, 252, 214, 0.5) 97%, transparent);
+  background: conic-gradient(transparent 0 80%, rgba(254, 243, 199, 0.5) 97%, transparent);
   -webkit-mask-image: radial-gradient(farthest-side, transparent calc(100% - 2.5px), #000 calc(100% - 2px));
   mask-image: radial-gradient(farthest-side, transparent calc(100% - 2.5px), #000 calc(100% - 2px));
   animation: turn 2.4s linear infinite;
@@ -246,7 +246,7 @@
 }
 
 .loader[data-phase="lit"] .ring svg {
-  filter: drop-shadow(0 0 12px rgba(217, 242, 90, 0.6));
+  filter: drop-shadow(0 0 12px rgba(250, 204, 21, 0.6));
 }
 
 .loader:not([data-phase="loading"]) .head,

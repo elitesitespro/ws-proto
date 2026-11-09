@@ -3,7 +3,7 @@ import Link from "next/link";
 import { cn } from "cn";
 import { Chip } from "@/ds/components/chip";
 import { Icon } from "@/components/icon";
-import { hueAttrs } from "@/app/_components/platform-showcase-content";
+import { PlatformIcon } from "@/components/ui/platform-icon";
 import { chapterHref, isChapterPage, type NavChapter, type NavPlatform } from "./nav-links";
 
 /** The header's focus ring, as on its other links. */
@@ -64,25 +64,26 @@ export function NavPlatformItem({
   compact?: boolean;
 }) {
   const { name, line, icon, href, hue } = platform;
-  const tint = hue ? hueAttrs(hue) : undefined;
   const row = cn(
     "flex items-center gap-1 rounded-md p-1",
     href && cn("transition-colors hover:bg-white/10", NAV_FOCUS)
   );
   const body = (
     <>
-      <span
-        aria-hidden="true"
-        {...tint}
-        className={cn(
-          "flex shrink-0 items-center justify-center rounded-icon",
-          compact ? "size-4" : "size-5",
-          // No colour of its own: a quiet glyph rather than borrowing gold
-          tint ? "bg-(--hue-soft) text-(--hue)" : "bg-white/5 text-[var(--cx-glass-text-2)]"
-        )}
-      >
-        <Icon name={icon} size={20} tone="current" />
-      </span>
+      {hue ? (
+        // A platform: its app icon, in its own colours
+        <PlatformIcon name={hue} size={compact ? 32 : 40} />
+      ) : (
+        <span
+          aria-hidden="true"
+          className={cn(
+            "flex shrink-0 items-center justify-center rounded-icon bg-white/5 text-[var(--cx-glass-text-2)]",
+            compact ? "size-4" : "size-5"
+          )}
+        >
+          <Icon name={icon} size={20} tone="current" />
+        </span>
+      )}
       <span className="flex min-w-0 flex-col">
         <span
           className={cn(

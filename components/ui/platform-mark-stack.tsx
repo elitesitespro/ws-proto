@@ -5,6 +5,7 @@ import Image from "next/image";
 import { motion, type Transition } from "motion/react";
 import { cn } from "cn";
 import { Icon } from "@/components/icon";
+import { WorldSpaceLogo } from "./worldspace-logo";
 import styles from "./platform-mark-stack.module.css";
 
 // The glyphs scale with the line but never drop below the system's 20px floor
@@ -23,14 +24,14 @@ function MeetGlobe() {
   );
 }
 
-// Front to back, each in its own look: WorldSpace leads with its real mark,
+// Front to back, each in its own look: WorldSpace leads with its helmet,
 // then Xtream's chilli, WorldMeet's globe, Vision's play and Arcade's gamepad
 // (the same marks their panels on the dial wear), light and dark in turn
 const MARKS: readonly { name: string; look: string; art: ReactNode }[] = [
   {
     name: "WorldSpace",
     look: styles.worldspace,
-    art: <Image src="/assets/worldspace/mark.webp" alt="" width={48} height={30} className={styles.cloud} />,
+    art: <WorldSpaceLogo size={48} className={styles.helmet} />,
   },
   {
     name: "Xtream",

@@ -506,6 +506,21 @@
   }
 }
 
+/* Shorter still: the school a little shallower, and the path down to the
+   programme and the next step in it */
+@media (max-width: 600px) and (max-height: 640px) {
+  .stand {
+    min-height: 92px;
+  }
+  .path {
+    gap: 8px;
+    padding: 12px;
+  }
+  .progress {
+    display: none;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .art,
   .about strong,

@@ -5,6 +5,7 @@ import { useLenis } from "lenis/react";
 import { Icon, type IconName } from "@/components/icon";
 import { tick } from "@/lib/haptics";
 import { Button } from "@/components/ui/button";
+import { PlatformIcon, platformGlow } from "@/components/ui/platform-icon";
 import { PlatformView } from "./platform-view";
 import { PlatformBackdrop } from "./platform-backdrop";
 import { hueAttrs } from "./platform-showcase-content";
@@ -301,7 +302,6 @@ function PlatformCardFace({
   platform: Platform;
   active?: boolean;
 }) {
-  const hue = hueAttrs(platform.name);
   return (
     <motion.div
       animate={{
@@ -311,14 +311,13 @@ function PlatformCardFace({
       transition={{ duration: 0.32, times: [0, 0.45, 1], ease: "easeOut" }}
       className="flex size-9 items-center justify-center rounded-card bg-background transition-colors duration-500"
     >
-      <div
-        data-hue={hue["data-hue"]}
-        className={`flex size-7 items-center justify-center rounded-md border-2 bg-[var(--hue)] text-[var(--hue-on)] ${active ? "border-ember" : "border-transparent"}`}
-        style={hue.style}
-      >
-        <Icon name={platform.icon} size={24} tone="current" />
-        <span className="sr-only">{platform.label}</span>
-      </div>
+      {/* Its app icon, in its own colours (the panel's mark); at the pointer, ringed in gold */}
+      <PlatformIcon
+        name={platform.name}
+        size={56}
+        className={`outline-2 outline-offset-[3px] transition-[outline-color] duration-300 ${active ? "outline-ember" : "outline-transparent"}`}
+      />
+      <span className="sr-only">{platform.label}</span>
     </motion.div>
   );
 }
@@ -347,7 +346,6 @@ function OrbitCard({
   onSelect: (index: number) => void;
 }) {
   const platform = platforms[index];
-  const hue = hueAttrs(platform.name);
   // Where it is round the ring (the turn coming in is in the laptop's degrees, so it's scaled to this ring's)
   const angleOf = (value: number, turn: number) => orbitAngle(value, index, step) + (turn * step) / cardAngleStep;
   const transform = useTransform([progress, sweep], ([value, turn]: number[]) => {
@@ -376,9 +374,8 @@ function OrbitCard({
       {/* The platform at the pointer glows in its colour */}
       <span
         aria-hidden="true"
-        data-hue={hue["data-hue"]}
-        style={hue.style}
-        className={`pointer-events-none absolute inset-0 rounded-card bg-[var(--hue)] blur-xl transition-opacity duration-500 ${active ? "opacity-60" : "opacity-0"}`}
+        style={{ backgroundColor: platformGlow(platform.name) }}
+        className={`pointer-events-none absolute inset-0 rounded-card blur-xl transition-opacity duration-500 ${active ? "opacity-60" : "opacity-0"}`}
       />
       {/* Click a platform on the dial to go straight to it */}
       <button
@@ -579,7 +576,8 @@ export function PlatformTimelineSection({ intro, introLine }: PlatformTimelineSe
     const to = stops()?.[index];
     if (to === undefined) return;
     if (lenis) lenis.scrollTo(to, { duration: GLIDE, easing: easeInOut, lock: true, force: true });
-    else window.scrollTo({ top: to, behavior: "instant" });
+    // No Lenis (a phone): the browser's own glide
+    else window.scrollTo({ top: to, behavior: shouldReduceMotion ? "instant" : "smooth" });
   };
   // Its page shows at once, and the dial turns it round to the pointer
   const pickPlatform = (index: number) => {
@@ -642,10 +640,12 @@ export function PlatformTimelineSection({ intro, introLine }: PlatformTimelineSe
       style={
         {
           ...activeHue.style,
+          // The dial's pointer and lit rim, in the colour of the icon under them
+          "--brand": platformGlow(activePlatform.name),
           "--dive-overlap": `${DIVE_OVERLAP * 100}svh`,
           backgroundColor: activeColours.fill,
           color: activeColours.text,
-          "--timeline-background": "var(--hue)",
+          "--timeline-background": "var(--brand)",
           // A laptop's height and a phone's: the stylesheet picks one by the
           // screen's width, so the page is its real length from the first paint
           "--timeline-height": `${100 + (intro ? INTRO_VH : 0) + LAST * STEP_VH}svh`,
@@ -760,7 +760,7 @@ export function PlatformTimelineSection({ intro, introLine }: PlatformTimelineSe
                     transform={`rotate(${index * PHONE_STEP})`}
                     data-hue={hue["data-hue"]}
                     data-active={index === activeIndex || undefined}
-                    style={hue.style}
+                    style={{ ...hue.style, "--brand": platformGlow(platform.name) } as CSSProperties}
                     className={styles.detent}
                   />
                 );

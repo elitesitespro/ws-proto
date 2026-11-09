@@ -6,12 +6,11 @@ import { hueAttrs, type ShowcasePlatformName } from "@/app/_components/platform-
 import entrance from "./hero-copy.module.css";
 
 // A word for each of the main WorldStreet platforms, worn in that platform's
-// hub colour. Trading leads, in WorldStreet's own gold rather than Forex's
-// jade (Owen, 30 Oct 2026: "not going to be green"), so the headline opens on
-// the brand; the rest are mixed so neighbouring words come from different
-// parts of life.
-const words: readonly { word: string; platform: ShowcasePlatformName; gold?: boolean }[] = [
-  { word: "trading", platform: "Forex", gold: true },
+// hub colour. Trading leads, in lemon lime rather than Forex's jade (Owen,
+// 9 Nov 2026: "trading should be in green"; the rest of the page stays gold);
+// the rest are mixed so neighbouring words come from different parts of life.
+const words: readonly { word: string; platform: ShowcasePlatformName; lemon?: boolean }[] = [
+  { word: "trading", platform: "Forex", lemon: true },
   { word: "streaming", platform: "XStream" },
   { word: "communication", platform: "WorldSpace" },
   { word: "gaming", platform: "Arcade" },
@@ -137,9 +136,9 @@ export function GlobeHeadline({ onWordChange, paused = false, waiting = false, r
     };
   }, []);
 
-  // "gold" has no entry in app/hues.css, so it wears the [data-hue] defaults:
-  // WorldStreet gold, its pins on the globe too
-  const hue = words[current].gold ? { "data-hue": "gold", style: {} } : hueAttrs(words[current].platform);
+  // "lemon" is the landing's own entry in app/hues.css: the word, its bar and
+  // its pins on the globe
+  const hue = words[current].lemon ? { "data-hue": "lemon", style: {} } : hueAttrs(words[current].platform);
   const rising = rise === undefined ? undefined : entrance.rise;
   const step = (n: number) => (rise === undefined ? undefined : ({ "--rise": rise + n } as CSSProperties));
 

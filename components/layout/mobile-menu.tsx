@@ -37,9 +37,18 @@ export function MobileMenu() {
   // would scroll it, and the bar change shape under the menu); the menu's
   // own list still scrolls
   useEffect(() => {
-    if (!open || !lenis) return;
-    lenis.stop();
-    return () => lenis.start();
+    if (!open) return;
+    if (lenis) {
+      lenis.stop();
+      return () => lenis.start();
+    }
+    // No Lenis (a phone): the page held by its own overflow, as Lenis's stop does
+    const root = document.documentElement;
+    const was = root.style.overflow;
+    root.style.overflow = "clip";
+    return () => {
+      root.style.overflow = was;
+    };
   }, [open, lenis]);
 
   // While open: Escape closes it and hands focus back to the button; a tap

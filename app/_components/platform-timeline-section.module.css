@@ -199,8 +199,8 @@
   border-radius: inherit;
   background: radial-gradient(circle, transparent 52%, rgba(12, 10, 9, 0.5) 84%, rgba(12, 10, 9, 0.85) 100%);
   box-shadow:
-    inset 0 0 0 1px rgba(198, 232, 43, 0.28),
-    inset 0 0 48px rgba(198, 232, 43, 0.14);
+    inset 0 0 0 1px rgba(234, 179, 8, 0.28),
+    inset 0 0 48px rgba(234, 179, 8, 0.14);
 }
 
 /* The bezel: a fine ring of marks that turns with the platforms */
@@ -282,7 +282,7 @@
   position: absolute;
   inset: 0;
   border-radius: inherit;
-  background-color: var(--hue);
+  background-color: var(--brand, var(--hue));
   transition: background-color 500ms;
 }
 .rimLight::before {
@@ -308,7 +308,7 @@
   vector-effect: non-scaling-stroke;
 }
 .detent {
-  stroke: var(--hue);
+  stroke: var(--brand, var(--hue));
   stroke-opacity: 0.45;
   stroke-width: 2px;
   stroke-linecap: round;
@@ -332,7 +332,7 @@
   width: 14px;
   height: 9px;
   translate: -50% 0;
-  background: var(--hue);
+  background: var(--brand, var(--hue));
   clip-path: polygon(0 0, 100% 0, 50% 100%);
   transition: background-color 500ms;
 }
@@ -403,6 +403,13 @@
 
 .stackedLayout {
   display: none;
+}
+/* Stacked, a platform's page is in the page's own flow, which scrolls on:
+   it's at least the dial's height, and taller where its demo needs it,
+   rather than drawn smaller or cut to fit (scene-fit.tsx) */
+.stackedLayout article[aria-label$="platform preview"] {
+  height: auto;
+  min-height: var(--stage-height);
 }
 
 /* A phone or tablet: the platform on top, the dial across the foot of the
@@ -485,6 +492,39 @@
 
   .detailScroller {
     padding-bottom: 8px;
+  }
+}
+
+/* A short phone (a phone with its browser's bars showing): the platform's
+   page takes all the room it can, so its demo is read whole, clear above its
+   way in. The dial's row a little lower (the platform at the pointer, at its
+   fullest, still 22px clear of the foot), the count and arrows a size
+   smaller and closer to the page. The page's room is what's left: the
+   header's 80px, 8px over the count, its 40px, 8px under it, and 16px over
+   the dial. */
+@media (max-width: 1023px) and (max-height: 740px) {
+  .orbitLayout {
+    --dial-row: 128px;
+    --dial-lift: 64px;
+  }
+  .platformDetails {
+    gap: 8px;
+  }
+  .platformDetails > nav > p {
+    height: 40px;
+  }
+  .platformDetails > nav > div {
+    padding: 2px;
+  }
+  .detailPages > * > article {
+    max-height: calc(100svh - 152px - var(--dial-row));
+  }
+}
+/* Shorter still: the dial's row lower again (18px clear at its fullest) */
+@media (max-width: 1023px) and (max-height: 640px) {
+  .orbitLayout {
+    --dial-row: 120px;
+    --dial-lift: 60px;
   }
 }
 

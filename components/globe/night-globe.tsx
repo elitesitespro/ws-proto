@@ -89,7 +89,7 @@ export type NightGlobeHandle = {
 };
 
 type Rgb = [number, number, number];
-const GOLD_RGB: Rgb = [198 / 255, 232 / 255, 43 / 255]; // WorldStreet's lemon lime (#C6E82B)
+const GOLD_RGB: Rgb = [234 / 255, 179 / 255, 8 / 255];
 
 /** "r, g, b" (0–255) to 0–1, or gold when unset or unreadable. */
 function toRgb(value?: string): Rgb {
@@ -329,6 +329,12 @@ export function NightGlobe({
   const canvasRef = useRef<HTMLCanvasElement>(null);
   // The live handle, set up with the GL state; the one given out forwards to it
   const apiRef = useRef<NightGlobeHandle | null>(null);
+  // What's asked of it before the GL is set up (its shaders still compiling):
+  // the latest of each, handed over the moment it is. The loader frames the
+  // planet under its dots this early, so it must arrive.
+  const earlyRef = useRef<{ frame?: GlobePlacement | null; dim?: number; spin?: number; daylight?: number; clouds?: number }>(
+    {}
+  );
   const pausedRef = useRef(paused);
 
   useImperativeHandle(
@@ -337,11 +343,11 @@ export function NightGlobe({
       project: (lat, lon, ahead) => apiRef.current?.project(lat, lon, ahead) ?? null,
       turnTo: (place) => apiRef.current?.turnTo(place),
       launch: (from, to, timing) => apiRef.current?.launch(from, to, timing) ?? to.map(() => 0),
-      dim: (amount) => apiRef.current?.dim(amount),
-      frame: (placement) => apiRef.current?.frame(placement),
-      spin: (radians) => apiRef.current?.spin(radians),
-      daylight: (amount) => apiRef.current?.daylight(amount),
-      clouds: (amount) => apiRef.current?.clouds(amount),
+      dim: (amount) => (apiRef.current ? apiRef.current.dim(amount) : void (earlyRef.current.dim = amount)),
+      frame: (placement) => (apiRef.current ? apiRef.current.frame(placement) : void (earlyRef.current.frame = placement)),
+      spin: (radians) => (apiRef.current ? apiRef.current.spin(radians) : void (earlyRef.current.spin = radians)),
+      daylight: (amount) => (apiRef.current ? apiRef.current.daylight(amount) : void (earlyRef.current.daylight = amount)),
+      clouds: (amount) => (apiRef.current ? apiRef.current.clouds(amount) : void (earlyRef.current.clouds = amount)),
     }),
     []
   );
@@ -741,6 +747,15 @@ export function NightGlobe({
           redraw();
         },
       };
+      // Whatever was asked before it was ready, now
+      const early = earlyRef.current;
+      earlyRef.current = {};
+      const api = apiRef.current;
+      if ("frame" in early) api.frame(early.frame ?? null);
+      if (early.dim !== undefined) api.dim(early.dim);
+      if (early.spin !== undefined) api.spin(early.spin);
+      if (early.daylight !== undefined) api.daylight(early.daylight);
+      if (early.clouds !== undefined) api.clouds(early.clouds);
 
       /** The place under a point of the box (CSS px from its top left), or null off the planet. */
       function locate(px: number, py: number): LatLon | null {
@@ -1276,7 +1291,7 @@ export function NightGlobe({
       className={cn(
         "absolute inset-0 size-full touch-pan-y select-none",
         // Without WebGL2: a still gold glow where the planet would be
-        "data-[fallback=true]:bg-[radial-gradient(circle_at_70%_50%,rgba(198,232,43,0.16),transparent_45%)]",
+        "data-[fallback=true]:bg-[radial-gradient(circle_at_70%_50%,rgba(234,179,8,0.16),transparent_45%)]",
         className
       )}
     />

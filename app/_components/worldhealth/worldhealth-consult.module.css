@@ -594,6 +594,15 @@
   }
 }
 
+/* Shorter still: the soonest doctor alone (the list is still soonest
+   first), booked by video, the notice kept */
+@media (max-width: 600px) and (max-height: 640px) {
+  .doctors li + li,
+  .modes {
+    display: none;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .reply,
   .ended,

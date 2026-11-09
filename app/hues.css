@@ -1,7 +1,5 @@
 /* Copied from worldstreet-hub/app/hues.css so the platforms here wear the same
-   colours as in the hub. Keep the two in step, except for WorldStreet's own
-   colour (the [data-hue] defaults below): it is lemon lime here and still
-   gold in the hub, since the landing switched first (8 Nov 2026). */
+   colours as in the hub. Keep the two in step. */
 /* Every section and platform in its own colour, kept subtle (lib/hues.ts
    says which goes where, and why). Gold is WorldStreet's, and the only
    strong colour: each platform's is a soft companion to it (Owen, 15 Oct
@@ -20,14 +18,14 @@
      --hue-on    text on a --hue fill
    The colour marks where you are; it never fills a card, washes a
    background or glows (the platform previews, /explore/<id>, are the one
-   place it's worn as a page colour). Buttons stay WorldStreet's colour: it is
+   place it's worn as a page colour). Buttons stay WorldStreet gold: gold is
    "do this". All literals on purpose (no var() chains). Keep lib/hues.ts
    HUES in step. */
 
 [data-hue] {
-  --hue: #c6e82b;
-  --hue-rgb: 198, 232, 43;
-  --hue-ink: #d9f25a;
+  --hue: #eab308;
+  --hue-rgb: 234, 179, 8;
+  --hue-ink: #facc15;
   --hue-on: #0c0a09;
   --hue-soft: rgba(var(--hue-rgb), 0.12);
   --hue-line: rgba(var(--hue-rgb), 0.2);
@@ -118,8 +116,18 @@
   --hue-ink: #c6cdfa;
 }
 
+/* Lemon lime: the landing's alone (not in the hub), worn only by the hero's
+   lead word, "trading", and its pins on the globe (Owen, 9 Nov 2026).
+   Everything else in WorldStreet's own colour stays gold. */
+[data-hue="lemon"] {
+  --hue: #c6e82b;
+  --hue-rgb: 198, 232, 43;
+  --hue-ink: #d9f25a;
+}
+
 /* On paper the colour as text needs its deep shade. */
-[data-theme="light"] [data-hue] { --hue-ink: #5e7a08; }
+[data-theme="light"] [data-hue] { --hue-ink: #a16207; }
+[data-theme="light"] [data-hue="lemon"] { --hue-ink: #5e7a08; }
 [data-theme="light"] [data-hue="trade"],
 [data-theme="light"] [data-hue="forex"] { --hue-ink: #006e40; }
 [data-theme="light"] [data-hue="crypto"] { --hue-ink: #624d8b; }

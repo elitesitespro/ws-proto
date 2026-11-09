@@ -401,6 +401,21 @@
   }
 }
 
+/* A short laptop: the trip's steps without their notes, and closer, so the
+   whole trip shows over the way in (it ran under it at 720 tall) */
+@media (min-width: 760px) and (max-height: 760px) {
+  .card {
+    gap: 10px;
+    padding: 14px;
+  }
+  .step small {
+    display: none;
+  }
+  .step {
+    padding-bottom: 8px;
+  }
+}
+
 /* A short phone (an SE, or bars showing): the arch slimmer, and the trip
    down to where to and its steps */
 @media (max-width: 759px) and (max-height: 740px) {
@@ -425,5 +440,19 @@
   }
   .step {
     padding-bottom: 6px;
+  }
+}
+
+/* Shorter still: the arch a slim window on the city, its approval across it */
+@media (max-width: 759px) and (max-height: 640px) {
+  .arch {
+    height: 72px;
+    border-radius: 64px 64px 14px 14px;
+  }
+  .weather {
+    display: none;
+  }
+  .step {
+    padding-bottom: 3px;
   }
 }

@@ -19,11 +19,11 @@ const GOLDEN = Math.PI * (3 - Math.sqrt(5));
 export const SHAPES = ["vivid", "globe", "w"] as const;
 export type Shape = (typeof SHAPES)[number];
 
-/** Rim to front, the brand's lemon lime warming to near-white (globe-draw's). */
-const RIM = [198, 232, 43];
-const FRONT = [246, 252, 214];
+/** Rim to front, the brand gold warming to near-white (globe-draw's). */
+const RIM = [234, 179, 8];
+const FRONT = [254, 243, 199];
 const SHADES = 16;
-/** Each shape's colour, from the lemon (0) to near-white (1). */
+/** Each shape's colour, from the gold (0) to near-white (1). */
 const TINT: Record<Shape, number> = { vivid: 0.6, globe: 0.25, w: 0 };
 /** How much of the morph is stagger: the shape fills in along its curve, not all at once. */
 const STAGGER = 0.55;

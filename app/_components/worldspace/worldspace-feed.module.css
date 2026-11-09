@@ -491,6 +491,33 @@
   }
 }
 
+/* A short phone with its bars showing: the stories and the post a size
+   smaller, so the post's poll fits whole over the way in */
+@media (max-width: 600px) and (max-height: 640px) {
+  .feed,
+  .post {
+    gap: 6px;
+  }
+  .post {
+    padding: 12px;
+  }
+  .story {
+    gap: 4px;
+    width: 46px;
+  }
+  .ring {
+    width: 40px;
+    height: 40px;
+    padding: 2px;
+  }
+  .name {
+    max-width: 46px;
+  }
+  .option {
+    height: 28px;
+  }
+}
+
 /* Without motion the stories don't play through; tap one to open it */
 @media (prefers-reduced-motion: reduce) {
   .progress circle,

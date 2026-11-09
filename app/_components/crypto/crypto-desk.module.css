@@ -432,12 +432,17 @@
     display: none;
   }
 }
-/* A tablet or a phone: the portfolio over the ticket */
+/* A tablet or a phone: the portfolio over the ticket. The portfolio never
+   shrinks past its total, its line and a holding: let go to nothing, on a
+   short phone it slid under the ticket, and the desk measured as fitting
+   (scene-fit.tsx), so nothing drew it smaller. */
 @media (max-width: 1023px) {
   .stage {
     grid-template-columns: minmax(0, 1fr);
-    grid-template-rows: minmax(0, 1fr) auto;
+    grid-template-rows: minmax(var(--portfolio-least), 1fr) auto;
     gap: 12px;
+    /* Its heading, total, line and one holding */
+    --portfolio-least: 176px;
   }
   .ticket {
     gap: 8px;
@@ -448,6 +453,9 @@
   .ticket {
     padding: 12px;
     border-radius: 20px;
+  }
+  .stage {
+    --portfolio-least: 164px;
   }
   .portfolio {
     grid-template-rows: auto auto minmax(24px, 44px) minmax(0, 1fr);
@@ -489,8 +497,18 @@
   .coins {
     display: none;
   }
+  .stage {
+    /* Its total, line and one holding */
+    --portfolio-least: 132px;
+  }
   .portfolio {
     grid-template-rows: auto minmax(20px, 36px) minmax(0, 1fr);
+  }
+}
+/* Shorter still: buying is the ticket's one side (its button says so) */
+@media (max-width: 600px) and (max-height: 640px) {
+  .sides {
+    display: none;
   }
 }
 

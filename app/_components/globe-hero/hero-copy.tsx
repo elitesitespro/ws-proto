@@ -58,13 +58,18 @@ export function HeroCopy({
   const lenis = useLenis();
   const explore = (event: MouseEvent<HTMLAnchorElement>) => {
     const to = document.getElementById("discover");
-    // Without Lenis, the link's own jump
-    if (!to || !lenis) return;
+    if (!to) return;
     event.preventDefault();
     // Past Lenis's own handling of in-page links, which would rush it
     event.stopPropagation();
     // To where the section pins, under the header, its heading up
-    lenis.scrollTo(to, { offset: -80, duration: GLIDE, easing: easeInOut });
+    if (lenis) lenis.scrollTo(to, { offset: -80, duration: GLIDE, easing: easeInOut });
+    // No Lenis (a phone): the browser's own glide
+    else
+      window.scrollTo({
+        top: to.getBoundingClientRect().top + window.scrollY - 80,
+        behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "instant" : "smooth",
+      });
   };
 
   return (

@@ -1,0 +1,62 @@
+/* A platform's app icon (platform-icon.tsx): its mark on its own colours,
+   as a squircle lit along the top edge and shaded along the bottom, with a
+   soft sheen over its top half, like the statement's stack of app icons
+   (platform-mark-stack.module.css). Sized by the TSX. */
+.icon {
+  position: relative;
+  display: grid;
+  flex: none;
+  place-items: center;
+  overflow: hidden;
+  border-radius: 27%;
+  background: var(--fill);
+  color: var(--ink);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.38),
+    inset 0 -2px 4px rgba(0, 0, 0, 0.2),
+    inset 0 0 0 1px var(--rim, rgba(255, 255, 255, 0.14));
+}
+.icon::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.22), rgba(255, 255, 255, 0.04) 46%, transparent 54%);
+  pointer-events: none;
+}
+@supports (corner-shape: squircle) {
+  .icon,
+  .icon::after {
+    border-radius: 36%;
+    corner-shape: squircle;
+  }
+}
+
+/* The marks, sized to the tile */
+.helmet {
+  width: 92%;
+  height: auto;
+}
+.chilli {
+  width: 80%;
+  height: auto;
+}
+.full {
+  width: 100%;
+  height: 100%;
+}
+.w {
+  width: 66%;
+  height: auto;
+  fill: currentColor;
+}
+.peaks {
+  width: 60%;
+  height: auto;
+  margin-top: 4%;
+  fill: currentColor;
+}
+.heart {
+  width: 74%;
+  height: auto;
+}

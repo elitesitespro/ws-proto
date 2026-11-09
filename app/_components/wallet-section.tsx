@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState, type CSSProperties } from "react";
+import { useEffect, useId, useRef, useState, type CSSProperties } from "react";
 import {
   motion,
   useMotionValue,
@@ -18,6 +18,7 @@ import { buttonVariants } from "@/components/ui/button";
 import { DashboardPreview } from "./dashboard/dashboard-preview";
 import { Flag, WorldStreetMark } from "./dashboard/dashboard-art";
 import { RevealWords } from "./street/reveal-words";
+import { useScrollTimeline } from "./street/use-scroll-timeline";
 import styles from "./wallet-section.module.css";
 
 // The currencies on show, and a disc for the rest
@@ -39,8 +40,16 @@ const rise: Variants = {
 };
 // A circle this big (in vmax) covers the screen from any point on it
 const COVER = 142;
-// Once the circle's this far open, the wallet comes alive
-const ALIVE = 0.6;
+// It grows as the opening's share to this power, slow out of the road's end
+const EASE = 1.2;
+// Its keyframes, where the browser runs it with the scroll: these steps of the opening
+const STEPS = [0, 0.08, 0.2, 0.35, 0.5, 0.65, 0.8, 1];
+// The dashboard waits this far down, and has risen into place by this far through
+const LIFT = "30svh";
+const RISEN = 0.85;
+// Once the gold has all but filled the screen, the wallet comes alive (its
+// dashboard's own goings-on start then, not while the circle's still growing)
+const ALIVE = 0.9;
 
 export type WalletReveal = {
   /** Where the circle opens, on the screen (CSS lengths). */
@@ -58,6 +67,9 @@ export type WalletReveal = {
  *
  * With `reveal` it sits pinned behind the end of what's above it, and opens
  * out of it through a growing circle as you scroll (./street/street-to-wallet).
+ * The circle and the dashboard's rise are keyframes the browser runs with the
+ * scroll itself where it can (so they keep step with a flung page however
+ * busy the page is), and follow the scroll by script where it can't.
  */
 export function WalletSection({
   reveal,
@@ -76,34 +88,58 @@ export function WalletSection({
 
   // Opening: 0 as it pins, 1 once the circle covers the screen
   const { scrollYProgress: opening } = useScroll({ target: roomRef, offset: ["start start", "end start"] });
-  // The circle's radius in px (a vmax is this many), so its clip and its rim
-  // are the same circle
+  // Whether the browser runs the opening with the scroll (then the circle
+  // and the rise are its keyframes, on the room's view of the page)
+  const timed = useScrollTimeline();
+  const name = `wallet${useId().replace(/[^a-zA-Z0-9]/g, "")}`;
+  const at = `at ${reveal?.x ?? "50%"} ${reveal?.y ?? "50%"}`;
+  // By script: the circle's radius in px (a vmax is this many)
   const vmax = useMotionValue(0);
   useEffect(() => {
+    if (timed) return;
     const size = () => vmax.set(Math.max(window.innerWidth, window.innerHeight) / 100);
     size();
     window.addEventListener("resize", size);
     return () => window.removeEventListener("resize", size);
-  }, [vmax]);
-  const radius = useTransform([opening, vmax], ([p, v]: number[]) => COVER * p ** 1.2 * v);
-  const clipPath = useTransform([opening, radius], ([p, r]: number[]) =>
-    p >= 1 ? "none" : `circle(${r.toFixed(1)}px at ${reveal?.x ?? "50%"} ${reveal?.y ?? "50%"})`,
+  }, [vmax, timed]);
+  const clipPath = useTransform([opening, vmax], ([p, v]: number[]) =>
+    p >= 1 ? "none" : `circle(${(COVER * p ** EASE * v).toFixed(1)}px ${at})`,
   );
-  // A gold rim just inside the circle's edge, so it reads as a circle even
-  // where the dark dashboard fills it; it fades as the circle fills the screen.
-  // Circles drawn at its radius, a fine line and a soft light in from it:
-  // only the rim's drawn again as it grows, not a blurred shadow its size.
-  const rimLine = useTransform(radius, (r) => Math.max(r - 1, 0));
-  const rimLight = useTransform(radius, (r) => Math.max(r - 9, 0));
-  const rimHaze = useTransform(radius, (r) => Math.max(r - 22, 0));
-  const rimOpacity = useTransform(opening, [0, 0.04, 0.6, 0.95], [0, 1, 1, 0]);
   // The dashboard waits lower down, so the circle opens on gold, and rises
   // into its place as the circle grows
-  const lift = useTransform(opening, [0, 0.85], ["30svh", "0svh"]);
+  const lift = useTransform(opening, [0, RISEN], [LIFT, "0svh"]);
   const [alive, setAlive] = useState(!reveal);
+  const sectionOpen = useRef(false);
   useMotionValueEvent(opening, "change", (p) => {
     if (p >= ALIVE && !alive) setAlive(true);
+    // Once it's all open the circle's off: the wallet scrolls on unclipped
+    const open = p >= 0.999;
+    if (open !== sectionOpen.current && sectionRef.current) {
+      sectionOpen.current = open;
+      sectionRef.current.toggleAttribute("data-open", open);
+    }
   });
+  // The opening's keyframes, for the browser to run with the scroll: the
+  // circle out of the road's end, and the dashboard rising into place
+  const frames = reveal
+    ? `@keyframes ${name}-open{${STEPS.map((p) => `${(p * 100).toFixed(0)}%{clip-path:circle(${(COVER * p ** EASE).toFixed(2)}vmax ${at})}`).join("")}}` +
+      `@keyframes ${name}-rise{0%{translate:0 ${LIFT}}${RISEN * 100}%,100%{translate:0 0}}`
+    : "";
+  const run = (key: string): CSSProperties => ({
+    animationName: `${name}-${key}`,
+    animationDuration: "auto",
+    animationTimingFunction: "linear",
+    animationFillMode: "both",
+    animationTimeline: `--${name}`,
+    animationRange: "exit 0% exit 100%",
+  });
+  // Never held still off the screen (sections asleep hold their looping
+  // animations, app/globals.css), or the opening would lose its place
+  const riseRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (!timed) return;
+    for (const el of [sectionRef.current, riseRef.current]) el?.style.setProperty("animation-play-state", "running", "important");
+  }, [timed]);
 
   // The heading comes up a word at a time: as it scrolls in, or as the
   // circle opens, all there by the time the dashboard has risen into place
@@ -126,7 +162,7 @@ export function WalletSection({
       aria-labelledby="wallet-heading"
       className={styles.section}
       data-reveal={reveal ? "" : undefined}
-      style={reveal ? { clipPath } : undefined}
+      style={reveal ? (timed ? run("open") : { clipPath }) : undefined}
     >
       <div aria-hidden="true" className={styles.backdrop}>
         <i className={styles.glowA} />
@@ -135,15 +171,6 @@ export function WalletSection({
           <WorldStreetMark />
         </motion.span>
       </div>
-      {reveal && (
-        <motion.span aria-hidden="true" className={styles.rim} style={{ left: reveal.x, top: reveal.y, opacity: rimOpacity }}>
-          <svg>
-            <motion.circle r={rimHaze} />
-            <motion.circle r={rimLight} />
-            <motion.circle r={rimLine} />
-          </svg>
-        </motion.span>
-      )}
 
       <div className="relative mx-auto w-full max-w-7xl px-4 md:px-6">
         <header className={styles.head}>
@@ -195,7 +222,7 @@ export function WalletSection({
         </header>
 
         <div ref={screenRef} className={styles.screen}>
-          <motion.div style={reveal ? { y: lift } : undefined}>
+          <motion.div ref={riseRef} style={reveal ? (timed ? run("rise") : { y: lift }) : undefined}>
             <motion.div style={reduce ? undefined : { rotateX, scale, y }} className={styles.tilt}>
               <DashboardPreview live={alive} vividHref={vividHref} />
             </motion.div>
@@ -213,13 +240,15 @@ export function WalletSection({
       </>
     );
   }
-  // Pinned for the room it opens over, then on with the page
+  // Pinned for the room it opens over, then on with the page. The room's
+  // view of the page runs the opening, for everything in the track.
   return (
     <div
       className={styles.track}
-      style={{ marginTop: reveal.overlap, "--room": reveal.room } as CSSProperties}
+      style={{ marginTop: reveal.overlap, "--room": reveal.room, timelineScope: `--${name}` } as CSSProperties}
     >
-      <div ref={roomRef} aria-hidden="true" className={styles.room} />
+      {timed && <style>{frames}</style>}
+      <div ref={roomRef} aria-hidden="true" className={styles.room} style={{ viewTimeline: `--${name} block` }} />
       {/* Where the wallet starts for Vivid's pill (vivid-pill-hooks.ts), which steps out of the way of the
           dashboard's own Ask Vivid: as the circle starts to open, not as this box comes up behind the street */}
       <div aria-hidden="true" data-vivid-part="wallet" className={styles.part} />

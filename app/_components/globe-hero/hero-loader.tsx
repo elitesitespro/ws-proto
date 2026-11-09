@@ -4,13 +4,20 @@ import { useEffect, useRef, useState, type CSSProperties, type RefObject } from 
 import { animate } from "motion/react";
 import { cn } from "cn";
 import type { GlobePlacement, NightGlobeHandle } from "@/components/globe/night-globe";
+import { warmPage } from "@/lib/warm-page";
 import { ARCS, EARTH_DOTS, HUB } from "./hero-loader-earth";
 import styles from "./hero-loader.module.css";
 
-// Once the scripts are running, what's left to wait on: the fonts and the
-// planet's image. Short of them the ring creeps on, never quite arriving;
-// after GIVE_UP_MS it stops waiting (say the image failed) and just fades.
-const GIVE_UP_MS = 9000;
+// Once the scripts are running, what's left to wait on: the fonts, the
+// planet's image, then the rest of the page (every platform's demo, every
+// picture down it), so nothing loads in as you scroll (Owen, 9 Nov 2026: the
+// loader is there so that everything is "completely loaded and ready"
+// before the hero). Short of them the ring creeps on, never quite arriving.
+// The rest of the page gets WARM_MS once the planet is in; after GIVE_UP_MS
+// it stops waiting altogether (say the image failed) and just fades. What
+// hasn't come by then carries on loading behind the hero.
+const GIVE_UP_MS = 14000;
+const WARM_MS = 8000;
 // The handover: the real planet fades up under the dots (LIGHT_MS), then
 // flies to its place in the hero (FLIGHT seconds) as the dark opens round it
 const LIGHT_MS = 600;
@@ -90,6 +97,10 @@ export function HeroLoader({ globe, stage, hero, globeReady, onOpen, onDone }: H
     const started = performance.now();
     let fonts = false;
     document.fonts.ready.then(() => (fonts = true));
+    // The rest of the page, warmed once the hero has what it needs: how much is in, and when it started
+    let warmed = 0;
+    let warmedAll = false;
+    let warmFrom = 0;
     let real = 0;
     let last = started;
     let frame = 0;
@@ -207,9 +218,13 @@ export function HeroLoader({ globe, stage, hero, globeReady, onOpen, onDone }: H
       last = now;
       const waited = now - started;
       const ready = latest.current.globeReady;
-      const all = (fonts && ready) || waited > GIVE_UP_MS;
-      // The scripts running are a third of it, the fonts a tenth, the planet the rest
-      const done = 0.3 + (fonts ? 0.1 : 0) + (ready ? 0.6 : 0);
+      if (fonts && ready && !warmFrom) {
+        warmFrom = now;
+        warmPage((share) => (warmed = share)).then(() => (warmedAll = true));
+      }
+      const all = (fonts && ready && (warmedAll || now - warmFrom > WARM_MS)) || waited > GIVE_UP_MS;
+      // The scripts running are a fifth of it, the fonts a tenth, the planet two fifths, the rest of the page the rest
+      const done = 0.2 + (fonts ? 0.1 : 0) + (ready ? 0.4 : 0) + 0.3 * warmed;
       const target = all ? 1 : done + (1 - done) * 0.5 * (1 - Math.exp(-waited / 3000));
       real += (target - real) * Math.min(dt * (all ? 6 : 2.5), 1);
       if (all && real > 0.995) real = 1;

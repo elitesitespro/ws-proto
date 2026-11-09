@@ -552,6 +552,36 @@
   }
 }
 
+/* Shorter still (a small phone with its bars showing): the rank card down
+   to the rank and the bar, and the answers a little shallower */
+@media (max-width: 600px) and (max-height: 640px) {
+  .stage {
+    gap: 8px;
+  }
+  .duel {
+    gap: 8px;
+    padding: 10px 12px;
+  }
+  .you,
+  .bot {
+    width: 28px;
+    height: 28px;
+  }
+  .answer {
+    min-height: 38px;
+  }
+  .card {
+    row-gap: 6px;
+    padding: 8px 14px;
+  }
+  .rank {
+    font-size: var(--text-2xl);
+  }
+  .xp {
+    display: none;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .round,
   .over,

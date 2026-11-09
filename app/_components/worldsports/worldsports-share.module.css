@@ -427,3 +427,30 @@
     display: none;
   }
 }
+
+/* Shorter still: a shallower pitch, and the share down to the player, his
+   price and the way to buy (no run of form) */
+@media (max-width: 759px) and (max-height: 640px) {
+  .pitch {
+    height: 100px;
+  }
+  .card {
+    gap: 8px 12px;
+    padding: 12px;
+  }
+  .face {
+    width: 44px;
+    height: 44px;
+  }
+  .price {
+    font-size: 22px;
+  }
+  .bars,
+  .change {
+    display: none;
+  }
+  .buy,
+  .sell {
+    height: 38px;
+  }
+}

@@ -20,19 +20,35 @@
   z-index: 1;
   padding-top: 72px;
 }
-/* The car's way: from its parking spot at the mouth to the one at the end.
-   Its rig is sticky on the car's line (top, in the TSX), so the browser
-   holds the car still on the screen while the street scrolls under it. */
-.carTrack {
+/* The car, on the road in the street's own layer (so the page can never
+   scroll the road out from under it): its way, a point moved along the road
+   by the drive's keyframes (the TSX), turns to face along it, and the car
+   sits centred on it. */
+.carLayer {
   position: absolute;
   z-index: 10;
+  top: 0;
   left: 0;
-  right: 0;
+  width: 0;
+  height: 0;
   pointer-events: none;
 }
-.carRig {
-  position: sticky;
+.carWay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 0;
   height: 0;
+  will-change: translate, rotate;
+}
+/* The car's line, up from the screen's foot (its height, in the TSX), measured */
+.foot {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 0;
+  visibility: hidden;
+  pointer-events: none;
 }
 
 /* The approach to the street, with its opening words: the tour's cream runs
@@ -317,14 +333,9 @@
   background: var(--hue);
   color: var(--hue-on);
 }
+/* Its app icon (components/ui/platform-icon.tsx) sizes and colours itself */
 .exitTile {
-  display: grid;
-  place-items: center;
-  width: 40px;
-  height: 40px;
-  border-radius: 12px;
-  background: var(--hue);
-  color: var(--hue-on);
+  flex: none;
 }
 .exitText {
   display: grid;
@@ -416,20 +427,22 @@
     padding-top: 64px;
     padding-bottom: 32px;
   }
-  /* Room under the approach for the mouth's funnel and the S out of it into
-     the first lane (the TSX lays them in whatever room this leaves) */
+  /* Room under the approach for the mouth's long curve down into the first
+     lane (the TSX lays it in whatever room this leaves), and the car waiting
+     in it */
   .inner {
     --gutter: 16px;
-    padding-top: 232px;
+    padding-top: 152px;
   }
   /* A block, not a grid: a grid's billboard could only stick inside its
      own cell */
   .district {
     display: block;
   }
-  /* Room for the S across */
+  /* Room for the lane change across: as tall as the road goes across, or
+     a little more, so it leans no more than about 45° off the upright */
   .district + .district {
-    margin-top: 320px;
+    margin-top: 440px;
   }
   .district[data-side="left"] {
     padding-right: 48px;

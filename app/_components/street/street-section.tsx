@@ -1,7 +1,7 @@
 "use client";
 
-import { useCallback, useEffect, useEffectEvent, useRef, useState, type ComponentType } from "react";
-import { useMotionValue, useMotionValueEvent, useScroll, useSpring } from "motion/react";
+import { useCallback, useEffect, useEffectEvent, useId, useRef, useState, type ComponentType, type CSSProperties } from "react";
+import { useMotionValueEvent, useScroll } from "motion/react";
 import { Icon } from "@/components/icon";
 import { tick } from "@/lib/haptics";
 import { useMediaQuery } from "@/lib/use-media-query";
@@ -16,6 +16,7 @@ import { MarketsArt } from "./art/markets-art";
 import { DistrictBillboard } from "./district-billboard";
 import { ExitSign } from "./exit-sign";
 import { RevealWords } from "./reveal-words";
+import { useScrollTimeline } from "./use-scroll-timeline";
 import { DISTRICTS, type ArtProps, type District } from "./street-districts";
 import styles from "./street-section.module.css";
 
@@ -31,16 +32,21 @@ const FIRST_EXIT = DISTRICTS.map((_, i) => 1 + DISTRICTS.slice(0, i).reduce((n, 
 // A laptop's mouth: its two rounded corners and the road between them, in
 // px (the road as wide as street.module.css draws it there)
 const MOUTH = { radius: 112, road: 32 };
-// A phone's or a tablet's first lane runs down the screen's edge, so its
-// mouth opens nearer the middle: a funnel this deep at most (or this share
-// of the room under the approach), opening this far either side of the road
-// at most (as wide as street.module.css draws it there). The road leaves it
-// in one S into the first lane, going across at most this much for every px
-// it drops, as gently as the bends between the districts.
-const FUNNEL = { depth: 96, share: 0.4, half: 144, road: 28, lean: 1.2 };
-// The car keeps this far down the screen while it drives. The street's
-// opening words have all come up by the time they reach this line too.
+// A phone's or a tablet's first lane runs down the screen's edge, and the
+// approach's cream pours straight down into it: on the road's inner side one
+// long curve out of the approach's edge, this wide and this deep at most; on
+// its outer side the cream runs on down the screen's edge and eases in off it
+// onto the road, so the dark of the verge opens from nothing rather than
+// starting as a sliver with a corner (Owen, 9 Nov 2026: "it should be curved
+// out better where the car starts") (the road as wide as street.module.css
+// draws it there)
+const SHOULDER = { reach: 176, depth: 120, road: 28 };
+// The car keeps this far down the screen while it drives (it's measured up
+// from the screen's foot, 40svh, so it holds there whatever the browser's
+// bars do). The street's opening words have all come up by the time they
+// reach this line too.
 export const ANCHOR = 0.6;
+const FROM_FOOT = `${Math.round((1 - ANCHOR) * 100)}svh`;
 // It waits this far down the street, and pulls up this far short of its end
 const PARKED = 48;
 export const PULL_UP = 40;
@@ -48,8 +54,12 @@ export const PULL_UP = 40;
 export const END_GAP = 56;
 // A laptop's bends: corners as round as this at most, the same as the mouth's
 const CORNER = MOUTH.radius;
-// A phone's or a tablet's bends are an S, its ends this far along it
-// toward each other: upright where it leaves one lane and joins the next
+// A phone's or a tablet's bends are a lane change, the way a road takes one:
+// a curve off one lane, a straight run across and a curve onto the next, the
+// curves this round (less where there isn't the room)
+const SWING = 180;
+// Where there's no room for that, an S, its ends this far along it toward
+// each other: upright where it leaves one lane and joins the next
 const SWAY = 0.36;
 // The car's indicator goes on this far before a bend
 const SIGNAL = 180;
@@ -58,6 +68,43 @@ const SIGNAL = 180;
  *  car's line is when the car's there (`v`: its own height, except on a
  *  laptop's bend, where it goes by the road's length). */
 type Point = { x: number; y: number; at: number; v: number };
+
+/** Where the car is when its line is `v` down the street: on the road, how far along, and which way it faces (°, 0 down the screen). */
+function along(points: Point[], v: number) {
+  let hi = points.findIndex((point) => point.v >= v);
+  if (hi <= 0) hi = hi === 0 ? 1 : points.length - 1;
+  const a = points[hi - 1];
+  const b = points[hi];
+  const t = Math.min(Math.max(b.v === a.v ? 0 : (v - a.v) / (b.v - a.v), 0), 1);
+  return {
+    x: a.x + (b.x - a.x) * t,
+    y: a.y + (b.y - a.y) * t,
+    at: a.at + (b.at - a.at) * t,
+    // Its nose is drawn pointing down the screen, at 90°
+    angle: (Math.atan2(b.y - a.y, b.x - a.x) * 180) / Math.PI - 90,
+  };
+}
+
+/**
+ * A phone's lane change across `across` px in `drop`: how round its curves
+ * are, and how far off the upright its straight run leans, so the two curves
+ * and the run take it exactly across in exactly the drop. Null where there
+ * isn't the room (an S does instead).
+ */
+function laneChange(across: number, drop: number) {
+  const r = Math.min(SWING, drop / 2, across / 2);
+  if (r < 8) return null;
+  const reach = (lean: number) => 2 * r * (1 - Math.cos(lean)) + (drop - 2 * r * Math.sin(lean)) * Math.tan(lean) - across;
+  let lo = 0;
+  let hi = Math.PI / 2 - 0.001;
+  if (reach(hi) < 0) return null;
+  for (let i = 0; i < 40; i++) {
+    const mid = (lo + hi) / 2;
+    if (reach(mid) < 0) lo = mid;
+    else hi = mid;
+  }
+  return { r, lean: (lo + hi) / 2 };
+}
 /** A stretch of the street, straight or a bend, for the light it leaves. */
 type Piece = { d: string; from: number; to: number };
 type Road = {
@@ -66,13 +113,18 @@ type Road = {
   d: string;
   /** The street, walked in small steps from its start, for placing the car. */
   points: Point[];
+  /** Where the car waits at the mouth and pulls up at the end, on its line. */
+  park: number;
+  stop: number;
+  /** The drive as keyframes, the car's place and heading at each step of its line, for the scroll to run. */
+  frames: string;
   pieces: Piece[];
   /** Where on the car's line each bend starts and ends, and which way it goes. */
   bends: { from: number; to: number; side: number }[];
   start: number;
   end: number;
-  /** Where the mouth opens (its middle), how big it is, and its shape. */
-  mouth: { x: number; width: number; height: number; d: string };
+  /** Where the mouth's box sits, how big it is, and its shape. */
+  mouth: { left: number; width: number; height: number; d: string };
   /** How far down each district starts, and each exit sits. */
   districts: number[];
   exits: number[];
@@ -87,11 +139,13 @@ type Road = {
  * billboard saying what it's for, and its platforms are exits off the road,
  * out to each one. It ends at your wallet.
  *
- * The car holds its line on the screen by itself (it's sticky), so it keeps
- * dead still while the street runs under it, however the page is scrolled:
- * only its steer across the road follows the scroll. On a phone or a tablet
- * the billboard holds at the top of the screen while the district's exits
- * come by under it, and each one the car passes takes the billboard.
+ * The car is on the road itself, in the street's own layer: the scroll moves
+ * it along the road (a scroll-driven animation, run by the browser with the
+ * scroll, where there are those; by script where not), so however fast the
+ * page is flung it can fall behind or run ahead a moment, but never leaves
+ * the road. It holds its line on the screen as it goes. On a phone or a
+ * tablet the billboard holds at the top of the screen while the district's
+ * exits come by under it, and each one the car passes takes the billboard.
  *
  * `pinned`: the street holds still once the car has pulled up at its end,
  * for as long as whatever wraps it runs on (the wallet opens out of it
@@ -108,7 +162,8 @@ export function StreetSection({
   const sectionRef = useRef<HTMLElement>(null);
   const approachRef = useRef<HTMLDivElement>(null);
   const openingRef = useRef<HTMLElement>(null);
-  const rigRef = useRef<HTMLDivElement>(null);
+  const footRef = useRef<HTMLSpanElement>(null);
+  const wayRef = useRef<HTMLDivElement>(null);
   const carRef = useRef<HTMLDivElement>(null);
   const blockRefs = useRef<(HTMLDivElement | null)[]>([]);
   const laneRefs = useRef<(HTMLSpanElement | null)[]>([]);
@@ -120,7 +175,14 @@ export function StreetSection({
   // How many districts the car has reached, and exits it has passed
   const [reached, setReached] = useState(0);
   const [passed, setPassed] = useState(0);
+  const reachedRef = useRef(0);
   const passedRef = useRef(0);
+  // How far up from the screen's foot the car's line is (FROM_FOOT, in px)
+  const fromFoot = useRef(0);
+  // Whether the browser runs the drive with the scroll itself
+  const timed = useScrollTimeline();
+  // The drive's keyframes and the street's view timeline, named for this street
+  const name = `street${useId().replace(/[^a-zA-Z0-9]/g, "")}`;
   // The exit you're pointing at, if any (a laptop's; on a phone or a tablet
   // the car picks what the billboard shows as it passes each one)
   const [looking, setLooking] = useState<ShowcasePlatformName | null>(null);
@@ -128,16 +190,9 @@ export function StreetSection({
   const registerExit = useCallback((number: number, el: HTMLLIElement | null) => {
     exitRefs.current[number - 1] = el;
   }, []);
-  const carX = useMotionValue(0);
-  const carY = useMotionValue(0);
-  // It steers into a bend, not snaps to it
-  const heading = useMotionValue(0);
-  const carAngle = useSpring(heading, { stiffness: 320, damping: 32, mass: 0.6 });
-
   // Lay the street down the districts' lanes, straight down each, and across
   // to the next between them: on a laptop a round corner, a straight run
-  // across and a round corner back down; on a phone or a tablet one S (and
-  // one more out of the mouth into the first lane)
+  // across and a round corner back down; on a phone or a tablet a lane change
   const measure = () => {
     const section = sectionRef.current;
     if (!section) return;
@@ -158,14 +213,8 @@ export function StreetSection({
     const start = approachRef.current ? approachRef.current.getBoundingClientRect().bottom - box.top : 0;
     const end = box.height - END_GAP;
     const entry = lanes[0];
-    // Where it opens. On a laptop that's over the first lane. On a phone or
-    // a tablet it's nearer the middle, in a funnel that narrows to the road
-    // (the car waits in its neck), and the road sweeps from there into the
-    // first lane, all in the room left under the approach
-    const neck = wide ? start : start + Math.min(FUNNEL.depth, Math.max(entry.top - start, 0) * FUNNEL.share);
-    const middle = box.width / 2 - entry.x;
-    const lead = wide ? 0 : Math.sign(middle) * Math.min(Math.abs(middle), (entry.top - neck) * FUNNEL.lean);
-    const mouthX = entry.x + lead;
+    // It opens over the first lane, and runs straight down it
+    const mouthX = entry.x;
 
     const points: Point[] = [];
     const pieces: Piece[] = [];
@@ -186,36 +235,49 @@ export function StreetSection({
     };
     let d = `M${mouthX} ${start}`;
     walk(mouthX, start);
-    // A phone's or a tablet's S, from one lane to the next, the car on its
-    // line all the way: it swings across as the page comes down. It's a
-    // stretch of its own, and a bend the car signals for.
+    // A phone's or a tablet's lane change, from one lane to the next, the car
+    // on its line all the way: it swings across as the page comes down. It's
+    // a stretch of its own, and a bend the car signals for.
     const swing = (x0: number, y0: number, x1: number, y1: number) => {
-      bends.push({ from: y0, to: y1, side: Math.sign(x1 - x0) });
-      const drop = y1 - y0;
-      const c1 = y0 + SWAY * drop;
-      const c2 = y1 - SWAY * drop;
-      const s = `C${x0} ${c1} ${x1} ${c2} ${x1} ${y1}`;
+      const side = Math.sign(x1 - x0);
+      bends.push({ from: y0, to: y1, side });
+      const shape = laneChange(Math.abs(x1 - x0), y1 - y0);
+      let s: string;
+      if (shape) {
+        // Off the lane round a curve, along the run, round onto the next lane
+        const { r, lean } = shape;
+        const ax = x0 + side * r * (1 - Math.cos(lean));
+        const ay = y0 + r * Math.sin(lean);
+        const bx = x1 - side * r * (1 - Math.cos(lean));
+        const by = y1 - r * Math.sin(lean);
+        s = `A${r} ${r} 0 0 ${side > 0 ? 0 : 1} ${ax} ${ay}L${bx} ${by}A${r} ${r} 0 0 ${side > 0 ? 1 : 0} ${x1} ${y1}`;
+        for (let step = 1; step <= 24; step++) {
+          const a = (step / 24) * lean;
+          walk(x0 + side * r * (1 - Math.cos(a)), y0 + r * Math.sin(a));
+        }
+        walk(bx, by);
+        for (let step = 1; step <= 24; step++) {
+          const a = lean - (step / 24) * lean;
+          walk(x1 - side * r * (1 - Math.cos(a)), y1 - r * Math.sin(a));
+        }
+      } else {
+        const drop = y1 - y0;
+        const c1 = y0 + SWAY * drop;
+        const c2 = y1 - SWAY * drop;
+        s = `C${x0} ${c1} ${x1} ${c2} ${x1} ${y1}`;
+        for (let step = 1; step <= 64; step++) {
+          const t = step / 64;
+          const u = 1 - t;
+          walk(
+            u ** 3 * x0 + 3 * u * u * t * x0 + 3 * u * t * t * x1 + t ** 3 * x1,
+            u ** 3 * y0 + 3 * u * u * t * c1 + 3 * u * t * t * c2 + t ** 3 * y1,
+          );
+        }
+      }
       d += s;
       piece += s;
-      for (let step = 1; step <= 64; step++) {
-        const t = step / 64;
-        const u = 1 - t;
-        walk(
-          u ** 3 * x0 + 3 * u * u * t * x0 + 3 * u * t * t * x1 + t ** 3 * x1,
-          u ** 3 * y0 + 3 * u * u * t * c1 + 3 * u * t * t * c2 + t ** 3 * y1,
-        );
-      }
       cut();
     };
-    // Out of the mouth: down its neck, where the car waits, then across
-    // into the first lane
-    if (Math.abs(lead) >= 1 && neck > start) {
-      d += `V${neck}`;
-      piece += `V${neck}`;
-      walk(mouthX, neck);
-      cut();
-      swing(mouthX, neck, entry.x, entry.top);
-    }
     lanes.forEach((lane, i) => {
       if (i === 0) return;
       const from = lanes[i - 1];
@@ -286,32 +348,66 @@ export function StreetSection({
         });
 
     // The mouth, the cream of the approach narrowing into the road. A
-    // laptop's: two round corners. A phone's or a tablet's: a wide funnel,
-    // each side one long curve, leaving the approach's edge level and meeting
-    // the road upright.
+    // laptop's: two round corners. A phone's or a tablet's: the cream pours
+    // into the first lane down the screen's edge, one long curve on the
+    // road's inner side, leaving the approach's edge level and meeting the
+    // road upright, and on its outer side an easy S off the screen's edge
+    // onto the road's, upright at both ends.
     let mouth: Road["mouth"];
     if (wide) {
       const { radius: r, road: w } = MOUTH;
       mouth = {
-        x: mouthX,
+        left: mouthX - r - w / 2,
         width: 2 * r + w,
         height: r,
         d: `M0 0A${r} ${r} 0 0 1 ${r} ${r}H${r + w}A${r} ${r} 0 0 1 ${2 * r + w} 0Z`,
       };
     } else {
-      const half = Math.max(Math.min(FUNNEL.half, mouthX - 16, box.width - mouthX - 16), FUNNEL.road);
-      const reach = half - FUNNEL.road / 2;
-      const deep = neck - start;
-      const far = 2 * half;
+      const w = SHOULDER.road;
+      // The long curve's on the side of the screen's middle
+      const inward = box.width / 2 >= mouthX ? 1 : -1;
+      const edge = inward > 0 ? mouthX - w / 2 : box.width - mouthX - w / 2;
+      const room = inward > 0 ? box.width - mouthX - w / 2 : mouthX - w / 2;
+      // The verge between the road and the screen's edge, which the S crosses
+      const verge = Math.max(edge, 0);
+      const reach = Math.max(Math.min(SHOULDER.reach, room - 24), 24);
+      const deep = Math.max(Math.min(SHOULDER.depth, entry.top - start - 24), 24);
+      const width = verge + w + reach;
+      // Drawn with its long curve on the right, and turned round if that's on the left
+      const shape =
+        inward > 0
+          ? `M0 0C0 ${deep * 0.55} ${verge} ${deep * 0.45} ${verge} ${deep}H${verge + w}A${reach} ${deep} 0 0 1 ${width} 0Z`
+          : `M${width} 0C${width} ${deep * 0.55} ${width - verge} ${deep * 0.45} ${width - verge} ${deep}H${width - verge - w}A${reach} ${deep} 0 0 0 0 0Z`;
       mouth = {
-        x: mouthX,
-        width: far,
+        left: inward > 0 ? mouthX - w / 2 - verge : mouthX + w / 2 + verge - width,
+        width,
         height: deep,
-        d:
-          `M0 0C${0.66 * reach} 0 ${reach} ${0.4 * deep} ${reach} ${deep}` +
-          `H${far - reach}C${far - reach} ${0.4 * deep} ${far - 0.66 * reach} 0 ${far} 0Z`,
+        d: shape,
       };
     }
+
+    // The drive, for the scroll to run: where the car is and which way it
+    // faces at each step of its line, from its spot at the mouth to the one
+    // at the end. Straight down the road its two ends are enough; round a
+    // bend, every step walked.
+    const park = start + PARKED;
+    const stop = Math.max(end - PULL_UP, park + 1);
+    const steps = [park, ...points.map((point) => point.v).filter((v) => v > park && v < stop), stop];
+    const frames = steps
+      .map((v, k) => {
+        const here = along(points, v);
+        // Facing along the road through this step: from the one before to the one after
+        const before = along(points, steps[Math.max(k - 1, 0)]);
+        const after = along(points, steps[Math.min(k + 1, steps.length - 1)]);
+        const angle =
+          after.x === before.x && after.y === before.y
+            ? here.angle
+            : (Math.atan2(after.y - before.y, after.x - before.x) * 180) / Math.PI - 90;
+        const at = (((v - park) / (stop - park)) * 100).toFixed(3);
+        return `${at}%{translate:${here.x.toFixed(1)}px ${here.y.toFixed(1)}px;rotate:${angle.toFixed(2)}deg}`;
+      })
+      .join("");
+    fromFoot.current = footRef.current?.offsetHeight ?? 0;
 
     lightShown.current = [];
     setRoad({
@@ -319,6 +415,9 @@ export function StreetSection({
       height: box.height,
       d,
       points,
+      park,
+      stop,
+      frames,
       pieces,
       bends,
       start,
@@ -331,30 +430,24 @@ export function StreetSection({
     onRoadEnd?.(last.x);
   };
 
-  // The car sits on its line on the screen (its rig is sticky there) while
-  // the street runs under it: find where the street is under that line, and
-  // steer it there. It waits at the mouth until the page brings the mouth up
-  // to its line, and pulls up at the end, both the rig's own doing.
+  // Where the car's line is on the street now (it waits at the mouth until
+  // the page brings the mouth up to it, and pulls up at the end): the light
+  // behind it, its indicator, the districts it's reached and the exits it's
+  // passed. Where the browser doesn't run the drive with the scroll, the car
+  // too, put on the road at that point.
   const drive = () => {
     const section = sectionRef.current;
-    const rig = rigRef.current;
-    if (!section || !rig || !road) return;
-    const line = rig.getBoundingClientRect().top - section.getBoundingClientRect().top;
-    const { points } = road;
-    let hi = points.findIndex((point) => point.v >= line);
-    if (hi <= 0) hi = hi === 0 ? 1 : points.length - 1;
-    const a = points[hi - 1];
-    const b = points[hi];
-    const t = Math.min(Math.max(b.v === a.v ? 0 : (line - a.v) / (b.v - a.v), 0), 1);
-    const x = a.x + (b.x - a.x) * t;
-    const y = a.y + (b.y - a.y) * t;
-    carX.set(x);
-    carY.set(y - line);
-    // Its nose is drawn pointing down the screen, at 90°
-    heading.set((Math.atan2(b.y - a.y, b.x - a.x) * 180) / Math.PI - 90);
+    if (!section || !road) return;
+    const seen = document.documentElement.clientHeight - fromFoot.current - section.getBoundingClientRect().top;
+    const line = Math.min(Math.max(seen, road.park), road.stop);
+    const { x, y, at, angle } = along(road.points, line);
+    const way = wayRef.current;
+    if (!timed && way) {
+      way.style.translate = `${x.toFixed(1)}px ${y.toFixed(1)}px`;
+      way.style.rotate = `${angle.toFixed(2)}deg`;
+    }
     // The light it leaves behind it, stretch by stretch: only the one it's on
     // changes as it goes
-    const at = a.at + (b.at - a.at) * t;
     road.pieces.forEach((piece, i) => {
       const shown = Math.round(Math.min(Math.max((at - piece.from) / (piece.to - piece.from), 0), 1) * 1000);
       if (lightShown.current[i] === shown) return;
@@ -368,12 +461,19 @@ export function StreetSection({
       if (turn) carRef.current.dataset.turn = turn;
       else delete carRef.current.dataset.turn;
     }
-    setReached(road.districts.filter((top) => top - 120 <= y).length);
+    // Only what's changed renders again
+    const reachedNow = road.districts.filter((top) => top - 120 <= y).length;
+    if (reachedNow !== reachedRef.current) {
+      reachedRef.current = reachedNow;
+      setReached(reachedNow);
+    }
     const now = road.exits.filter((exit) => exit <= y).length;
-    // A tick as it passes each exit, where the exits come to the car
-    if (now > passedRef.current && narrow) tick();
-    passedRef.current = now;
-    setPassed(now);
+    if (now !== passedRef.current) {
+      // A tick as it passes each exit, where the exits come to the car
+      if (now > passedRef.current && narrow) tick();
+      passedRef.current = now;
+      setPassed(now);
+    }
   };
 
   const { scrollY } = useScroll();
@@ -398,8 +498,23 @@ export function StreetSection({
   useEffect(() => {
     const frame = requestAnimationFrame(() => redrive());
     return () => cancelAnimationFrame(frame);
-  }, [road]);
-  const parked = road ? road.start + PARKED : 0;
+  }, [road, timed]);
+  // The drive's never held still off the screen (sections asleep there hold
+  // their looping animations, app/globals.css), or it'd lose its place
+  useEffect(() => {
+    wayRef.current?.style.setProperty("animation-play-state", "running", "important");
+  }, [road, timed]);
+  const driving: CSSProperties | undefined =
+    road && timed
+      ? {
+          animationName: name,
+          animationDuration: "auto",
+          animationTimingFunction: "linear",
+          animationFillMode: "both",
+          animationTimeline: `--${name}`,
+          animationRange: `cover calc(${road.park.toFixed(1)}px + ${FROM_FOOT}) cover calc(${road.stop.toFixed(1)}px + ${FROM_FOOT})`,
+        }
+      : undefined;
 
   return (
     <section
@@ -407,14 +522,29 @@ export function StreetSection({
       id="street"
       aria-labelledby="street-heading"
       className={`${styles.section} ${street.street} bg-background text-foreground`}
-      // Pinned, it holds from when the car reaches its parking spot at the
-      // end: the road's end on the car's line, just below it
-      style={
-        pinned && road
-          ? { position: "sticky", top: `calc(${ANCHOR * 100}svh + ${PULL_UP - road.end}px)` }
-          : undefined
-      }
+      // Its view of the page runs the car's drive. Pinned, it holds from when
+      // the car reaches its parking spot at the end: the road's end on the
+      // car's line, just below it.
+      style={{
+        viewTimeline: `--${name} block`,
+        ...(pinned && road ? { position: "sticky", top: `calc(${ANCHOR * 100}svh + ${PULL_UP - road.end}px)` } : {}),
+      }}
     >
+      {/* How far up from the screen's foot the car's line is, measured */}
+      <span ref={footRef} aria-hidden="true" className={styles.foot} style={{ height: FROM_FOOT }} />
+      {/* The mouth under the road, so the road's line and the light behind
+          the car run on up into the cream */}
+      {road && (
+        <svg
+          aria-hidden="true"
+          className={street.mouth}
+          style={{ left: road.mouth.left, top: road.start }}
+          width={road.mouth.width}
+          height={road.mouth.height}
+        >
+          <path d={road.mouth.d} />
+        </svg>
+      )}
       {road && (
         <svg
           aria-hidden="true"
@@ -446,17 +576,6 @@ export function StreetSection({
               <path d={piece.d} pathLength={1000} />
             </g>
           ))}
-        </svg>
-      )}
-      {road && (
-        <svg
-          aria-hidden="true"
-          className={street.mouth}
-          style={{ left: road.mouth.x, top: road.start }}
-          width={road.mouth.width}
-          height={road.mouth.height}
-        >
-          <path d={road.mouth.d} />
         </svg>
       )}
 
@@ -538,16 +657,13 @@ export function StreetSection({
         </div>
       </div>
 
-      {/* The car's rig: sticky on its line from its parking spot at the
-          mouth to the one at the end, so the browser holds it there */}
+      {/* The car, on the road in the street's own layer: the drive (its
+          keyframes, run by the street's view of the page) takes it along */}
       {road && (
-        <div
-          aria-hidden="true"
-          className={styles.carTrack}
-          style={{ top: parked, height: Math.max(road.end - PULL_UP - parked, 0) }}
-        >
-          <div ref={rigRef} className={styles.carRig} style={{ top: `${ANCHOR * 100}svh` }}>
-            <StreetCar ref={carRef} style={{ x: carX, y: carY, rotate: carAngle }} />
+        <div aria-hidden="true" className={styles.carLayer}>
+          {timed && <style>{`@keyframes ${name}{${road.frames}}`}</style>}
+          <div ref={wayRef} className={styles.carWay} style={driving}>
+            <StreetCar ref={carRef} />
           </div>
         </div>
       )}

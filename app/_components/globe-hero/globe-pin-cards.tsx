@@ -4,6 +4,7 @@ import { useId, useState } from "react";
 import Image from "next/image";
 import { cn } from "cn";
 import { Icon, type IconName } from "@/components/icon";
+import { PlatformIcon } from "@/components/ui/platform-icon";
 import type { Face, GameArt, PinCard } from "./globe-pins-content";
 import styles from "./globe-pins.module.css";
 
@@ -76,15 +77,6 @@ function FaceStack({ faces, size = 20 }: { faces: readonly Face[]; size?: number
   );
 }
 
-/** A solid tile in the platform's colour, with the glyph in its ink: the card's mark. */
-function Mark({ icon, size = 24 }: { icon: IconName; size?: number }) {
-  return (
-    <span className="grid shrink-0 place-items-center rounded-sm bg-[var(--hue)]" style={{ width: size, height: size }}>
-      <Icon name={icon} size={Math.round(size * 0.62)} tone="current" className="text-[var(--hue-on)]" />
-    </span>
-  );
-}
-
 function ChangePill({ change, stable }: { change: number; stable?: boolean }) {
   if (stable) {
     return <span className="rounded-pill bg-white/10 px-1 text-xs leading-[20px] text-[var(--cx-glass-text-2)]">Stable</span>;
@@ -130,7 +122,7 @@ function Sparkline({ values, up }: { values: readonly number[]; up: boolean }) {
 const label = "text-xs leading-[20px] text-[var(--cx-glass-text-2)]";
 
 /** The body of one pin's card, by kind. The card's glass, accent and link are around it (globe-pins.tsx). */
-export function PinCardBody({ card, live, city, icon }: { card: PinCard; live: PinLive; city: string; icon: IconName }) {
+export function PinCardBody({ card, live, city }: { card: PinCard; live: PinLive; city: string }) {
   const place = (text: string) => text.replace("{city}", city);
 
   switch (card.kind) {
@@ -201,7 +193,8 @@ export function PinCardBody({ card, live, city, icon }: { card: PinCard; live: P
       return (
         <span className="flex w-[296px] flex-col gap-1 p-1.5">
           <span className="flex items-center gap-1 pr-[24px]">
-            <Mark icon={icon} size={24} />
+            {/* A WorldSpace group: its logo heads the card */}
+            <PlatformIcon name="WorldSpace" size={24} />
             <span className="min-w-0 flex-1 truncate text-xs leading-[20px] font-medium text-[var(--cx-glass-text)]">{place(card.group)}</span>
             <span className="flex items-center gap-[6px] text-xs leading-[20px] text-[var(--cx-glass-text-2)] tabular-nums">
               <span className="size-[6px] rounded-full bg-credit" />

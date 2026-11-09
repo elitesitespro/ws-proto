@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import Image from "next/image";
+import { WorldSpaceLogo } from "@/components/ui/worldspace-logo";
 import { PlatformViewShell } from "./platform-view-shell";
 import { WorldspaceFeed } from "./worldspace/worldspace-feed";
 import { WorldspaceRoom } from "./worldspace/worldspace-room";
@@ -24,7 +24,7 @@ export function WorldspacePlatformView() {
       glass="dark"
       eyebrow={
         <span className={styles.brand}>
-          <Image src="/assets/worldspace/mark.webp" alt="" width={40} height={25} className={styles.mark} />
+          <WorldSpaceLogo size={36} className={styles.mark} />
           WorldSpace
         </span>
       }

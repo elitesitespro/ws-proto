@@ -398,7 +398,7 @@ export function GlobePins({
                   }}
                 >
                   <span className={styles.accent} />
-                  <PinCardBody card={pin.card} live={pin} city={pin.city.name} icon={set.icon} />
+                  <PinCardBody card={pin.card} live={pin} city={pin.city.name} />
                   <Icon name="arrow-up-right" size={16} className={cn("text-current", styles.go)} />
                   <span className="sr-only">Open {shownFor}</span>
                 </a>

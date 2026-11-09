@@ -53,6 +53,12 @@
 .scene > * {
   zoom: var(--fit, 1);
 }
+/* The last resort, where even that isn't enough: the scene keeps to its own
+   box, fading out at its foot, so nothing in it is ever under the way in */
+.scene[data-cut] {
+  overflow-y: clip;
+  mask-image: linear-gradient(to bottom, #000 calc(100% - 28px), transparent);
+}
 
 .footer {
   display: flex;

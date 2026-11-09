@@ -1,8 +1,7 @@
 /* Vivid, after the wallet, on the night: its intro (vivid-intro.module.css),
-   its heading, the switchboard (vivid-switchboard.module.css), and its two
-   plans. Vivid wears
-   WorldStreet's gold and nothing else (worldstreet-hub lib/hues.ts); the
-   platforms it points to wear their own. */
+   its heading, the switchboard (vivid-switchboard.module.css), and Free and
+   Pro. Vivid wears WorldStreet's gold and nothing else (worldstreet-hub
+   lib/hues.ts); the platforms it points to wear their own. */
 .section {
   position: relative;
   z-index: 2;
@@ -24,7 +23,7 @@
 }
 .eyebrow {
   margin-bottom: 16px;
-  color: #d9f25a;
+  color: #facc15;
   font-size: 14px;
   font-weight: 500;
   line-height: 20px;
@@ -36,148 +35,197 @@
   line-height: 28px;
 }
 
+/* Free and Pro (vivid-plans.tsx): a line, the two side by side as one table
+   with Pro's column lit gold, and Pro's way in. Standing up it reads top to
+   bottom (the way in after the table); laid across, the line and the way in
+   on the left, the table on the right. */
 .plansWrap {
-  margin-top: 96px;
-}
-.plans {
-  display: grid;
-  gap: 16px;
-}
-.plan {
-  position: relative;
-  overflow: hidden;
-  display: grid;
-  align-content: start;
-  gap: 12px;
-  padding: 24px;
-  border-radius: 24px;
-  background: rgba(255, 255, 255, 0.03);
-  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.08);
-}
-.pro {
-  background:
-    radial-gradient(90% 70% at 100% 0%, rgba(198, 232, 43, 0.12), transparent 70%),
-    rgba(255, 255, 255, 0.03);
-  box-shadow: inset 0 0 0 1px rgba(198, 232, 43, 0.4);
-}
-.planName {
   display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 15px;
-  font-weight: 500;
+  flex-direction: column;
+  margin-top: 72px;
 }
-.badge,
+.plansHead {
+  display: contents;
+}
+.plansTitle {
+  order: 0;
+  max-width: 18em;
+  margin-bottom: 24px;
+  font-size: 28px;
+  font-weight: 400;
+  line-height: 1.15;
+  letter-spacing: -0.03em;
+  text-wrap: balance;
+}
+.plansTitle span {
+  color: #facc15;
+}
+
+.compare {
+  order: 1;
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  font-size: 15px;
+  line-height: 1.4;
+}
+.compare th,
+.compare td {
+  padding: 12px 0;
+  vertical-align: middle;
+}
+.compare tbody th[scope="row"] {
+  padding-right: 12px;
+  color: #d6d3d1;
+  font-weight: 400;
+  text-align: left;
+  text-wrap: pretty;
+}
+.compare tbody td {
+  text-align: center;
+}
+/* A hairline between the rows, across the words and Free's column */
+.compare tbody tr > :not(.cellPro) {
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.07);
+}
+.colFree,
+.colPro {
+  font-size: 14px;
+  font-weight: 500;
+  text-align: center;
+}
+.colFree {
+  width: 56px;
+  color: #a8a29e;
+}
+/* Pro's column: lit gold from its head to its foot, a gold rim round it */
+.colPro,
+.cellPro {
+  width: 76px;
+  background: rgba(234, 179, 8, 0.09);
+  box-shadow:
+    inset 1px 0 0 rgba(234, 179, 8, 0.4),
+    inset -1px 0 0 rgba(234, 179, 8, 0.4);
+}
+.compare th.colPro {
+  padding-top: 14px;
+  border-radius: 18px 18px 0 0;
+  box-shadow:
+    inset 1px 0 0 rgba(234, 179, 8, 0.4),
+    inset -1px 0 0 rgba(234, 179, 8, 0.4),
+    inset 0 1px 0 rgba(234, 179, 8, 0.4);
+}
+.compare tbody:last-of-type tr:last-child .cellPro {
+  border-radius: 0 0 18px 18px;
+  box-shadow:
+    inset 1px 0 0 rgba(234, 179, 8, 0.4),
+    inset -1px 0 0 rgba(234, 179, 8, 0.4),
+    inset 0 -1px 0 rgba(234, 179, 8, 0.4);
+}
+.proHead {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
 .badgePro {
   padding: 2px 10px;
   border-radius: 999px;
+  background: #eab308;
+  color: #1c1917;
   font-size: 12px;
   font-weight: 500;
 }
-.badge {
-  background: rgba(198, 232, 43, 0.14);
-  color: #d9f25a;
+.yes,
+.yesPro,
+.no {
+  display: inline-grid;
+  place-items: center;
+  vertical-align: middle;
 }
-.badgePro {
-  background: #c6e82b;
+.yes {
+  color: rgba(250, 250, 249, 0.7);
+}
+.yesPro {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: #eab308;
   color: #1c1917;
 }
-.plan h3 {
-  font-size: var(--text-lg);
-  font-weight: 400;
-  letter-spacing: -0.02em;
-  line-height: 1.2;
+.no {
+  color: rgba(250, 250, 249, 0.25);
 }
-.plan ul {
-  display: grid;
-  gap: 8px;
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-.plan li {
-  position: relative;
-  padding-left: 20px;
-  color: #d6d3d1;
-  font-size: 15px;
-  line-height: 1.5;
-}
-.plan li::before {
-  content: "";
-  position: absolute;
-  top: 0.6em;
-  left: 2px;
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: #c6e82b;
-}
-/* Voice, Pro's: the globe as a press-to-talk control, breathing */
-.voice {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  justify-self: start;
-  margin-top: 8px;
-  padding: 10px 20px 10px 10px;
-  border-radius: 999px;
-  background: rgba(28, 25, 23, 0.9);
-  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.1);
-  color: inherit;
-  text-decoration: none;
-  transition: box-shadow 200ms ease;
-}
-.voice:hover {
-  box-shadow: inset 0 0 0 1px rgba(198, 232, 43, 0.6);
-}
-.voice:focus-visible {
-  outline: 2px solid #d9f25a;
-  outline-offset: 3px;
-}
-.voice > span:last-child {
-  display: grid;
-  line-height: 1.35;
-}
-.voice b {
-  font-size: 14px;
+/* What only Pro does: introduced as what it adds, and set brighter */
+.compare .plus th {
+  padding: 22px 12px 8px 0;
+  color: #facc15;
+  font-size: 13px;
   font-weight: 500;
+  letter-spacing: 0.02em;
+  text-align: left;
 }
-.voice small {
-  color: #a8a29e;
-  font-size: 12px;
-}
-.voiceOrb {
-  position: relative;
-  display: grid;
-  place-items: center;
-}
-.breath {
-  position: absolute;
-  inset: -3px;
-  border-radius: 50%;
-  box-shadow: 0 0 0 1px rgba(198, 232, 43, 0.5);
-  animation: breath 2.4s cubic-bezier(0.22, 1, 0.36, 1) infinite;
-}
-@keyframes breath {
-  from {
-    opacity: 0.8;
-    transform: scale(1);
-  }
-  to {
-    opacity: 0;
-    transform: scale(1.32);
-  }
+.compare .proRow th[scope="row"] {
+  color: #fafaf9;
 }
 
-@media (min-width: 768px) {
-  .plans {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+/* Pro's way in: the gold button, with the plain fact about Free under it */
+.getPro {
+  order: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  height: 56px;
+  margin-top: 28px;
+  padding: 0 28px;
+  border-radius: 999px;
+  background: #eab308;
+  box-shadow: 0 8px 32px -6px rgba(234, 179, 8, 0.6);
+  color: #1c1917;
+  font-size: 17px;
+  font-weight: 500;
+  text-decoration: none;
+  transition:
+    background 200ms ease,
+    transform 120ms ease;
+}
+.getPro:hover {
+  background: #facc15;
+}
+.getPro:active {
+  transform: scale(0.98);
+}
+.getPro:focus-visible {
+  outline: 2px solid #facc15;
+  outline-offset: 3px;
+}
+.plansNote {
+  order: 3;
+  margin-top: 10px;
+  color: #a8a29e;
+  font-size: 13px;
+  line-height: 18px;
+  text-align: center;
+}
+.fineprint {
+  order: 4;
+  margin-top: 20px;
+  color: rgba(255, 255, 255, 0.4);
+  font-size: 12px;
+  line-height: 16px;
+  text-align: center;
+}
+
+/* A tablet: the board's width, centred */
+@media (min-width: 768px) and (max-width: 1023px) {
+  .plansWrap {
+    max-width: 640px;
+    margin-inline: auto;
   }
 }
-/* A phone: the two side by side all the same, set smaller, so they read
-   together; Pro's voice button down to its globe and its name */
+/* A phone: less night round it */
 @media (max-width: 767px) {
-  /* Less night between the plans and the finale */
   .section {
     padding-bottom: 72px;
   }
@@ -188,57 +236,22 @@
     font-size: 16px;
     line-height: 24px;
   }
-  .plansWrap {
-    margin-top: 56px;
-  }
-  .plans {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 10px;
-  }
-  .plan {
-    gap: 10px;
-    padding: 16px 14px;
-    border-radius: 20px;
-  }
-  .planName {
+}
+/* A narrow phone: the table a little tighter */
+@media (max-width: 380px) {
+  .compare {
     font-size: 14px;
   }
-  .plan h3 {
-    font-size: var(--text-base);
+  .colFree {
+    width: 48px;
   }
-  .plan ul {
-    gap: 6px;
-  }
-  .plan li {
-    padding-left: 14px;
-    font-size: 13px;
-    line-height: 1.4;
-  }
-  .plan li::before {
-    left: 0;
-    width: 5px;
-    height: 5px;
-  }
-  .voice {
-    gap: 10px;
-    padding: 6px 14px 6px 6px;
-  }
-  .voiceOrb {
-    width: 40px;
-    height: 40px;
-  }
-  /* scale shrinks the drawing, not the box it's laid out in, so the 56px
-     globe gives back what it's over the 40px orb (8px a side) and sits
-     centred in its ring instead of hanging off its corner */
-  .voiceOrb > :last-child {
-    margin: -8px;
-    scale: 0.72;
-  }
-  .voice small {
-    display: none;
+  .colPro,
+  .cellPro {
+    width: 68px;
   }
 }
-/* On a laptop the heading and its line sit side by side */
+/* On a laptop the heading and its line sit side by side, and so do Free and
+   Pro's line (with its way in) and the table */
 @media (min-width: 1024px) {
   .head {
     grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
@@ -251,12 +264,45 @@
     justify-self: end;
   }
   .plansWrap {
+    display: grid;
+    grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+    column-gap: clamp(48px, 6vw, 96px);
+    align-items: start;
     margin-top: 120px;
   }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .breath {
-    animation: none;
+  .plansHead {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    grid-column: 1;
+    grid-row: 1;
+    padding-top: 24px;
+  }
+  .plansTitle {
+    font-size: 44px;
+    line-height: 1.1;
+  }
+  .getPro {
+    margin-top: 8px;
+  }
+  .plansNote {
+    text-align: left;
+  }
+  .compare {
+    grid-column: 2;
+    grid-row: 1;
+    font-size: 16px;
+  }
+  .colFree {
+    width: 96px;
+  }
+  .colPro,
+  .cellPro {
+    width: 128px;
+  }
+  .fineprint {
+    grid-column: 2;
+    grid-row: 2;
+    text-align: left;
   }
 }

@@ -448,6 +448,27 @@
   .captions {
     display: grid;
   }
+  /* The call alone, from the top, its own height (centred in a row that
+     could shrink to nothing, it ran out over the words above and under the
+     way in below, and only what ran out below was measured) */
+  .stage {
+    grid-template-rows: auto;
+    align-items: start;
+  }
+}
+
+/* Shorter still: the captions a little tighter, and the people a row of a
+   set height (square, they grew with the width as the call was drawn smaller
+   to fit, scene-fit.tsx, and never fitted) */
+@media (max-width: 1023px) and (max-height: 640px) {
+  .captions {
+    gap: 4px;
+    padding: 6px 12px 8px;
+  }
+  .tile {
+    aspect-ratio: auto;
+    height: 44px;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {

@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useLayoutEffect, useRef, useState, type RefObject } from "react";
 import { cn } from "cn";
 import { Icon, type IconName } from "@/components/icon";
+import { PlatformIcon } from "@/components/ui/platform-icon";
 import type { LatLon, NightGlobeHandle } from "@/components/globe/night-globe";
 import { hueAttrs, platformDetails, type ShowcasePlatformName } from "@/app/_components/platform-showcase-content";
 import { PIN_CITIES, type PinCity } from "./globe-pins-content";
@@ -149,9 +150,7 @@ export function GlobeCityLayer({ layer, globe, hovered, open, onClose }: GlobeCi
                       {...hue}
                       className="group flex items-center gap-1.5 rounded-md px-1 py-[6px] transition-colors hover:bg-white/[.06]"
                     >
-                      <span className="grid size-[28px] shrink-0 place-items-center rounded-sm bg-[var(--hue)]">
-                        <Icon name={line.icon} size={17} tone="current" className="text-[var(--hue-on)]" />
-                      </span>
+                      <PlatformIcon name={line.platform} size={28} />
                       <span className="flex min-w-0 flex-1 flex-col">
                         <span className="truncate text-xs leading-[20px] text-[var(--cx-glass-text)]">
                           {line.say(n.toLocaleString("en-US"))}

@@ -1,7 +1,8 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import { useEffect, useMemo, type ComponentType } from "react";
+import { createElement, useEffect, useMemo, type ComponentType } from "react";
+import { createRoot } from "react-dom/client";
 import type { ShowcasePlatformName } from "./platform-showcase-content";
 import { WorldspacePlatformView } from "./worldspace-platform-view";
 
@@ -66,16 +67,77 @@ const fetchViews: Record<Later, () => Promise<View>> = {
 // Views whose chunk is in: a turn of the dial shows them straight away, with no frame of nothing while next/dynamic
 // resolves them
 const ready: Partial<Record<Later, View>> = {};
-let fetching = false;
+let fetching: Promise<void> | null = null;
 
 function fetchAll() {
-  if (fetching) return;
-  fetching = true;
-  for (const [name, fetchView] of Object.entries(fetchViews) as [Later, () => Promise<View>][]) {
-    // A chunk that fails to come is fetched again by next/dynamic when its view is shown
-    fetchView().then((view) => (ready[name] = view), () => {});
-  }
+  fetching ??= Promise.all(
+    (Object.entries(fetchViews) as [Later, () => Promise<View>][]).map(([name, fetchView]) =>
+      // A chunk that fails to come is fetched again by next/dynamic when its view is shown
+      fetchView().then(
+        (view) => {
+          ready[name] = view;
+        },
+        () => {},
+      ),
+    ),
+  ).then(() => {});
+  return fetching;
 }
+
+const nextFrame = () => new Promise<void>((done) => requestAnimationFrame(() => done()));
+
+/**
+ * Every platform's demo, made ready while the hero's loader is up (lib/warm-page.ts): its chunk fetched, then the
+ * demo put on for a moment, out of sight and untouchable, just long enough to ask for its pictures at the very sizes
+ * it will ask for on the dial, and taken off again while they come in. One at a time, so the loader keeps turning.
+ * `landed` is called as each one's pictures are in.
+ */
+export async function warmPlatformViews(landed: () => void = () => {}) {
+  await fetchAll();
+  const stage = document.createElement("div");
+  stage.setAttribute("aria-hidden", "true");
+  stage.inert = true;
+  stage.style.cssText =
+    "position:fixed;inset:0;visibility:hidden;pointer-events:none;overflow:hidden;z-index:-1;contain:strict";
+  document.body.append(stage);
+  const coming: Promise<void>[] = [];
+  const clips: Promise<void>[] = [];
+  for (const name of Object.keys(fetchViews) as Later[]) {
+    const View = ready[name];
+    if (!View) {
+      landed();
+      continue;
+    }
+    const host = document.createElement("div");
+    host.style.cssText = "position:absolute;left:0;top:0;width:min(560px,100vw)";
+    stage.append(host);
+    // A demo that throws out here doesn't matter: it's shown for real on the dial
+    const quiet = () => {};
+    const root = createRoot(host, { onUncaughtError: quiet, onCaughtError: quiet, onRecoverableError: quiet });
+    let pictures: HTMLImageElement[] = [];
+    try {
+      root.render(createElement(View));
+      await nextFrame();
+      await nextFrame();
+      pictures = Array.from(host.querySelectorAll("img"));
+      for (const img of pictures) if (img.loading === "lazy") img.loading = "eager";
+      // Its clips (Xtream's rooms) into the cache too, whole
+      for (const video of Array.from(host.querySelectorAll("video"))) {
+        const src = video.currentSrc || video.src || video.querySelector("source")?.src;
+        if (src) clips.push(fetch(src).then((response) => response.blob()).then(() => {}, () => {}));
+      }
+    } finally {
+      // Off again at once: the pictures it asked for carry on coming in (decode() on each holds it)
+      coming.push(Promise.all(pictures.map((img) => img.decode().catch(() => {}))).then(landed));
+      root.unmount();
+      host.remove();
+    }
+  }
+  stage.remove();
+  await Promise.all([...coming, ...clips]);
+}
+/** How many demos warmPlatformViews puts on. */
+export const WARM_VIEWS = Object.keys(fetchViews).length;
 
 /**
  * Fetch the rest as the dial comes within three screens: not with the page, where on a slow phone they'd land while
