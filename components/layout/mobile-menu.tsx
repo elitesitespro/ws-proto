@@ -102,62 +102,68 @@ export function MobileMenu() {
           !open && "hidden"
         )}
       >
-        <nav aria-label="Mobile navigation" className="flex flex-col gap-2">
-          <div>
-            <NavGroupLabel id={chaptersId}>On the page</NavGroupLabel>
-            <ul aria-labelledby={chaptersId} className="grid grid-cols-2 gap-x-1">
-              {NAV_CHAPTERS.map((chapter) => (
-                <li key={chapter.label}>
-                  <ChapterLink chapter={chapter} pathname={pathname} onNavigate={close} className={ROW_LINK}>
-                    {chapter.label}
-                  </ChapterLink>
-                </li>
-              ))}
-            </ul>
-          </div>
+        {/* Its rows are only there while it's open: closed, they were a couple of hundred elements the page
+            restyled with every change to it, on every phone, menu or no menu */}
+        {open && (
+          <>
+            <nav aria-label="Mobile navigation" className="flex flex-col gap-2">
+              <div>
+                <NavGroupLabel id={chaptersId}>On the page</NavGroupLabel>
+                <ul aria-labelledby={chaptersId} className="grid grid-cols-2 gap-x-1">
+                  {NAV_CHAPTERS.map((chapter) => (
+                    <li key={chapter.label}>
+                      <ChapterLink chapter={chapter} pathname={pathname} onNavigate={close} className={ROW_LINK}>
+                        {chapter.label}
+                      </ChapterLink>
+                    </li>
+                  ))}
+                </ul>
+              </div>
 
-          <div>
-            <NavGroupLabel id={platformsId}>Every platform</NavGroupLabel>
-            <ul aria-labelledby={platformsId} className="grid grid-cols-2">
-              {NAV_PLATFORMS.map((platform) => (
-                <li key={platform.name} className="min-w-0">
-                  <NavPlatformItem platform={platform} onNavigate={close} compact />
-                </li>
-              ))}
-            </ul>
-          </div>
+              <div>
+                <NavGroupLabel id={platformsId}>Every platform</NavGroupLabel>
+                <ul aria-labelledby={platformsId} className="grid grid-cols-2">
+                  {NAV_PLATFORMS.map((platform) => (
+                    <li key={platform.name} className="min-w-0">
+                      <NavPlatformItem platform={platform} onNavigate={close} compact />
+                    </li>
+                  ))}
+                </ul>
+              </div>
 
-          <div>
-            <NavGroupLabel id={pagesId}>WorldStreet</NavGroupLabel>
-            <ul aria-labelledby={pagesId} className="flex flex-wrap gap-1">
-              {[...NAV_PAGES, CONTACT_LINK].map((page) => (
-                <li key={page.href}>
-                  <a href={page.href} onClick={close} className={cn(ROW_LINK, "bg-white/5")}>
-                    {page.label}
-                  </a>
-                </li>
-              ))}
-            </ul>
-          </div>
-        </nav>
+              <div>
+                <NavGroupLabel id={pagesId}>WorldStreet</NavGroupLabel>
+                <ul aria-labelledby={pagesId} className="flex flex-wrap gap-1">
+                  {[...NAV_PAGES, CONTACT_LINK].map((page) => (
+                    <li key={page.href}>
+                      <a href={page.href} onClick={close} className={cn(ROW_LINK, "bg-white/5")}>
+                        {page.label}
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </nav>
 
-        {/* A tablet's bar already shows both */}
-        <div className="mt-2 flex flex-col gap-1 border-t border-white/10 pt-2 md:hidden">
-          <a
-            href={ACCOUNT_LINKS.join}
-            onClick={close}
-            className={cn(buttonVariants({ variant: "default", size: "lg" }), "w-full")}
-          >
-            Open an account
-          </a>
-          <a
-            href={ACCOUNT_LINKS.signIn}
-            onClick={close}
-            className={cn(buttonVariants({ variant: "outline", size: "lg" }), "w-full")}
-          >
-            Sign in
-          </a>
-        </div>
+            {/* A tablet's bar already shows both */}
+            <div className="mt-2 flex flex-col gap-1 border-t border-white/10 pt-2 md:hidden">
+              <a
+                href={ACCOUNT_LINKS.join}
+                onClick={close}
+                className={cn(buttonVariants({ variant: "default", size: "lg" }), "w-full")}
+              >
+                Open an account
+              </a>
+              <a
+                href={ACCOUNT_LINKS.signIn}
+                onClick={close}
+                className={cn(buttonVariants({ variant: "outline", size: "lg" }), "w-full")}
+              >
+                Sign in
+              </a>
+            </div>
+          </>
+        )}
       </div>
     </div>
   );

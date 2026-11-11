@@ -170,7 +170,8 @@ export function StreetSection({
   const exitRefs = useRef<(HTMLLIElement | null)[]>([]);
   const lightRefs = useRef<(SVGGElement | null)[]>([]);
   const lightShown = useRef<number[]>([]);
-  usePauseOffscreen(sectionRef);
+  // Each district on its own as well: the street is some six screens long
+  usePauseOffscreen(sectionRef, "[data-district]");
   const [road, setRoad] = useState<Road | null>(null);
   // How many districts the car has reached, and exits it has passed
   const [reached, setReached] = useState(0);
@@ -477,7 +478,12 @@ export function StreetSection({
   };
 
   const { scrollY } = useScroll();
-  useMotionValueEvent(scrollY, "change", drive);
+  // Only while the street is within a screen of view: out of it the car's held at one end of its line, and every
+  // scroll of the page above (the dial flung through) made it measure the street, the page laid out again each time
+  const near = useRef(false);
+  useMotionValueEvent(scrollY, "change", () => {
+    if (near.current) drive();
+  });
   // The street's opening words come up as you scroll: the headline is all in
   // while it's still low on the screen, just risen into view, and the line
   // under it by the time it reaches the car's line
@@ -487,6 +493,21 @@ export function StreetSection({
   });
   const remeasure = useEffectEvent(measure);
   const redrive = useEffectEvent(drive);
+  // The street coming within a screen of view, or going
+  useEffect(() => {
+    const section = sectionRef.current;
+    if (!section) return;
+    const watch = new IntersectionObserver(
+      ([entry]) => {
+        near.current = entry.isIntersecting;
+        // Coming near, or going (to leave the car at the end of its line it's got to)
+        redrive();
+      },
+      { rootMargin: "100% 0px" },
+    );
+    watch.observe(section);
+    return () => watch.disconnect();
+  }, []);
   useEffect(() => {
     const section = sectionRef.current;
     if (!section) return;
@@ -612,6 +633,7 @@ export function StreetSection({
                 blockRefs.current[i] = el;
               }}
               className={styles.district}
+              data-district=""
               data-side={i % 2 ? "left" : "right"}
               data-hue={district.hue}
             >

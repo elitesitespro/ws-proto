@@ -81,7 +81,9 @@ export function SceneFit({ className, children }: { className: string; children:
       window.clearTimeout(settle);
       settle = window.setTimeout(fit, SETTLE);
     };
-    fit();
+    // First fitted by the ResizeObserver's opening report, which comes once the page is laid out and before it's
+    // painted. Fitted here, as the scene went on, the read made the browser restyle and lay out the whole page
+    // there and then, with the rest of that frame still to come (the dial puts a scene on as it turns).
     const resized = new ResizeObserver(soon);
     resized.observe(scene);
     // Not every style change: only what changes what's in it

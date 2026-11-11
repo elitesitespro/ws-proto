@@ -80,10 +80,6 @@ export function GlobeHeadline({ onWordChange, paused = false, waiting = false, r
     let index = 0;
     let onScreen = false;
     let frame = 0;
-    const observer = new IntersectionObserver(([entry]) => {
-      onScreen = entry.isIntersecting;
-    });
-    observer.observe(heading);
 
     const play = (from: string, to: string) => {
       const start = performance.now();
@@ -115,7 +111,7 @@ export function GlobeHeadline({ onWordChange, paused = false, waiting = false, r
     const run = (now: number) => {
       const dt = Math.min(now - last, 100);
       last = now;
-      if (!waitingRef.current && !pausedRef.current && onScreen && !document.hidden) rested += dt;
+      if (!waitingRef.current && !pausedRef.current) rested += dt;
       if (rested >= HOLD_MS) {
         rested = 0;
         const from = words[index].word;
@@ -127,12 +123,31 @@ export function GlobeHeadline({ onWordChange, paused = false, waiting = false, r
       if (barRef.current) barRef.current.style.transform = `scaleX(${(rested / HOLD_MS).toFixed(4)})`;
       clock = requestAnimationFrame(run);
     };
-    clock = requestAnimationFrame(run);
+    // The clock itself stops while the heading is scrolled away or the tab is
+    // hidden: left looping, it wrote the bar's transform on every frame for
+    // the rest of the page, a restyle a frame that nobody could see.
+    const sync = () => {
+      const on = onScreen && !document.hidden;
+      if (on && !clock) {
+        last = performance.now();
+        clock = requestAnimationFrame(run);
+      } else if (!on && clock) {
+        cancelAnimationFrame(clock);
+        clock = 0;
+      }
+    };
+    const observer = new IntersectionObserver(([entry]) => {
+      onScreen = entry.isIntersecting;
+      sync();
+    });
+    observer.observe(heading);
+    document.addEventListener("visibilitychange", sync);
 
     return () => {
       cancelAnimationFrame(clock);
       cancelAnimationFrame(frame);
       observer.disconnect();
+      document.removeEventListener("visibilitychange", sync);
     };
   }, []);
 

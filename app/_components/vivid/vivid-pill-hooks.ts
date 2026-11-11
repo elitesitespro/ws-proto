@@ -38,6 +38,11 @@ export function useSectionInView() {
       if (el) keys.set(el, key);
     }
     const under = new Set<string>();
+    // Whether the first section's top is below the line, as of its last crossing. Taken from the observer's own
+    // report, never measured: a measure here, as the page loads or scrolls, made the browser lay the whole page out
+    // first (over a second on a phone as it loaded). It can only change as the first section crosses the line,
+    // and every crossing comes with a report.
+    let firstBelow = false;
     const pick = () => {
       let best: string | null = null;
       for (const key of SECTION_ORDER) if (under.has(key)) best = key;
@@ -48,8 +53,7 @@ export function useSectionInView() {
         return;
       }
       // Nothing under the line: above the first section it's the globe at the top, otherwise a gap, so keep
-      const first = document.getElementById(SECTION_ORDER[0]);
-      if (first && first.getBoundingClientRect().top > window.innerHeight * LINE) setId(HERO);
+      if (firstBelow) setId(HERO);
     };
     const io = new IntersectionObserver(
       (entries) => {
@@ -58,6 +62,10 @@ export function useSectionInView() {
           if (!key) continue;
           if (entry.isIntersecting) under.add(key);
           else under.delete(key);
+          if (key === SECTION_ORDER[0]) {
+            const line = entry.rootBounds?.top ?? window.innerHeight * LINE;
+            firstBelow = !entry.isIntersecting && entry.boundingClientRect.top > line;
+          }
         }
         pick();
       },

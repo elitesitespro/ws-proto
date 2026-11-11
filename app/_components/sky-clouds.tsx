@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useState, useSyncExternalStore } from "react";
+import { memo, useState, useSyncExternalStore } from "react";
 import { motion, useTransform, type MotionStyle, type MotionValue } from "motion/react";
 import styles from "./sky-clouds.module.css";
 
@@ -113,7 +113,8 @@ export type Cloud = {
  * mounted just before it's seen; otherwise they wait until it nears the
  * screen, or the preload has them.
  */
-export function SkyClouds({
+// Memoised: the sections it's in render again as they scroll (the dial at each platform), its clouds needn't
+export const SkyClouds = memo(function SkyClouds({
   clouds,
   progress,
   eager = false,
@@ -131,7 +132,7 @@ export function SkyClouds({
       ))}
     </div>
   );
-}
+});
 
 function Drift({ cloud, progress, eager }: { cloud: Cloud; progress: MotionValue<number>; eager: boolean }) {
   const { dx = 0, dy = 0, grow = 0, flip = false, opacity = 1, fade } = cloud;

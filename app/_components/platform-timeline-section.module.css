@@ -146,6 +146,55 @@
   clip-path: inset(-80px -50vw calc(100svh - 100lvh));
 }
 
+/* Leaving the last platform, the section's own colour (--fade-fill, set in
+   the TSX) comes up over the dial and its scene at their foot, so they fade
+   into the street's cream rather than being cut off by the section's edge:
+   a band 320px tall at its fullest, grown from nothing (scaleY, in the TSX),
+   eased so there's no line across the planet where it starts. Over
+   everything in the stage. Only its transform and opacity change as the
+   page scrolls, so it never repaints. */
+.footFade {
+  position: absolute;
+  inset-inline: 0;
+  bottom: 0;
+  z-index: 30;
+  pointer-events: none;
+}
+/* (A few pixels past the stage's foot, all colour: ending on it, a hairline of
+   the planet under it showed through where the scaled band's edge fell
+   between pixels) */
+.footBand {
+  position: absolute;
+  inset-inline: 0;
+  bottom: -4px;
+  height: 324px;
+  transform-origin: bottom;
+  transform: scaleY(0);
+  background: linear-gradient(
+    to bottom,
+    transparent,
+    color-mix(in srgb, var(--fade-fill) 0.8%, transparent) 12.5%,
+    color-mix(in srgb, var(--fade-fill) 6.3%, transparent) 25%,
+    color-mix(in srgb, var(--fade-fill) 21.1%, transparent) 37.5%,
+    color-mix(in srgb, var(--fade-fill) 50%, transparent) 50%,
+    color-mix(in srgb, var(--fade-fill) 78.9%, transparent) 62.5%,
+    color-mix(in srgb, var(--fade-fill) 93.8%, transparent) 75%,
+    color-mix(in srgb, var(--fade-fill) 99.2%, transparent) 87.5%,
+    var(--fade-fill)
+  );
+  will-change: transform;
+}
+/* Past the stage's foot, under a phone's browser bar, to the screen's real
+   foot (100lvh): all the section's colour once the fade has begun */
+.footUnder {
+  position: absolute;
+  inset-inline: 0;
+  top: -2px;
+  height: calc(100lvh - 100svh + 2px);
+  background: var(--fade-fill);
+  opacity: 0;
+}
+
 .orbitCircle {
   position: absolute;
   left: 0;
@@ -172,35 +221,35 @@
   pointer-events: none;
 }
 
+/* The world turning, and over it the light: the limb falling into shadow,
+   and a thin gold edge of atmosphere, as on the globe above. The light is
+   round and centred, so turning doesn't change it, and it's drawn on the
+   turning layer itself: on a layer of its own over this one, it was another
+   picture the size of the planet for the phone to hold. */
 .globe {
   position: absolute;
   inset: 0;
-  background: center / cover no-repeat;
+  border-radius: 50%;
+  background: radial-gradient(circle, transparent 52%, rgba(12, 10, 9, 0.5) 84%, rgba(12, 10, 9, 0.85) 100%) center /
+    cover no-repeat;
+  box-shadow:
+    inset 0 0 0 1px rgba(234, 179, 8, 0.28),
+    inset 0 0 48px rgba(234, 179, 8, 0.14);
   will-change: transform;
 }
 /* The polar night is fetched once the dial is within three screens
    (data-near, set by the section), not with the page: on a phone the dial is
    far below the hero, whose own maps should have the line first. AVIF where
-   the browser takes it (35KB against the WebP's 81KB). */
+   the browser takes it (35KB against the WebP's 81KB). The light is written
+   out again with it (no var(): a declaration with one can't fall back to the
+   line before it). */
 [data-near] .globe {
-  background-image: url("/assets/globe/night-polar.webp");
-  background-image: image-set(
-    url("/assets/globe/night-polar.avif") type("image/avif"),
-    url("/assets/globe/night-polar.webp") type("image/webp")
-  );
-}
-
-/* Light that doesn't turn with the world: the limb falling into shadow, and
-   a thin gold edge of atmosphere, as on the globe above */
-.orbitCutout::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  border-radius: inherit;
-  background: radial-gradient(circle, transparent 52%, rgba(12, 10, 9, 0.5) 84%, rgba(12, 10, 9, 0.85) 100%);
-  box-shadow:
-    inset 0 0 0 1px rgba(234, 179, 8, 0.28),
-    inset 0 0 48px rgba(234, 179, 8, 0.14);
+  background-image:
+    radial-gradient(circle, transparent 52%, rgba(12, 10, 9, 0.5) 84%, rgba(12, 10, 9, 0.85) 100%),
+    url("/assets/globe/night-polar.webp");
+  background-image:
+    radial-gradient(circle, transparent 52%, rgba(12, 10, 9, 0.5) 84%, rgba(12, 10, 9, 0.85) 100%),
+    image-set(url("/assets/globe/night-polar.avif") type("image/avif"), url("/assets/globe/night-polar.webp") type("image/webp"));
 }
 
 /* The bezel: a fine ring of marks that turns with the platforms */

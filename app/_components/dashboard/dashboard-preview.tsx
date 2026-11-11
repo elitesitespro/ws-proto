@@ -364,7 +364,10 @@ export function DashboardPreview({
                     {hidden ? (
                       <span className={`cx-amount-display ${styles.amount}`}>••••••</span>
                     ) : (
-                      <span className={`cx-amount-display ${styles.amount}`} aria-label={money(target, active)}>
+                      <span className={`cx-amount-display ${styles.amount}`}>
+                        {/* Read out whole: a plain span can't carry a label, so the rolling digits are hidden from
+                            screen readers and this says the amount */}
+                        <span className="sr-only">{money(target, active)}</span>
                         <span className="cur" aria-hidden="true">
                           {WALLETS[active].symbol.trim()}
                         </span>

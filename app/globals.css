@@ -179,10 +179,27 @@
   }
 
   /* A section well off the screen holds its looping animations still
-     (lib/use-pause-offscreen.ts) */
-  [data-asleep] *,
-  [data-asleep] *::before,
-  [data-asleep] *::after {
+     (lib/use-pause-offscreen.ts marks each element animating in it: a rule
+     over the whole section restyled all of it at every sleep and wake) */
+  [data-held],
+  [data-held]::before,
+  [data-held]::after {
     animation-play-state: paused !important;
+  }
+
+  /* On a phone or a tablet, nothing is put on its own layer ahead of time.
+     Safari on an iPhone closed the page ("A problem repeatedly occurred")
+     when it was flung fast from end to end: each will-change (the
+     stylesheets', and the ones motion sets inline) held a layer's memory for
+     as long as it was on the page, the dial's planet-sized ones most of all,
+     and where the dial hands over to the next section they tipped it over.
+     With none, the same phone took a minute of flinging (11 Nov 2026).
+     Whatever animates still gets its layer for as long as it's animating. */
+  @media (pointer: coarse) {
+    *,
+    *::before,
+    *::after {
+      will-change: auto !important;
+    }
   }
 }

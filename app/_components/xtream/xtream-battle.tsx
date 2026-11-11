@@ -67,6 +67,8 @@ const CHATTER: readonly { who: string; face: string; text: string; late?: boolea
 const ROUND = 45;
 const WALLET = 500;
 const COMBO_MS = 2500;
+// How long the battle is up, and showing, before its rooms' clips go on
+const SETTLE_MS = 400;
 
 let uid = 0;
 const next = () => ++uid;
@@ -75,6 +77,59 @@ const money = (n: number, cents = false) =>
 const price = (n: number) => (n < 1 ? "$0.50" : money(n));
 const clock = (s: number) => `${Math.floor(s / 60)}:${String(s % 60).padStart(2, "0")}`;
 const gifted = (gift: Gift) => gift.verb ?? `sent a ${gift.name}`;
+
+/**
+ * A room's loop. Its clip goes on only once the battle has been up, and
+ * actually showing, for a moment: a battle that is only passing through (a
+ * fast scroll past it on the dial, or the loader's warm-up putting it on
+ * out of sight for a frame or two) never starts a media player. Each player
+ * holds a lot of memory until the page next collects its garbage, and on an
+ * iPhone a few of them were enough for Safari to close the page and reload
+ * it ("a problem repeatedly occurred"). The poster shows meanwhile. Taken off,
+ * the player is let go at once.
+ */
+function RoomVideo({ src, poster, play }: { src: string; poster: string; play: boolean }) {
+  const ref = useRef<HTMLVideoElement>(null);
+  const [live, setLive] = useState(false);
+
+  useEffect(() => {
+    let timer = 0;
+    const check = () => {
+      const video = ref.current;
+      // Not while it's out of sight in a hidden stage (where checkVisibility is missing, as shown)
+      if (!video || video.checkVisibility?.({ visibilityProperty: true, checkVisibilityCSS: true }) !== false) setLive(true);
+      else timer = window.setTimeout(check, SETTLE_MS);
+    };
+    timer = window.setTimeout(check, SETTLE_MS);
+    return () => window.clearTimeout(timer);
+  }, []);
+
+  useEffect(() => {
+    const video = ref.current;
+    return () => {
+      if (!video) return;
+      video.pause();
+      video.removeAttribute("src");
+      video.load();
+    };
+  }, []);
+
+  return (
+    <video
+      ref={ref}
+      src={live ? src : undefined}
+      // The clip, for the loader's warm-up to fetch (platform-view.tsx)
+      data-src={src}
+      poster={poster}
+      autoPlay={play}
+      muted
+      loop
+      playsInline
+      preload="metadata"
+      aria-hidden="true"
+    />
+  );
+}
 
 function pick<T>(items: readonly T[], odds?: readonly number[]) {
   if (!odds) return items[Math.floor(Math.random() * items.length)];
@@ -235,16 +290,7 @@ export function XtreamBattle() {
               disabled={over}
               onClick={() => setSide(to)}
             >
-              <video
-                src={HOSTS[to].video}
-                poster={HOSTS[to].poster}
-                autoPlay={!reduced}
-                muted
-                loop
-                playsInline
-                preload="metadata"
-                aria-hidden="true"
-              />
+              <RoomVideo src={HOSTS[to].video} poster={HOSTS[to].poster} play={!reduced} />
               {side === to && !over && <span className={styles.backing}>You’re backing</span>}
             </button>
           ))}

@@ -60,6 +60,17 @@ function facing(places: readonly Place[]) {
 }
 
 const easeOut = (t: number) => 1 - (1 - t) ** 3;
+// The colours it's drawn in, from its stylesheet
+const COLOURS = [
+  "--globe-halo",
+  "--globe-hi",
+  "--globe-lo",
+  "--globe-rim",
+  "--globe-dot-limb",
+  "--globe-dot",
+  "--globe-arc",
+  "--globe-voice",
+] as const;
 
 /**
  * The world in dots (the WorldMeet app's hero globe, worldstreet/worldcall),
@@ -93,11 +104,15 @@ export function CallGlobe({ home, homePin, guests }: { home: Place; homePin: Rea
     let view = facing([call.current.home, ...call.current.guests.map((g) => g.place)]);
     let t = 0;
 
+    // Its colours (--globe-*, in its stylesheet), read when it's laid out rather than on every frame: reading them
+    // made the browser bring the whole page's styles up to date first, each time, while the dial turned round it
+    const colours = new Map<string, string>();
     const resize = () => {
       size = el.offsetWidth;
       dpr = Math.min(2, window.devicePixelRatio || 1);
       cv.width = Math.max(1, Math.round(size * dpr));
       cv.height = Math.max(1, Math.round(size * dpr));
+      colours.clear();
     };
 
     const draw = () => {
@@ -125,8 +140,14 @@ export function CallGlobe({ home, homePin, guests }: { home: Place; homePin: Rea
         };
       };
 
-      const cs = getComputedStyle(el);
-      const colour = (name: string) => cs.getPropertyValue(name).trim();
+      let palette = colours;
+      if (!palette.size) {
+        const cs = getComputedStyle(el);
+        palette = new Map(COLOURS.map((name) => [name, cs.getPropertyValue(name).trim()]));
+        // Kept only once its stylesheet is in (until then they read empty, and are read again next frame)
+        if ([...palette.values()].every(Boolean)) for (const [name, value] of palette) colours.set(name, value);
+      }
+      const colour = (name: (typeof COLOURS)[number]) => palette.get(name) ?? "";
       const k = (size * dpr) / BOX;
       const o = (size * dpr) / 2;
       const px = dpr / k; // one CSS pixel, in globe units

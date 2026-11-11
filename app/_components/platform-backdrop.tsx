@@ -1,4 +1,4 @@
-import type { CSSProperties } from "react";
+import { memo, type CSSProperties } from "react";
 import { WorkworldMapBackground } from "./workworld-map-background";
 import styles from "./platform-backdrop.module.css";
 
@@ -23,7 +23,8 @@ const STARS = (() => {
   });
 })();
 
-export function PlatformBackdrop({ name }: { name: string }) {
+// Memoised, like the page it sits behind (platform-view.tsx): the dial passing doesn't draw it again
+export const PlatformBackdrop = memo(function PlatformBackdrop({ name }: { name: string }) {
   if (name === "WorkWorld") return <WorkworldMapBackground />;
   // Every platform has one; a platform without its own class in the CSS
   // shows the section's fill
@@ -67,4 +68,4 @@ export function PlatformBackdrop({ name }: { name: string }) {
       <div className={styles.shade} />
     </div>
   );
-}
+});

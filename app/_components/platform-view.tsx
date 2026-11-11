@@ -1,7 +1,7 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import { createElement, useEffect, useMemo, type ComponentType } from "react";
+import { createElement, memo, useEffect, useMemo, type ComponentType } from "react";
 import { createRoot } from "react-dom/client";
 import type { ShowcasePlatformName } from "./platform-showcase-content";
 import { WorldspacePlatformView } from "./worldspace-platform-view";
@@ -121,9 +121,11 @@ export async function warmPlatformViews(landed: () => void = () => {}) {
       await nextFrame();
       pictures = Array.from(host.querySelectorAll("img"));
       for (const img of pictures) if (img.loading === "lazy") img.loading = "eager";
-      // Its clips (Xtream's rooms) into the cache too, whole
+      // Its clips (Xtream's rooms) into the cache too, whole: their files only. Out here no <video> is ever given its
+      // clip (it waits to be showing, xtream-battle.tsx), so no media player starts. Each one kept hundreds of MB alive
+      // until it was collected, enough for an iPhone's Safari to close the page as it was scrolled.
       for (const video of Array.from(host.querySelectorAll("video"))) {
-        const src = video.currentSrc || video.src || video.querySelector("source")?.src;
+        const src = video.currentSrc || video.src || video.dataset.src || video.querySelector("source")?.src;
         if (src) clips.push(fetch(src).then((response) => response.blob()).then(() => {}, () => {}));
       }
     } finally {
@@ -159,7 +161,9 @@ function fetchAhead() {
   return () => near.disconnect();
 }
 
-export function PlatformView({ name }: { name: ShowcasePlatformName }) {
+// Memoised: the dial re-renders the section on every platform it passes, and without it the page showing (a whole
+// demo) rendered again with each one, many times a second as the dial was flung, for nothing.
+export const PlatformView = memo(function PlatformView({ name }: { name: ShowcasePlatformName }) {
   // Chosen once for each platform, so a view never swaps from one to the other (and starts over) while it's showing
   const View = useMemo(
     () => (name === "WorldSpace" ? WorldspacePlatformView : (ready[name] ?? lazyViews[name])),
@@ -167,4 +171,4 @@ export function PlatformView({ name }: { name: ShowcasePlatformName }) {
   );
   useEffect(fetchAhead, []);
   return <View />;
-}
+});

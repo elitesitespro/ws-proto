@@ -1,6 +1,6 @@
 "use client";
 
-import { Fragment, useEffect, useRef, useState, type CSSProperties, type PointerEvent, type ReactNode } from "react";
+import { Fragment, memo, useCallback, useEffect, useRef, useState, type CSSProperties, type PointerEvent, type ReactNode } from "react";
 import { useLenis } from "lenis/react";
 import { Icon, type IconName } from "@/components/icon";
 import { tick } from "@/lib/haptics";
@@ -22,6 +22,7 @@ import {
   useSpring,
   useIsPresent,
   useTransform,
+  type MotionStyle,
   type MotionValue,
   type Variants,
 } from "motion/react";
@@ -109,6 +110,11 @@ const LAST = platforms.length - 1;
 const STEP_VH = 32;
 // Seconds to glide to a platform picked on the dial or by the arrows
 const GLIDE = 0.8;
+// How long the dial rests on a platform before its page and scene are put on (milliseconds). A fling turns the
+// dial through every platform in well under a second: putting each one's demo and its screen-sized scene on as it
+// passed, with the ones before still fading out, had all of them on at once, and each pass up or down built and threw
+// away the lot. On an iPhone that was enough for Safari to close the page ("a problem repeatedly occurred").
+const SETTLE_MS = 180;
 // The world under the dial turns with it, a third as fast
 const GLOBE_PACE = 1 / 3;
 // The bezel's marks, one every 6°: a longer one at each platform's place
@@ -119,6 +125,19 @@ const TICKS = Array.from({ length: 60 }, (_, index) => index * 6);
 const RIM_TICKS = Array.from({ length: LAST * (PHONE_STEP / 6) + 1 }, (_, index) => index * 6).filter(
   (angle) => angle % PHONE_STEP !== 0,
 );
+// Both scales' marks never change: drawn once, so the dial's renders as it turns pass them by
+const RIM_TICK_LINES = RIM_TICKS.map((angle) => (
+  <line key={angle} x1="99.4" x2="98.4" transform={`rotate(${angle})`} className={styles.rimTick} />
+));
+const TICK_LINES = TICKS.map((angle) => (
+  <line
+    key={angle}
+    x1="99"
+    x2={angle % cardAngleStep === 0 ? 94 : 97}
+    transform={`rotate(${angle})`}
+    className={angle % cardAngleStep === 0 ? styles.tickMajor : styles.tick}
+  />
+));
 
 // With an intro, how far the page scrolls with the section pinned before the
 // platforms start, in screen heights (vh): the heading holds, then the dial
@@ -270,7 +289,9 @@ const roll = {
 
 /** One word of the intro heading coming up out of a blur as the section
  *  rises into the middle of the screen, a beat after the one before. */
-function IntroWord({
+// Memoised, as are the dial's platforms (OrbitCard): the section renders again on every platform the dial
+// passes, and these only need to when what they're given changes
+const IntroWord = memo(function IntroWord({
   children,
   index,
   arrive,
@@ -293,7 +314,7 @@ function IntroWord({
       {children}
     </motion.span>
   );
-}
+});
 
 function PlatformCardFace({
   platform,
@@ -322,7 +343,7 @@ function PlatformCardFace({
   );
 }
 
-function OrbitCard({
+const OrbitCard = memo(function OrbitCard({
   index,
   progress,
   sweep,
@@ -390,7 +411,7 @@ function OrbitCard({
       </button>
     </motion.li>
   );
-}
+});
 
 type PlatformTimelineSectionProps = {
   /**
@@ -433,8 +454,39 @@ export function PlatformTimelineSection({ intro, introLine }: PlatformTimelineSe
   // Which platform is at the pointer, and which way the dial last turned
   const [step, setStep] = useState({ index: 0, direction: 1 });
   const activeIndex = step.index;
+  // The platform whose page, scene and colours are on: the one at the pointer, once the dial has rested on it
+  // (SETTLE_MS). The dial itself, its name and its count keep up with every platform it passes. At either end
+  // it's at once, so a fling out of the wheel lands on the last (or first) platform's colours.
+  const [shown, setShown] = useState(step);
+  // Where the page is, as the scroll tracking already has it: reading window.scrollY here, just after the dial's
+  // render, made the browser lay the page out again first, on every platform the dial passed
+  const { scrollY: pageY } = useScroll();
+  // The screen's height, kept as it changes (reading it while flung laid the page out again too)
+  const screenHeight = useRef(0);
+  useEffect(() => {
+    const measure = () => (screenHeight.current = window.innerHeight);
+    measure();
+    window.addEventListener("resize", measure);
+    return () => window.removeEventListener("resize", measure);
+  }, []);
+  useEffect(() => {
+    if (step.index === shown.index) return;
+    let from = pageY.get();
+    let timer = 0;
+    const settle = () => {
+      // Still being flung: the page has gone more than half a platform's way since the last look. By the distance,
+      // not the time alone, so a phone struggling through slow frames doesn't count as resting.
+      const moved = Math.abs(pageY.get() - from);
+      from = pageY.get();
+      if (moved > (STEP_VH / 200) * screenHeight.current) timer = window.setTimeout(settle, SETTLE_MS);
+      else setShown({ index: step.index, direction: step.index > shown.index ? 1 : -1 });
+    };
+    timer = window.setTimeout(settle, step.index === 0 || step.index === LAST ? 0 : SETTLE_MS);
+    return () => window.clearTimeout(timer);
+  }, [step.index, shown.index, pageY]);
   const shouldReduceMotion = useReducedMotion();
   const activePlatform = platforms[activeIndex];
+  const shownPlatform = platforms[shown.index];
   const visiblePlatforms = platforms;
   const introVh = narrow ? PHONE_INTRO_VH : INTRO_VH;
   const { scrollYProgress } = useScroll({
@@ -501,18 +553,14 @@ export function PlatformTimelineSection({ intro, introLine }: PlatformTimelineSe
   const nearCloudOpacity = useTransform(entered, [0.15, 0.4], [1, 0]);
   // Leaving the last platform, the dial and its scene fade out at their foot
   // instead of being cut off by the section's edge, so the tour's cream runs
-  // straight on into the street's
+  // straight on into the street's: a band of the section's own colour grows
+  // up over them (.footBand, eased, so there's no line across the planet
+  // where it starts). Drawn over them rather than masking the pinned stage,
+  // which repainted the stage and its mask on every frame of the hand-over.
   const { scrollYProgress: leaving } = useScroll({ target: sectionRef, offset: ["end end", "end start"] });
-  // (eased, so there's no line across the planet where it starts)
-  const footFade = useTransform(leaving, (v) => {
-    const fade = Math.round(320 * Math.min(v / 0.12, 1));
-    if (fade === 0) return "none";
-    const stops = Array.from({ length: 9 }, (_, i) => {
-      const t = i / 8;
-      return `rgba(0, 0, 0, ${(1 - easeInOut(t)).toFixed(3)}) calc(100% - ${Math.round(fade * (1 - t))}px)`;
-    });
-    return `linear-gradient(to bottom, ${stops.join(", ")})`;
-  });
+  const footFade = useTransform(leaving, (v) => Math.min(v / 0.12, 1));
+  // Under a phone's browser bar, past the stage's foot, it's all the section's colour once the fade's begun
+  const footUnder = useTransform(footFade, (f) => (f > 0 ? 1 : 0));
   // The dial follows the scroll on a light spring, so it settles onto each
   // platform with a little give
   const turned = useTransform(scrollYProgress, detent);
@@ -584,8 +632,15 @@ export function PlatformTimelineSection({ intro, introLine }: PlatformTimelineSe
     if (index === activeIndex || !stops()) return;
     picked.current = index;
     setStep({ index, direction: index > activeIndex ? 1 : -1 });
+    setShown({ index, direction: index > shown.index ? 1 : -1 });
     goToPlatform(index);
   };
+  // The same, held still for the dial's platforms (memoised: a new function on every render would render them all)
+  const pickRef = useRef(pickPlatform);
+  useEffect(() => {
+    pickRef.current = pickPlatform;
+  });
+  const selectPlatform = useCallback((index: number) => pickRef.current(index), []);
 
   // On a touchscreen, swipe the platform aside for the next one (or back
   // for the last): it gives a little under your finger as you drag
@@ -625,8 +680,9 @@ export function PlatformTimelineSection({ intro, introLine }: PlatformTimelineSe
     animate(dragX, [0, -28, 0], { duration: 0.9, delay: 0.5, ease: "easeInOut" });
   });
 
-  const activeHue = hueAttrs(activePlatform.name);
-  const activeColours = sectionColours(activePlatform.name);
+  // The page's colours (its panel takes the hue from the section): the shown platform's
+  const pageHue = hueAttrs(shownPlatform.name);
+  const pageColours = sectionColours(shownPlatform.name);
   // The intro sits in the first platform's colour: the sky the dive came out into
   const firstHue = hueAttrs(platforms[0].name);
 
@@ -635,17 +691,17 @@ export function PlatformTimelineSection({ intro, introLine }: PlatformTimelineSe
       ref={sectionRef}
       id={intro ? "discover" : undefined}
       aria-labelledby="platform-timeline-heading"
-      data-hue={activeHue["data-hue"]}
-      className={`${styles.section} ${intro ? styles.overDive : ""} transition-colors duration-500`}
+      data-hue={pageHue["data-hue"]}
+      // The fill fades to the next platform's; the ink switches once, halfway
+      // through. Faded too, it restyled everything in the section on every
+      // frame of the fade (colour is inherited), each time the dial settled.
+      className={`${styles.section} ${intro ? styles.overDive : ""} [transition:background-color_500ms_cubic-bezier(0.4,0,0.2,1),color_0s_250ms]`}
       style={
         {
-          ...activeHue.style,
-          // The dial's pointer and lit rim, in the colour of the icon under them
-          "--brand": platformGlow(activePlatform.name),
+          ...pageHue.style,
           "--dive-overlap": `${DIVE_OVERLAP * 100}svh`,
-          backgroundColor: activeColours.fill,
-          color: activeColours.text,
-          "--timeline-background": "var(--brand)",
+          backgroundColor: pageColours.fill,
+          color: pageColours.text,
           // A laptop's height and a phone's: the stylesheet picks one by the
           // screen's width, so the page is its real length from the first paint
           "--timeline-height": `${100 + (intro ? INTRO_VH : 0) + LAST * STEP_VH}svh`,
@@ -705,39 +761,46 @@ export function PlatformTimelineSection({ intro, introLine }: PlatformTimelineSe
         </h2>
       )}
 
-      <motion.div
-        className={`${styles.orbitLayout} sticky top-10 h-[calc(100svh-80px)] w-full`}
-        style={{ maskImage: footFade, WebkitMaskImage: footFade }}
-      >
+      <div className={`${styles.orbitLayout} sticky top-10 h-[calc(100svh-80px)] w-full`}>
         <motion.div
           className="absolute inset-0 -z-10"
           style={intro ? { opacity: backdropOpacity } : undefined}
         >
           {/* Each platform's colour and scene, a screen tall, scrolling on
               with its page on the right */}
-          <AnimatePresence initial={false} custom={step.direction}>
+          <AnimatePresence initial={false} custom={shown.direction}>
             <motion.div
-              key={activePlatform.name}
-              custom={step.direction}
+              key={shownPlatform.name}
+              custom={shown.direction}
               variants={shouldReduceMotion ? undefined : scenery}
               initial="enter"
               animate="centre"
               exit="exit"
               className={styles.scenery}
-              {...hueAttrs(activePlatform.name)}
+              {...pageHue}
               style={{
-                ...hueAttrs(activePlatform.name).style,
+                ...pageHue.style,
                 x: "-50%",
-                backgroundColor: activeColours.fill,
+                backgroundColor: pageColours.fill,
               }}
             >
-              <PlatformBackdrop name={activePlatform.name} />
+              <PlatformBackdrop name={shownPlatform.name} />
             </motion.div>
           </AnimatePresence>
         </motion.div>
         <motion.div
           className={`${styles.orbitStage} relative min-w-0`}
-          style={{ x: stageX, opacity: stageOpacity }}
+          style={
+            {
+              x: stageX,
+              opacity: stageOpacity,
+              // The dial's pointer and lit rim, in the colour of the icon under them. Set here, on the dial, not
+              // on the section: it changes with every platform the dial passes, and on the section each change
+              // restyled the whole of it, the platform's page and all, many times a second as it was flung.
+              "--brand": platformGlow(activePlatform.name),
+              "--timeline-background": "var(--brand)",
+            } as MotionStyle
+          }
         >
           {/* The world at night, seen from over the pole, turning as the dial does */}
           <div aria-hidden="true" className={styles.orbitCutout}>
@@ -747,9 +810,7 @@ export function PlatformTimelineSection({ intro, introLine }: PlatformTimelineSe
             {/* A phone's: the scale along the rim, turning with the platforms, a detent in each one's
                 colour at its place; the one at the pointer lights up */}
             <motion.svg viewBox="-100 -100 200 200" className={styles.rimBezel} style={{ transform: bezelTransform }}>
-              {RIM_TICKS.map((angle) => (
-                <line key={angle} x1="99.4" x2="98.4" transform={`rotate(${angle})`} className={styles.rimTick} />
-              ))}
+              {RIM_TICK_LINES}
               {platforms.map((platform, index) => {
                 const hue = hueAttrs(platform.name);
                 return (
@@ -774,15 +835,7 @@ export function PlatformTimelineSection({ intro, introLine }: PlatformTimelineSe
               style={{ transform: bezelTransform }}
             >
               <circle r="99.5" className={styles.bezelRail} />
-              {TICKS.map((angle) => (
-                <line
-                  key={angle}
-                  x1="99"
-                  x2={angle % cardAngleStep === 0 ? 94 : 97}
-                  transform={`rotate(${angle})`}
-                  className={angle % cardAngleStep === 0 ? styles.tickMajor : styles.tick}
-                />
-              ))}
+              {TICK_LINES}
             </motion.svg>
           </div>
 
@@ -808,7 +861,7 @@ export function PlatformTimelineSection({ intro, introLine }: PlatformTimelineSe
                   narrow={narrow}
                   active={activeIndex === index}
                   near={Math.abs(index - activeIndex) <= 2}
-                  onSelect={pickPlatform}
+                  onSelect={selectPlatform}
                 />
               ),
             )}
@@ -868,7 +921,7 @@ export function PlatformTimelineSection({ intro, introLine }: PlatformTimelineSe
         >
           <motion.nav
             aria-label="Browse platforms"
-            className={`${navGlassTone(activePlatform.name)} relative z-10 flex items-center justify-between gap-1`}
+            className={`${navGlassTone(shownPlatform.name)} relative z-10 flex items-center justify-between gap-1`}
             style={{ opacity: navOpacity, y: navY }}
           >
             <p className="cx-liquid cx-liquid--pill flex h-[48px] items-center px-cx-5 text-xs tabular-nums">
@@ -900,24 +953,29 @@ export function PlatformTimelineSection({ intro, introLine }: PlatformTimelineSe
           </motion.nav>
           <motion.div
             className={styles.detailScroller}
-            aria-label={`${activePlatform.label} details`}
+            aria-label={`${shownPlatform.label} details`}
             style={{ opacity: detailsOpacity, y: detailsY }}
           >
             <div className={styles.detailPages}>
-              <AnimatePresence initial={false} custom={step.direction}>
+              <AnimatePresence initial={false} custom={shown.direction}>
                 <DetailPage
-                  key={activePlatform.name}
-                  direction={step.direction}
+                  key={shownPlatform.name}
+                  direction={shown.direction}
                   still={!!shouldReduceMotion}
-                  color={activeColours.text}
+                  color={pageColours.text}
                 >
-                  <PlatformView name={activePlatform.name} />
+                  <PlatformView name={shownPlatform.name} />
                 </DetailPage>
               </AnimatePresence>
             </div>
           </motion.div>
         </motion.div>
-      </motion.div>
+        {/* Leaving the last platform: the section's colour coming up over the dial and its scene at their foot */}
+        <div aria-hidden="true" className={styles.footFade} style={{ "--fade-fill": pageColours.fill } as CSSProperties}>
+          <motion.div className={styles.footBand} style={{ scaleY: footFade }} />
+          <motion.div className={styles.footUnder} style={{ opacity: footUnder }} />
+        </div>
+      </div>
       {stacked && (
         <div className={styles.stackedLayout}>
           {platforms.map((platform) => {

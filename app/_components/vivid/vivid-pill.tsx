@@ -61,6 +61,7 @@ import {
   type MouseEvent,
 } from "react";
 import { createPortal, flushSync } from "react-dom";
+import { useScroll } from "motion/react";
 import { Icon } from "@/components/icon";
 import { ACCOUNT_LINKS } from "@/components/layout/nav-links";
 import { buttonVariants } from "@/components/ui/button";
@@ -243,10 +244,13 @@ function Pill() {
 
   // Scroll down: sleep into the thumb. Scroll up: wake, where the part of the page leaves the foot of the screen
   // free (and unless it was put to sleep by hand); and stopped in such a part it hasn't been open in, it opens by
-  // itself. Not while the card is open, or while there's something in the field.
+  // itself. Not while the card is open, or while there's something in the field. The page's position comes from
+  // motion's own reading, taken once a frame for everything on the page that follows the scroll: read here, on
+  // each scroll event, it made the browser restyle and lay out the page first, a second time that frame.
+  const { scrollY } = useScroll();
   useEffect(() => {
     if (!present) return;
-    let last = window.scrollY;
+    let last = scrollY.get();
     // Just come into view, and the visitor is still scrolling down: it stays open a moment before it tucks away
     const grace = last + GRACE;
     const busy = () => {
@@ -261,10 +265,9 @@ function Pill() {
     };
     // Coming into view counts as the page moving: if it stays put from here, that's a stop
     let idle = window.setTimeout(stopped, IDLE_MS);
-    const onScroll = () => {
+    const onScroll = (y: number) => {
       window.clearTimeout(idle);
       idle = window.setTimeout(stopped, IDLE_MS);
-      const y = window.scrollY;
       const d = y - last;
       if (Math.abs(d) < 6) return;
       last = y;
@@ -273,12 +276,12 @@ function Pill() {
         if (y >= grace && !now.current.asleep) setAsleep(true);
       } else if (now.current.asleep && !manual.current && now.current.stance === "open") setAsleep(false);
     };
-    window.addEventListener("scroll", onScroll, { passive: true });
+    const stop = scrollY.on("change", onScroll);
     return () => {
-      window.removeEventListener("scroll", onScroll);
+      stop();
       window.clearTimeout(idle);
     };
-  }, [present]);
+  }, [present, scrollY]);
 
   // The page's Ask Vivid buttons (data-vivid-summon) open it and put you in its field. Where it's out of sight they
   // stay links, to the hub's Vivid.
