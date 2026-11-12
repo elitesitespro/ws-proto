@@ -1,8 +1,8 @@
 "use client";
 
+import type { ReactNode } from "react";
 import { Icon } from "@/components/icon";
 import { PlatformViewShell } from "./platform-view-shell";
-import { VisionParty } from "./vision/vision-party";
 import styles from "./vsion-platform-view.module.css";
 
 /**
@@ -10,7 +10,7 @@ import styles from "./vsion-platform-view.module.css";
  * line from worldstreetgold.com, a watch party you can run, and tonight's
  * originals on a drifting wall.
  */
-export function VsionPlatformView() {
+export function VsionPlatformView({ children }: { children: ReactNode }) {
   return (
     <PlatformViewShell
       name="Vsion"
@@ -38,7 +38,7 @@ export function VsionPlatformView() {
         </>
       }
     >
-      <VisionParty />
+      {children}
     </PlatformViewShell>
   );
 }

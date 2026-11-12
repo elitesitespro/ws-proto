@@ -1,0 +1,80 @@
+/* Arcade's still: its demo's lime rank card (your place writ large, the
+   controller leaning in, the streak's yellow badge) over a trivia question */
+.rank {
+  position: relative;
+  justify-content: space-between;
+  overflow: hidden;
+  background: linear-gradient(135deg, #c9d68e, var(--hue));
+}
+.place {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  /* Clear of the controller */
+  padding-right: 96px;
+}
+.climb {
+  justify-self: start;
+  background: #fffdf8;
+  color: #150f26;
+}
+.pad {
+  position: absolute;
+  top: -12px;
+  right: -16px;
+  width: 104px;
+  height: auto;
+  transform: rotate(14deg);
+  filter: drop-shadow(0 12px 12px rgba(21, 15, 38, 0.35));
+}
+.streak {
+  position: absolute;
+  right: 8px;
+  top: 36px;
+  display: grid;
+  justify-items: center;
+  align-content: center;
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: #ffcc2d;
+  color: #150f26;
+  font-size: var(--cx-caption);
+  font-weight: 500;
+  line-height: 1;
+  transform: rotate(-8deg);
+  box-shadow: 0 8px 16px -8px rgba(21, 15, 38, 0.6);
+}
+.streak b {
+  font-size: var(--cx-h3);
+  font-weight: 500;
+  letter-spacing: -0.04em;
+}
+.answer {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 36px;
+  padding-inline: 8px 12px;
+  border-radius: var(--cx-r-md);
+  background: #f0f2e4;
+}
+.answer > b {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 6px;
+  background: #fffdf8;
+  font-size: var(--cx-caption);
+  font-weight: 500;
+}
+.answer[data-right] {
+  background: #d9f5e6;
+  color: #065f46;
+}
+/* Clear of the streak badge */
+.level {
+  padding-right: 72px;
+}

@@ -504,15 +504,23 @@ export function PlatformTimelineSection({ intro, introLine }: PlatformTimelineSe
     target: sectionRef,
     offset: ["start 80px", `${introVh}vh 80px`],
   });
-  const entered = useTransform(opening, (v) => (intro ? (narrow ? phonePace(v) : v) : 1));
+  const paced = (v: number) => (intro ? (narrow ? phonePace(v) : v) : 1);
+  const entered = useTransform(opening, paced);
   // The heading holds, then the page carries on through it: it grows a
   // little and blurs away
   const headingOpacity = useTransform(entered, [0.25, 0.55], [1, 0]);
   const headingScale = useTransform(entered, [0.25, 0.6], [1, 1.12]);
   const headingBlur = useTransform(entered, [0.25, 0.6], [0, 16]);
   const headingFilter = useMotionTemplate`blur(${headingBlur}px)`;
-  // The line under it comes up as the heading's last word lands, and goes with it
-  const lineOpacity = useTransform([arrive, entered], ([a, v]: number[]) => along(a, 0.8, 1) * (1 - along(v, 0.2, 0.45)));
+  // The line under it comes up as the heading's last word lands, and goes with it. Worked out from the two scroll
+  // positions themselves, not from `entered`: a value made from a scroll position and from one derived from another
+  // was worked out once in a frame, and where a fling brought the section from below the screen to past its intro in
+  // that one frame, it was worked out before `entered` had moved and never again. The line then stayed on, over
+  // every platform's panel, for as long as the dial was turned.
+  const lineOpacity = useTransform(
+    [arrive, opening],
+    ([a, v]: number[]) => along(a, 0.8, 1) * (1 - along(paced(v), 0.2, 0.45)),
+  );
   const lineY = useTransform(arrive, [0.8, 1], [16, 0]);
   // The dial rolls in from the left, its platforms coming round the ring
   // into place, then its pointer and name
@@ -538,7 +546,7 @@ export function PlatformTimelineSection({ intro, introLine }: PlatformTimelineSe
     target: sectionRef,
     offset: [`start ${Math.round((1.07 - DIVE_OVERLAP) * 100) / 100}`, `start ${Math.round((1 - DIVE_OVERLAP) * 100) / 100}`],
   });
-  const skyOpacity = useTransform([skyIn, entered], ([shown, v]: number[]) => shown * (1 - along(v, 0.62, 0.7)));
+  const skyOpacity = useTransform([skyIn, opening], ([shown, v]: number[]) => shown * (1 - along(paced(v), 0.62, 0.7)));
   // The clouds' drift, over the section rising and then the pinned intro, at
   // the page's own pace (a phone's quicker beats would hurry them on)
   const cloudDrift = useTransform([arrive, opening], ([a, v]: number[]) => a + (v * introVh) / INTRO_VH);

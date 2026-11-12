@@ -1,0 +1,7 @@
+/* Prediction Market's still: the two sides, each as wide as the crowd's
+   share of it */
+.odds {
+  display: grid;
+  grid-template-columns: minmax(0, var(--yes)) minmax(0, var(--no));
+  gap: 8px;
+}

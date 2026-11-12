@@ -1,0 +1,15 @@
+/* Worldwork's still: how far each one is, as its demo sets it, large and
+   first in the row */
+.away {
+  flex: none;
+  display: flex;
+  align-items: baseline;
+  gap: 2px;
+  width: 72px;
+  line-height: 1.3;
+  font-size: var(--cx-caption);
+  font-variant-numeric: tabular-nums;
+}
+.away > span {
+  line-height: 1.3;
+}

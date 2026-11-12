@@ -1,13 +1,13 @@
+import type { ReactNode } from "react";
 import Image from "next/image";
 import { PlatformViewShell } from "./platform-view-shell";
-import { AiMovieSet } from "./ai-movie/ai-movie-set";
 import styles from "./ai-movie-platform-view.module.css";
 
 /**
  * AI Studio (movie.worldstreetgold.com), in its own night navy and gold: its
  * mark and its line, then a set you can direct (ai-movie/).
  */
-export function AiMoviePlatformView() {
+export function AiMoviePlatformView({ children }: { children: ReactNode }) {
   return (
     <PlatformViewShell
       name="AI Movie"
@@ -36,7 +36,7 @@ export function AiMoviePlatformView() {
         </>
       }
     >
-      <AiMovieSet />
+      {children}
     </PlatformViewShell>
   );
 }

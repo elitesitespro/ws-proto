@@ -1,6 +1,6 @@
+import type { ReactNode } from "react";
 import { Icon } from "@/components/icon";
 import { PlatformViewShell } from "./platform-view-shell";
-import { ArcadeDuel } from "./arcade/arcade-duel";
 import styles from "./arcade-platform-view.module.css";
 
 /**
@@ -8,7 +8,7 @@ import styles from "./arcade-platform-view.module.css";
  * mark and line, then a Trivia Duel against the Street Bot you can play,
  * beside your card on the weekly board.
  */
-export function ArcadePlatformView() {
+export function ArcadePlatformView({ children }: { children: ReactNode }) {
   return (
     <PlatformViewShell
       name="Arcade"
@@ -37,7 +37,7 @@ export function ArcadePlatformView() {
         </>
       }
     >
-      <ArcadeDuel />
+      {children}
     </PlatformViewShell>
   );
 }

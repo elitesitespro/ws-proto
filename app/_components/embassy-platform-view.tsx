@@ -1,5 +1,5 @@
+import type { ReactNode } from "react";
 import { Icon } from "@/components/icon";
-import { EmbassyTrip } from "./embassy/embassy-trip";
 import { PlatformViewShell } from "./platform-view-shell";
 import styles from "./embassy-platform-view.module.css";
 
@@ -8,7 +8,7 @@ import styles from "./embassy-platform-view.module.css";
  * its mark in passport blue, its line in a serif, and a trip to follow, from
  * the passport to the visa approved.
  */
-export function EmbassyPlatformView() {
+export function EmbassyPlatformView({ children }: { children: ReactNode }) {
   return (
     <PlatformViewShell
       name="E-Embassy"
@@ -30,7 +30,7 @@ export function EmbassyPlatformView() {
         </span>
       }
     >
-      <EmbassyTrip />
+      {children}
     </PlatformViewShell>
   );
 }

@@ -1,6 +1,6 @@
+import type { ReactNode } from "react";
 import { Icon } from "@/components/icon";
 import { PlatformViewShell } from "./platform-view-shell";
-import { WorldworkFinder } from "./workworld/worldwork-finder";
 import styles from "./workworld-platform-view.module.css";
 
 /**
@@ -8,7 +8,7 @@ import styles from "./workworld-platform-view.module.css";
  * its black and white, its line, and the directory you can use, a trade's
  * providers closest first, to call yourself.
  */
-export function WorkworldPlatformView() {
+export function WorkworldPlatformView({ children }: { children: ReactNode }) {
   return (
     <PlatformViewShell
       name="WorkWorld"
@@ -37,7 +37,7 @@ export function WorkworldPlatformView() {
         </>
       }
     >
-      <WorldworkFinder />
+      {children}
     </PlatformViewShell>
   );
 }

@@ -1,0 +1,45 @@
+/* AI Studio's still: its demo's clapperboard (the striped stick, the slate's
+   four figures, a line of the script) and the cast on a strip of film */
+.board {
+  padding-top: 0;
+  overflow: hidden;
+}
+.clapper {
+  display: block;
+  height: 16px;
+  margin-inline: -16px;
+  background: repeating-linear-gradient(-60deg, #0b0e1b 0 14px, #f2eee6 14px 30px);
+}
+.slate {
+  display: grid;
+  grid-template-columns: minmax(0, 1.6fr) repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+.script {
+  display: grid;
+  gap: 2px;
+  font-family: var(--font-mono, ui-monospace), ui-monospace, "SFMono-Regular", Menlo, monospace;
+}
+/* The strip: sprocket holes along both edges, the frames between */
+.film {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(0, 1fr);
+  gap: 4px;
+  padding: 12px 4px;
+  border-radius: var(--cx-r-md);
+  background:
+    repeating-linear-gradient(90deg, #f2eee6 0 8px, transparent 8px 18px) top 4px left 6px / 100% 4px no-repeat,
+    repeating-linear-gradient(90deg, #f2eee6 0 8px, transparent 8px 18px) bottom 4px left 6px / 100% 4px no-repeat,
+    #05070f;
+}
+.film > * {
+  border-radius: var(--cx-r-sm, 8px);
+}
+.take {
+  position: absolute;
+  top: 6px;
+  left: 6px;
+  background: var(--hue);
+  color: var(--hue-on);
+}

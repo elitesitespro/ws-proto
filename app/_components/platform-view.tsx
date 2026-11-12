@@ -1,99 +1,175 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import { createElement, memo, useEffect, useMemo, type ComponentType } from "react";
+import {
+  createElement,
+  memo,
+  useEffect,
+  useMemo,
+  useSyncExternalStore,
+  type ComponentType,
+  type ReactNode,
+} from "react";
 import { createRoot } from "react-dom/client";
 import type { ShowcasePlatformName } from "./platform-showcase-content";
+import { AcademyPlatformView } from "./academy-platform-view";
+import { AiMoviePlatformView } from "./ai-movie-platform-view";
+import { ArcadePlatformView } from "./arcade-platform-view";
+import { CryptoPlatformView } from "./crypto-platform-view";
+import { EmbassyPlatformView } from "./embassy-platform-view";
+import { ForexPlatformView } from "./forex-platform-view";
+import { PredictionPlatformView } from "./prediction-platform-view";
+import { VsionPlatformView } from "./vsion-platform-view";
+import { WorkworldPlatformView } from "./workworld-platform-view";
+import { WorldhealthPlatformView } from "./worldhealth-platform-view";
+import { WorldmeetPlatformView } from "./worldmeet-platform-view";
 import { WorldspacePlatformView } from "./worldspace-platform-view";
+import { WorldsportsPlatformView } from "./worldsports-platform-view";
+import { WorldstorePlatformView } from "./worldstore-platform-view";
+import { XtreamPlatformView } from "./xtream-platform-view";
 
-type View = ComponentType;
-type Later = Exclude<ShowcasePlatformName, "WorldSpace">;
+type Name = ShowcasePlatformName;
+type Scene = ComponentType;
+type Still = ComponentType<{ name: Name }>;
 
-// The dial opens on WorldSpace, so it comes with the page. Every other platform's demo is a chunk of its own, its
-// styles with it, fetched ahead as the dial draws near, long before it turns to them: the page's first load carries
-// one demo instead of all of them. They only ever mount in the browser, so nothing server-rendered waits on them.
+// Each platform's frame: its mark, its line and its way in. They're light, so they come with the page, and a
+// platform's words are there the moment the dial turns to it. What goes in the frame depends on the screen.
+const frames: Record<Name, ComponentType<{ children: ReactNode }>> = {
+  WorldSpace: WorldspacePlatformView,
+  WorldMeet: WorldmeetPlatformView,
+  XStream: XtreamPlatformView,
+  Vsion: VsionPlatformView,
+  "AI Movie": AiMoviePlatformView,
+  Arcade: ArcadePlatformView,
+  WorldStore: WorldstorePlatformView,
+  WorkWorld: WorkworldPlatformView,
+  Academy: AcademyPlatformView,
+  WorldHealth: WorldhealthPlatformView,
+  "E-Embassy": EmbassyPlatformView,
+  Forex: ForexPlatformView,
+  Crypto: CryptoPlatformView,
+  WorldSports: WorldsportsPlatformView,
+  Prediction: PredictionPlatformView,
+};
+
+// A desktop gets each platform's demo, the one you can play: a chunk of its own, its styles with it, fetched ahead
+// as the dial draws near, long before it turns to them. They only ever mount in the browser.
 const Nothing = () => null;
 // next/dynamic needs each import() and its options written into the call
-const lazyViews: Record<Later, View> = {
-  WorldMeet: dynamic(() => import("./worldmeet-platform-view").then((m) => m.WorldmeetPlatformView), {
+const lazyDemos: Record<Name, Scene> = {
+  WorldSpace: dynamic(() => import("./worldspace/worldspace-space").then((m) => m.WorldspaceSpace), {
     loading: Nothing,
   }),
-  Vsion: dynamic(() => import("./vsion-platform-view").then((m) => m.VsionPlatformView), { loading: Nothing }),
-  "AI Movie": dynamic(() => import("./ai-movie-platform-view").then((m) => m.AiMoviePlatformView), {
+  WorldMeet: dynamic(() => import("./worldmeet/worldmeet-call").then((m) => m.WorldmeetCall), { loading: Nothing }),
+  XStream: dynamic(() => import("./xtream/xtream-battle").then((m) => m.XtreamBattle), { loading: Nothing }),
+  Vsion: dynamic(() => import("./vision/vision-party").then((m) => m.VisionParty), { loading: Nothing }),
+  "AI Movie": dynamic(() => import("./ai-movie/ai-movie-set").then((m) => m.AiMovieSet), { loading: Nothing }),
+  Arcade: dynamic(() => import("./arcade/arcade-duel").then((m) => m.ArcadeDuel), { loading: Nothing }),
+  WorldStore: dynamic(() => import("./worldstore/worldstore-deal").then((m) => m.WorldstoreDeal), {
     loading: Nothing,
   }),
-  Arcade: dynamic(() => import("./arcade-platform-view").then((m) => m.ArcadePlatformView), { loading: Nothing }),
-  WorldStore: dynamic(() => import("./worldstore-platform-view").then((m) => m.WorldstorePlatformView), {
+  WorkWorld: dynamic(() => import("./workworld/worldwork-finder").then((m) => m.WorldworkFinder), {
     loading: Nothing,
   }),
-  WorkWorld: dynamic(() => import("./workworld-platform-view").then((m) => m.WorkworldPlatformView), {
+  Academy: dynamic(() => import("./academy/academy-path").then((m) => m.AcademyPath), { loading: Nothing }),
+  WorldHealth: dynamic(() => import("./worldhealth/worldhealth-consult").then((m) => m.WorldhealthConsult), {
     loading: Nothing,
   }),
-  Academy: dynamic(() => import("./academy-platform-view").then((m) => m.AcademyPlatformView), { loading: Nothing }),
-  WorldHealth: dynamic(() => import("./worldhealth-platform-view").then((m) => m.WorldhealthPlatformView), {
+  "E-Embassy": dynamic(() => import("./embassy/embassy-trip").then((m) => m.EmbassyTrip), { loading: Nothing }),
+  Forex: dynamic(() => import("./forex/forex-desk").then((m) => m.ForexDesk), { loading: Nothing }),
+  Crypto: dynamic(() => import("./crypto/crypto-desk").then((m) => m.CryptoDesk), { loading: Nothing }),
+  WorldSports: dynamic(() => import("./worldsports/worldsports-share").then((m) => m.WorldsportsShare), {
     loading: Nothing,
   }),
-  "E-Embassy": dynamic(() => import("./embassy-platform-view").then((m) => m.EmbassyPlatformView), {
-    loading: Nothing,
-  }),
-  Forex: dynamic(() => import("./forex-platform-view").then((m) => m.ForexPlatformView), { loading: Nothing }),
-  Crypto: dynamic(() => import("./crypto-platform-view").then((m) => m.CryptoPlatformView), { loading: Nothing }),
-  XStream: dynamic(() => import("./xtream-platform-view").then((m) => m.XtreamPlatformView), { loading: Nothing }),
-  WorldSports: dynamic(() => import("./worldsports-platform-view").then((m) => m.WorldsportsPlatformView), {
-    loading: Nothing,
-  }),
-  Prediction: dynamic(() => import("./prediction-platform-view").then((m) => m.PredictionPlatformView), {
+  Prediction: dynamic(() => import("./prediction/prediction-call").then((m) => m.PredictionCall), {
     loading: Nothing,
   }),
 };
 // The same chunks, fetched ahead
-const fetchViews: Record<Later, () => Promise<View>> = {
-  WorldMeet: () => import("./worldmeet-platform-view").then((m) => m.WorldmeetPlatformView),
-  Vsion: () => import("./vsion-platform-view").then((m) => m.VsionPlatformView),
-  "AI Movie": () => import("./ai-movie-platform-view").then((m) => m.AiMoviePlatformView),
-  Arcade: () => import("./arcade-platform-view").then((m) => m.ArcadePlatformView),
-  WorldStore: () => import("./worldstore-platform-view").then((m) => m.WorldstorePlatformView),
-  WorkWorld: () => import("./workworld-platform-view").then((m) => m.WorkworldPlatformView),
-  Academy: () => import("./academy-platform-view").then((m) => m.AcademyPlatformView),
-  WorldHealth: () => import("./worldhealth-platform-view").then((m) => m.WorldhealthPlatformView),
-  "E-Embassy": () => import("./embassy-platform-view").then((m) => m.EmbassyPlatformView),
-  Forex: () => import("./forex-platform-view").then((m) => m.ForexPlatformView),
-  Crypto: () => import("./crypto-platform-view").then((m) => m.CryptoPlatformView),
-  XStream: () => import("./xtream-platform-view").then((m) => m.XtreamPlatformView),
-  WorldSports: () => import("./worldsports-platform-view").then((m) => m.WorldsportsPlatformView),
-  Prediction: () => import("./prediction-platform-view").then((m) => m.PredictionPlatformView),
+const fetchDemos: Record<Name, () => Promise<Scene>> = {
+  WorldSpace: () => import("./worldspace/worldspace-space").then((m) => m.WorldspaceSpace),
+  WorldMeet: () => import("./worldmeet/worldmeet-call").then((m) => m.WorldmeetCall),
+  XStream: () => import("./xtream/xtream-battle").then((m) => m.XtreamBattle),
+  Vsion: () => import("./vision/vision-party").then((m) => m.VisionParty),
+  "AI Movie": () => import("./ai-movie/ai-movie-set").then((m) => m.AiMovieSet),
+  Arcade: () => import("./arcade/arcade-duel").then((m) => m.ArcadeDuel),
+  WorldStore: () => import("./worldstore/worldstore-deal").then((m) => m.WorldstoreDeal),
+  WorkWorld: () => import("./workworld/worldwork-finder").then((m) => m.WorldworkFinder),
+  Academy: () => import("./academy/academy-path").then((m) => m.AcademyPath),
+  WorldHealth: () => import("./worldhealth/worldhealth-consult").then((m) => m.WorldhealthConsult),
+  "E-Embassy": () => import("./embassy/embassy-trip").then((m) => m.EmbassyTrip),
+  Forex: () => import("./forex/forex-desk").then((m) => m.ForexDesk),
+  Crypto: () => import("./crypto/crypto-desk").then((m) => m.CryptoDesk),
+  WorldSports: () => import("./worldsports/worldsports-share").then((m) => m.WorldsportsShare),
+  Prediction: () => import("./prediction/prediction-call").then((m) => m.PredictionCall),
 };
 
-// Views whose chunk is in: a turn of the dial shows them straight away, with no frame of nothing while next/dynamic
-// resolves them
-const ready: Partial<Record<Later, View>> = {};
-let fetching: Promise<void> | null = null;
+// A phone or a tablet gets each platform's still (platform-stills.tsx): one picture of it, nothing to press. There
+// the demos' controls ran into each other, and their script was weight a phone carried for nothing; it never
+// fetches them now. The stills are small, so they're one chunk between them.
+const LazyStill: Still = dynamic(() => import("./platform-stills").then((m) => m.PlatformStill), {
+  loading: Nothing,
+});
 
-function fetchAll() {
-  fetching ??= Promise.all(
-    (Object.entries(fetchViews) as [Later, () => Promise<View>][]).map(([name, fetchView]) =>
-      // A chunk that fails to come is fetched again by next/dynamic when its view is shown
-      fetchView().then(
-        (view) => {
-          ready[name] = view;
+// Where the dial's own layout turns to its phone one (platform-timeline-section.tsx)
+const PHONE = "(max-width: 1023px)";
+type Kind = "still" | "demo";
+const kindNow = (): Kind => (window.matchMedia(PHONE).matches ? "still" : "demo");
+const watchKind = (changed: () => void) => {
+  const list = window.matchMedia(PHONE);
+  list.addEventListener("change", changed);
+  return () => list.removeEventListener("change", changed);
+};
+const kindUnknown = () => null;
+
+// Scenes whose chunk is in: a turn of the dial shows them straight away, with no frame of nothing while next/dynamic
+// resolves them
+const readyDemos: Partial<Record<Name, Scene>> = {};
+let readyStill: Still | null = null;
+let fetchingDemos: Promise<void> | null = null;
+let fetchingStills: Promise<void> | null = null;
+
+function fetchAllDemos() {
+  fetchingDemos ??= Promise.all(
+    (Object.entries(fetchDemos) as [Name, () => Promise<Scene>][]).map(([name, fetchDemo]) =>
+      // A chunk that fails to come is fetched again by next/dynamic when its demo is shown
+      fetchDemo().then(
+        (demo) => {
+          readyDemos[name] = demo;
         },
         () => {},
       ),
     ),
   ).then(() => {});
-  return fetching;
+  return fetchingDemos;
+}
+function fetchStills() {
+  fetchingStills ??= import("./platform-stills").then(
+    (m) => {
+      readyStill = m.PlatformStill;
+    },
+    () => {},
+  );
+  return fetchingStills;
+}
+
+/** What goes in a platform's frame on this screen, once its chunk is in. */
+function sceneFor(name: Name, kind: Kind): ReactNode {
+  if (kind === "still") return createElement(readyStill ?? LazyStill, { name });
+  return createElement(readyDemos[name] ?? lazyDemos[name]);
 }
 
 const nextFrame = () => new Promise<void>((done) => requestAnimationFrame(() => done()));
 
 /**
- * Every platform's demo, made ready while the hero's loader is up (lib/warm-page.ts): its chunk fetched, then the
- * demo put on for a moment, out of sight and untouchable, just long enough to ask for its pictures at the very sizes
+ * Every platform's scene, made ready while the hero's loader is up (lib/warm-page.ts): its chunk fetched, then the
+ * scene put on for a moment, out of sight and untouchable, just long enough to ask for its pictures at the very sizes
  * it will ask for on the dial, and taken off again while they come in. One at a time, so the loader keeps turning.
- * `landed` is called as each one's pictures are in.
+ * `landed` is called as each one's pictures are in. On a phone that's the stills; on a desktop, the demos.
  */
 export async function warmPlatformViews(landed: () => void = () => {}) {
-  await fetchAll();
+  const kind = kindNow();
+  await (kind === "still" ? fetchStills() : fetchAllDemos());
   const stage = document.createElement("div");
   stage.setAttribute("aria-hidden", "true");
   stage.inert = true;
@@ -102,21 +178,20 @@ export async function warmPlatformViews(landed: () => void = () => {}) {
   document.body.append(stage);
   const coming: Promise<void>[] = [];
   const clips: Promise<void>[] = [];
-  for (const name of Object.keys(fetchViews) as Later[]) {
-    const View = ready[name];
-    if (!View) {
+  for (const name of Object.keys(frames) as Name[]) {
+    if (kind === "still" ? !readyStill : !readyDemos[name]) {
       landed();
       continue;
     }
     const host = document.createElement("div");
     host.style.cssText = "position:absolute;left:0;top:0;width:min(560px,100vw)";
     stage.append(host);
-    // A demo that throws out here doesn't matter: it's shown for real on the dial
+    // A scene that throws out here doesn't matter: it's shown for real on the dial
     const quiet = () => {};
     const root = createRoot(host, { onUncaughtError: quiet, onCaughtError: quiet, onRecoverableError: quiet });
     let pictures: HTMLImageElement[] = [];
     try {
-      root.render(createElement(View));
+      root.render(createElement(frames[name], null, sceneFor(name, kind)));
       await nextFrame();
       await nextFrame();
       pictures = Array.from(host.querySelectorAll("img"));
@@ -138,37 +213,45 @@ export async function warmPlatformViews(landed: () => void = () => {}) {
   stage.remove();
   await Promise.all([...coming, ...clips]);
 }
-/** How many demos warmPlatformViews puts on. */
-export const WARM_VIEWS = Object.keys(fetchViews).length;
+/** How many scenes warmPlatformViews puts on. */
+export const WARM_VIEWS = Object.keys(frames).length;
 
 /**
- * Fetch the rest as the dial comes within three screens: not with the page, where on a slow phone they'd land while
- * the hero's loader and globe are still settling, the moment not to add to.
+ * Fetch the demos as the dial comes within three screens: not with the page, where on a slow phone they'd land while
+ * the hero's loader and globe are still settling, the moment not to add to. The stills are one small chunk, and the
+ * dial opens on one, so they're fetched as soon as the screen's known to be a phone's.
  */
-function fetchAhead() {
+function fetchAhead(kind: Kind | null) {
+  if (!kind) return;
+  if (kind === "still") {
+    fetchStills();
+    return;
+  }
   const dial = document.getElementById("discover");
   const near = new IntersectionObserver(
     ([entry]) => {
       if (!entry.isIntersecting) return;
       near.disconnect();
-      fetchAll();
+      fetchAllDemos();
     },
     { rootMargin: "300% 0px" },
   );
   // No dial to watch: fetch them now
   if (dial) near.observe(dial);
-  else fetchAll();
+  else fetchAllDemos();
   return () => near.disconnect();
 }
 
 // Memoised: the dial re-renders the section on every platform it passes, and without it the page showing (a whole
-// demo) rendered again with each one, many times a second as the dial was flung, for nothing.
+// scene) rendered again with each one, many times a second as the dial was flung, for nothing.
 export const PlatformView = memo(function PlatformView({ name }: { name: ShowcasePlatformName }) {
-  // Chosen once for each platform, so a view never swaps from one to the other (and starts over) while it's showing
-  const View = useMemo(
-    () => (name === "WorldSpace" ? WorldspacePlatformView : (ready[name] ?? lazyViews[name])),
-    [name],
-  );
-  useEffect(fetchAhead, []);
-  return <View />;
+  // Not known on the server or while the page hydrates: the frame alone until it is, so the HTML matches and a phone
+  // never asks for a demo
+  const kind = useSyncExternalStore(watchKind, kindNow, kindUnknown);
+  // Chosen once for each platform and screen, so a scene never swaps from the lazy one to the ready one (and starts
+  // over) while it's showing
+  const scene = useMemo(() => (kind ? sceneFor(name, kind) : null), [name, kind]);
+  useEffect(() => fetchAhead(kind), [kind]);
+  const Frame = frames[name];
+  return <Frame>{scene}</Frame>;
 });

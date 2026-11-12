@@ -1,0 +1,619 @@
+/* A platform's still: what the dial shows of it on a phone or a tablet, in
+   place of the demo you can play on a desktop (platform-view.tsx). One
+   picture of the product, nothing to press: a phone has no room for a
+   demo's controls (they ran into each other), and no need to carry them.
+
+   The pieces here are shared by every still; what only one still wears (a
+   clapperboard, an arch, an orbit) is in its own stylesheet beside it. They
+   take their colours from the panel they're on: its ink (currentColor), its
+   own colour (--hue) and its glass tone (cx-glass-light / cx-glass-dark, set
+   by the shell). One piece in each still is marked .grow: it takes whatever
+   room a taller phone has, so the still always fills its place above the
+   way in. */
+.still {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  height: 100%;
+  min-height: 0;
+  font-size: var(--text-xs);
+  line-height: 1.3;
+}
+.still p {
+  margin: 0;
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-height: 0;
+  padding: 16px;
+  border-radius: var(--cx-r-card);
+  background: color-mix(in srgb, currentColor 8%, transparent);
+  /* A hairline, so it reads as a surface and not a patch of tint */
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, currentColor 9%, transparent);
+}
+:global(.cx-glass-light) .card {
+  background: rgba(255, 255, 255, 0.92);
+  box-shadow:
+    0 0 0 1px rgba(12, 10, 9, 0.06),
+    0 16px 32px -24px rgba(12, 10, 9, 0.45);
+}
+/* A card in the panel's own colour */
+.card[data-fill] {
+  background: var(--hue);
+  color: var(--hue-on, #0c0a09);
+  box-shadow: none;
+}
+.card[data-tight] {
+  padding: 12px;
+}
+/* An ink card on a paper panel (a trading desk's order ticket) */
+.card.ink {
+  background: #0c0a09;
+  color: #fff;
+  box-shadow: 0 16px 32px -20px rgba(12, 10, 9, 0.6);
+}
+.grow {
+  flex: 1 1 0;
+  min-height: 96px;
+}
+
+/* Where what's under it needs the room more */
+.grow[data-short] {
+  min-height: 72px;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.between {
+  justify-content: space-between;
+}
+.stack {
+  display: grid;
+  gap: 2px;
+}
+/* Takes the row's spare width, and gives way before its neighbours do */
+.fill {
+  flex: 1 1 0;
+  min-width: 0;
+}
+.name {
+  font-weight: 500;
+}
+.clip {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.meta {
+  font-size: var(--cx-caption);
+  letter-spacing: var(--cx-caption-ls);
+  opacity: 0.7;
+}
+.figure {
+  font-size: var(--cx-h3);
+  font-weight: 300;
+  letter-spacing: -0.03em;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+/* A figure that leads its still */
+.giant {
+  font-size: clamp(40px, 13vw, 56px);
+  font-weight: 500;
+  letter-spacing: -0.05em;
+  line-height: 0.9;
+  font-variant-numeric: tabular-nums;
+}
+.eyebrow {
+  color: var(--hue-ink, var(--hue));
+  font-size: var(--cx-caption);
+  font-weight: 500;
+  letter-spacing: var(--cx-caption-ls);
+}
+.title {
+  font-size: var(--cx-h3);
+  font-weight: 500;
+  letter-spacing: -0.03em;
+  line-height: 1.05;
+}
+.hue {
+  color: var(--hue-ink, var(--hue));
+}
+.dim {
+  opacity: 0.45;
+}
+.gain {
+  color: #4ade80;
+}
+.loss {
+  color: #f87171;
+}
+:global(.cx-glass-light) .gain {
+  color: #15803d;
+}
+:global(.cx-glass-light) .loss {
+  color: #b91c1c;
+}
+/* On an ink card the bright pair again, whatever the panel */
+:global(.cx-glass-light) .ink .gain {
+  color: #4ade80;
+}
+:global(.cx-glass-light) .ink .loss {
+  color: #f87171;
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  height: 28px;
+  padding-inline: 12px;
+  border-radius: var(--cx-r-pill);
+  background: color-mix(in srgb, currentColor 10%, transparent);
+  font-weight: 500;
+  white-space: nowrap;
+}
+.chip[data-on] {
+  background: var(--hue);
+  color: var(--hue-on, #0c0a09);
+}
+/* A dot that says it's live */
+.live::before {
+  content: "";
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: currentColor;
+}
+/* A small tag for a change, tinted in its own colour */
+.tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px;
+  border-radius: var(--cx-r-pill);
+  background: color-mix(in srgb, currentColor 14%, transparent);
+  font-size: var(--cx-caption);
+  font-weight: 500;
+  line-height: 16px;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+.tag[data-on] {
+  background: var(--hue);
+  color: var(--hue-on, #0c0a09);
+}
+
+/* A picture: fills its box (next/image, fill), with room for a caption over
+   its foot */
+.photo {
+  position: relative;
+  overflow: hidden;
+  border-radius: var(--cx-r-card);
+  color: #fff;
+  background: color-mix(in srgb, currentColor 8%, transparent);
+}
+.photo img {
+  object-fit: cover;
+}
+.photo::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.1);
+  pointer-events: none;
+}
+/* The one that's speaking, leading, chosen */
+.photo[data-ring]::after {
+  box-shadow: inset 0 0 0 2px var(--hue);
+}
+.photo[data-dim] img {
+  opacity: 0.55;
+}
+.caption {
+  position: absolute;
+  inset: auto 0 0;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 32px 16px 12px;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.82), transparent);
+}
+.caption[data-tight] {
+  padding: 24px 8px 8px;
+}
+.pinned {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  background: rgba(0, 0, 0, 0.55);
+  color: #fff;
+}
+.pinned[data-on] {
+  background: var(--hue);
+  color: var(--hue-on, #0c0a09);
+}
+.pinned[data-side="right"] {
+  left: auto;
+  right: 12px;
+}
+.pinned[data-foot] {
+  top: auto;
+  bottom: 8px;
+  left: 8px;
+}
+/* A round sticker, stuck on at a tilt */
+.sticker {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  display: grid;
+  place-items: center;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: #e3122a;
+  color: #fff;
+  font-size: var(--text-sm);
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  transform: rotate(-12deg);
+  box-shadow: 0 8px 16px -8px rgba(0, 0, 0, 0.6);
+}
+/* More of the same, small, along a picture's foot */
+.thumbs {
+  position: absolute;
+  left: 8px;
+  bottom: 8px;
+  display: flex;
+  gap: 4px;
+}
+.thumbs img {
+  width: 36px;
+  height: 36px;
+  border-radius: var(--cx-r-md);
+  object-fit: cover;
+  box-shadow: 0 0 0 2px #fff;
+}
+
+.face {
+  flex: none;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+.face[data-ring] {
+  box-shadow: 0 0 0 2px var(--hue);
+}
+.face[data-small] {
+  width: 28px;
+  height: 28px;
+}
+.faces {
+  display: flex;
+}
+.faces > * + * {
+  margin-left: -12px;
+}
+/* A round glyph in the panel's colour (a player's pause, a seller's shield) */
+.glyph {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--hue);
+  color: var(--hue-on, #0c0a09);
+}
+
+/* How far along: --at is the share done */
+.bar {
+  height: 6px;
+  border-radius: var(--cx-r-pill);
+  background: color-mix(in srgb, currentColor 14%, transparent);
+  overflow: hidden;
+}
+.bar > i {
+  display: block;
+  width: var(--at);
+  height: 100%;
+  border-radius: inherit;
+  background: var(--hue);
+}
+.card[data-fill] .bar > i {
+  background: currentColor;
+}
+/* How far round: --at is the share done, its figure in the middle */
+.ring {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background:
+    radial-gradient(closest-side, var(--ring-in, #1f1b16) calc(100% - 5px), transparent calc(100% - 4px)),
+    conic-gradient(var(--hue) var(--at), color-mix(in srgb, currentColor 14%, transparent) 0);
+  font-size: var(--cx-caption);
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+}
+/* Steps in a row: done, under way, to come */
+.steps {
+  display: flex;
+  gap: 4px;
+}
+.steps > i {
+  flex: 1 1 0;
+  height: 6px;
+  border-radius: var(--cx-r-pill);
+  background: color-mix(in srgb, currentColor 14%, transparent);
+}
+.steps > i[data-done] {
+  background: var(--hue);
+}
+.steps > i[data-now] {
+  background: linear-gradient(to right, var(--hue) 50%, color-mix(in srgb, currentColor 14%, transparent) 50%);
+}
+/* A poll's answer: its share filled in behind its words */
+.meter {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  height: 32px;
+  padding-inline: 12px;
+  border-radius: var(--cx-r-md);
+  background: color-mix(in srgb, currentColor 7%, transparent);
+  overflow: hidden;
+  isolation: isolate;
+}
+.meter::before {
+  content: "";
+  position: absolute;
+  inset: 0 auto 0 0;
+  z-index: -1;
+  width: var(--at);
+  border-radius: inherit;
+  background: color-mix(in srgb, var(--hue) 22%, transparent);
+}
+.meter[data-on]::before {
+  background: color-mix(in srgb, var(--hue) 55%, transparent);
+}
+
+/* Charts (still-chart.tsx). The plot is a box the drawing stretches to: three
+   faint rules behind it, the line and its fill, a dot where it stands now. */
+.plot {
+  position: relative;
+  min-height: 56px;
+  margin-right: 6px;
+  background: linear-gradient(to bottom, color-mix(in srgb, currentColor 9%, transparent) 1px, transparent 1px) 0 0 / 100%
+    33.4%;
+}
+.plot svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+.line {
+  fill: none;
+  stroke: var(--hue-ink, var(--hue));
+  stroke-width: 2.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  vector-effect: non-scaling-stroke;
+}
+.fadeFrom {
+  stop-color: var(--hue-ink, var(--hue));
+  stop-opacity: 0.3;
+}
+.fadeTo {
+  stop-color: var(--hue-ink, var(--hue));
+  stop-opacity: 0;
+}
+.head {
+  position: absolute;
+  right: -5px;
+  width: 10px;
+  height: 10px;
+  margin-top: -5px;
+  border-radius: 50%;
+  background: var(--hue-ink, var(--hue));
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--hue-ink, var(--hue)) 26%, transparent);
+}
+/* A dashed level across the plot, named at its right (a rising line starts
+   down by the level, and would run through a name at the left) */
+.mark {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 0;
+  border-top: 1px dashed color-mix(in srgb, currentColor 34%, transparent);
+}
+.mark b {
+  position: absolute;
+  right: 0;
+  bottom: 2px;
+  font-size: var(--cx-caption);
+  font-weight: 500;
+  line-height: 1;
+  opacity: 0.6;
+}
+.ticks {
+  display: flex;
+  justify-content: space-between;
+  font-size: var(--cx-caption);
+  letter-spacing: var(--cx-caption-ls);
+  line-height: 1;
+  opacity: 0.55;
+  font-variant-numeric: tabular-nums;
+}
+/* Candles: room down the right for the levels' tags */
+.candles {
+  margin-right: 80px;
+}
+.candles line {
+  stroke-width: 1;
+}
+.candles rect {
+  stroke: none;
+}
+.up {
+  fill: #16a34a;
+  stroke: #16a34a;
+}
+.down {
+  fill: #dc2626;
+  stroke: #dc2626;
+}
+.level {
+  position: absolute;
+  left: 0;
+  right: -80px;
+  height: 0;
+  border-top: 1px dashed var(--tag);
+}
+.level b {
+  position: absolute;
+  right: 0;
+  top: -11px;
+  padding-inline: 6px;
+  border-radius: 6px;
+  background: var(--tag);
+  color: #fff;
+  font-size: var(--cx-caption);
+  font-weight: 500;
+  line-height: 22px;
+  white-space: nowrap;
+}
+.level[data-kind="tp"] {
+  --tag: #15803d;
+}
+.level[data-kind="sl"] {
+  --tag: #dc2626;
+}
+.level[data-kind="now"] {
+  --tag: #0c0a09;
+  border-top-style: solid;
+}
+
+/* Things side by side in equal shares (figures, answers, two rooms) */
+.split {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(0, 1fr);
+  gap: 8px;
+}
+.cell {
+  display: grid;
+  gap: 2px;
+  padding: 8px 12px;
+  border-radius: var(--cx-r-md);
+  background: color-mix(in srgb, currentColor 7%, transparent);
+}
+.cell[data-on] {
+  background: var(--hue);
+  color: var(--hue-on, #0c0a09);
+}
+.rule {
+  border-top: 1px solid color-mix(in srgb, currentColor 12%, transparent);
+  padding-top: 8px;
+}
+/* The one that's picked: ringed in the panel's colour */
+.picked {
+  margin: -4px;
+  padding: 8px;
+  border-radius: var(--cx-r-md);
+  background: color-mix(in srgb, var(--hue) 9%, transparent);
+  box-shadow: inset 0 0 0 2px var(--hue);
+}
+/* A strip in the panel's colour, softly: a promise, a note */
+.note {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border-radius: var(--cx-r-md);
+  background: color-mix(in srgb, var(--hue) 14%, transparent);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--hue) 30%, transparent);
+}
+
+/* A few panels are handed their family's softened colour inline (the dial's:
+   platform-showcase-content.ts), which no stylesheet can outrank from
+   outside. Their stills wear the product's own colour instead, as their
+   demos do. */
+.still[data-brand="studio"] {
+  --hue: #ffcc2d;
+  --hue-ink: #ffcc2d;
+  --hue-on: #1a1400;
+}
+.still[data-brand="work"] {
+  --hue: #fafafa;
+  --hue-ink: #fff;
+  --hue-on: #0a0a0a;
+}
+.still[data-brand="health"] {
+  --hue: #00776e;
+  --hue-ink: #005f5a;
+  --hue-on: #fff;
+}
+.still[data-brand="embassy"] {
+  --hue: #0450c0;
+  --hue-ink: #8eb7ff;
+  --hue-on: #fff;
+}
+.still[data-brand="arcade"] {
+  --hue: #b5c478;
+  --hue-ink: #556300;
+  --hue-on: #150f26;
+}
+/* Forex is ink on paper */
+.still[data-brand="forex"] {
+  --hue-ink: #0c0a09;
+}
+/* Text on the panel's colour is white where that colour is a deep one */
+.still[data-on="white"] {
+  --hue-on: #fff;
+}
+.centre {
+  justify-items: center;
+  text-align: center;
+}
+.pair {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-auto-rows: minmax(0, 1fr);
+  gap: 8px;
+}
+.pair > .cell {
+  align-content: center;
+}
+.lead {
+  font-size: var(--text-sm);
+  font-weight: 500;
+  letter-spacing: var(--cx-body-ls);
+  line-height: 1.25;
+}
+.was {
+  text-decoration: line-through;
+}
+.end {
+  justify-items: end;
+  text-align: right;
+}
+.base {
+  align-items: baseline;
+}

@@ -1,6 +1,6 @@
+import type { ReactNode } from "react";
 import Image from "next/image";
 import { PlatformViewShell } from "./platform-view-shell";
-import { AcademyPath } from "./academy/academy-path";
 import styles from "./academy-platform-view.module.css";
 
 /**
@@ -8,7 +8,7 @@ import styles from "./academy-platform-view.module.css";
  * dark and gold: its W, its line, and its eight schools on their pedestals
  * beside the path through each.
  */
-export function AcademyPlatformView() {
+export function AcademyPlatformView({ children }: { children: ReactNode }) {
   return (
     <PlatformViewShell
       name="Academy"
@@ -28,7 +28,7 @@ export function AcademyPlatformView() {
         </>
       }
     >
-      <AcademyPath />
+      {children}
     </PlatformViewShell>
   );
 }

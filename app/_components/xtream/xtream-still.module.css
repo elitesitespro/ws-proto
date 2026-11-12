@@ -1,0 +1,46 @@
+/* Xtream's still: the battle as its demo stages it. Each room's name and
+   total sit at its head, the clock on the seam between them, and under
+   both the tug of war in the two rooms' colours. */
+.versus {
+  position: relative;
+  gap: 4px;
+}
+.score {
+  position: absolute;
+  inset: 0 0 auto;
+  display: grid;
+  gap: 2px;
+  padding: 8px 12px 28px;
+  background: linear-gradient(to bottom, rgba(0, 0, 0, 0.78), transparent);
+}
+.score[data-side="right"] {
+  justify-items: end;
+  text-align: right;
+}
+.clock {
+  position: absolute;
+  top: 44%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  padding: 4px 12px;
+  border-radius: var(--cx-r-pill);
+  background: #fff;
+  color: #0c0a09;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+  box-shadow: 0 8px 16px -8px rgba(0, 0, 0, 0.7);
+}
+/* Who's ahead: Zara's chili from the left, Kojo's ember from the right */
+.tug {
+  position: relative;
+  height: 8px;
+  border-radius: var(--cx-r-pill);
+  background: #ff7a1a;
+  overflow: hidden;
+}
+.tug > i {
+  position: absolute;
+  inset: 0 42% 0 0;
+  background: var(--hue);
+  box-shadow: 2px 0 0 #fff;
+}

@@ -1,6 +1,6 @@
+import type { ReactNode } from "react";
 import Image from "next/image";
 import { PlatformViewShell } from "./platform-view-shell";
-import { WorldhealthConsult } from "./worldhealth/worldhealth-consult";
 import styles from "./worldhealth-platform-view.module.css";
 
 /**
@@ -8,7 +8,7 @@ import styles from "./worldhealth-platform-view.module.css";
  * heart mark, its line, and a consultation you can book, from telling Vivid
  * how you feel to the call itself. Not for emergencies.
  */
-export function WorldhealthPlatformView() {
+export function WorldhealthPlatformView({ children }: { children: ReactNode }) {
   return (
     <PlatformViewShell
       name="WorldHealth"
@@ -33,7 +33,7 @@ export function WorldhealthPlatformView() {
         </>
       }
     >
-      <WorldhealthConsult />
+      {children}
     </PlatformViewShell>
   );
 }

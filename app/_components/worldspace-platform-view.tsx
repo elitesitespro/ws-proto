@@ -1,10 +1,6 @@
-"use client";
-
-import { useState } from "react";
+import type { ReactNode } from "react";
 import { WorldSpaceLogo } from "@/components/ui/worldspace-logo";
 import { PlatformViewShell } from "./platform-view-shell";
-import { WorldspaceFeed } from "./worldspace/worldspace-feed";
-import { WorldspaceRoom } from "./worldspace/worldspace-room";
 import styles from "./worldspace-platform-view.module.css";
 
 /**
@@ -14,10 +10,7 @@ import styles from "./worldspace-platform-view.module.css";
  * from either side takes you into the room. WorldSpace's cyan (the shell's
  * data-hue, set in platform-views.module.css) marks what's live and yours.
  */
-export function WorldspacePlatformView() {
-  const [joined, setJoined] = useState(false);
-  const join = () => setJoined(!joined);
-
+export function WorldspacePlatformView({ children }: { children: ReactNode }) {
   return (
     <PlatformViewShell
       name="WorldSpace"
@@ -43,10 +36,7 @@ export function WorldspacePlatformView() {
         </>
       }
     >
-      <div className={styles.space}>
-        <WorldspaceFeed joined={joined} onJoin={join} />
-        <WorldspaceRoom joined={joined} onJoin={join} />
-      </div>
+      {children}
     </PlatformViewShell>
   );
 }

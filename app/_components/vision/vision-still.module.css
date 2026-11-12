@@ -1,0 +1,6 @@
+/* Vision's still: tonight's film, and the edge of the next one on the shelf */
+.shelf {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 64px;
+  gap: 8px;
+}

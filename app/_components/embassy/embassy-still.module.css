@@ -1,0 +1,61 @@
+/* E-Embassy's still: its demo's arch on the city, the weather there and
+   the visa's blue bar on it, with the route and the steps done beside it */
+.trip {
+  flex-direction: row;
+  gap: 12px;
+}
+.arch {
+  flex: 0.9 1 0;
+  min-width: 0;
+  border-radius: 999px 999px var(--cx-r-card) var(--cx-r-card);
+}
+.weather {
+  position: absolute;
+  top: 18%;
+  left: 50%;
+  display: grid;
+  justify-items: center;
+  gap: 2px;
+  padding: 8px 12px;
+  border-radius: var(--cx-r-md);
+  background: rgba(11, 18, 38, 0.72);
+  white-space: nowrap;
+  transform: translateX(-50%);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.14);
+}
+.approved {
+  position: absolute;
+  inset: auto 8px 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  height: 36px;
+  border-radius: var(--cx-r-md);
+  background: var(--hue);
+  color: #fff;
+  font-weight: 500;
+  white-space: nowrap;
+}
+.plan {
+  flex: 1 1 0;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 8px;
+}
+.ticket {
+  flex-direction: row;
+  align-items: center;
+}
+/* The flight: a dashed line with the plane on it */
+.route {
+  display: grid;
+  place-items: center;
+  background: linear-gradient(to right, currentColor 50%, transparent 50%) center / 8px 1px repeat-x;
+}
+.route > * {
+  background: #1a1d29;
+  border-radius: 50%;
+}

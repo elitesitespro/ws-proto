@@ -1,8 +1,8 @@
 "use client";
 
+import type { ReactNode } from "react";
 import Image from "next/image";
 import { PlatformViewShell } from "./platform-view-shell";
-import { XtreamBattle } from "./xtream/xtream-battle";
 import styles from "./xtream-platform-view.module.css";
 
 /**
@@ -10,7 +10,7 @@ import styles from "./xtream-platform-view.module.css";
  * mark, its line ("Go live. Get backed. Get paid."), and a battle you can
  * play: two rooms, one clock, and the gifts that decide it.
  */
-export function XtreamPlatformView() {
+export function XtreamPlatformView({ children }: { children: ReactNode }) {
   return (
     <PlatformViewShell
       name="XStream"
@@ -28,7 +28,7 @@ export function XtreamPlatformView() {
         </>
       }
     >
-      <XtreamBattle />
+      {children}
     </PlatformViewShell>
   );
 }

@@ -1,6 +1,6 @@
+import type { ReactNode } from "react";
 import { Icon } from "@/components/icon";
 import { PlatformViewShell } from "./platform-view-shell";
-import { WorldsportsShare } from "./worldsports/worldsports-share";
 import styles from "./worldsports-platform-view.module.css";
 
 /**
@@ -8,7 +8,7 @@ import styles from "./worldsports-platform-view.module.css";
  * it: its trophy on the pitch's green, its line, and a player share to buy
  * on the pitch. Players and prices are illustrative; 18+.
  */
-export function WorldsportsPlatformView() {
+export function WorldsportsPlatformView({ children }: { children: ReactNode }) {
   return (
     <PlatformViewShell
       name="WorldSports"
@@ -31,7 +31,7 @@ export function WorldsportsPlatformView() {
         </>
       }
     >
-      <WorldsportsShare />
+      {children}
     </PlatformViewShell>
   );
 }

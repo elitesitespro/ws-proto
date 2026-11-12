@@ -1,6 +1,6 @@
+import type { ReactNode } from "react";
 import { Icon } from "@/components/icon";
 import { PlatformViewShell } from "./platform-view-shell";
-import { PredictionCall } from "./prediction/prediction-call";
 import styles from "./prediction-platform-view.module.css";
 
 /**
@@ -8,7 +8,7 @@ import styles from "./prediction-platform-view.module.css";
  * topics with the crowd's chance moving live, and your own call to make on
  * it, every outcome with its % chance. For adults 18 and over.
  */
-export function PredictionPlatformView() {
+export function PredictionPlatformView({ children }: { children: ReactNode }) {
   return (
     <PlatformViewShell
       name="Prediction"
@@ -30,7 +30,7 @@ export function PredictionPlatformView() {
         </>
       }
     >
-      <PredictionCall />
+      {children}
     </PlatformViewShell>
   );
 }

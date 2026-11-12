@@ -1,6 +1,6 @@
+import type { ReactNode } from "react";
 import { Icon } from "@/components/icon";
 import { PlatformViewShell } from "./platform-view-shell";
-import { CryptoDesk } from "./crypto/crypto-desk";
 import styles from "./crypto-platform-view.module.css";
 
 /**
@@ -8,7 +8,7 @@ import styles from "./crypto-platform-view.module.css";
  * gold, its line, and a desk you can trade on: a sample portfolio moving
  * live and a ticket for spot or perpetual futures.
  */
-export function CryptoPlatformView() {
+export function CryptoPlatformView({ children }: { children: ReactNode }) {
   return (
     <PlatformViewShell
       name="Crypto"
@@ -31,7 +31,7 @@ export function CryptoPlatformView() {
         </>
       }
     >
-      <CryptoDesk />
+      {children}
     </PlatformViewShell>
   );
 }

@@ -1,6 +1,6 @@
+import type { ReactNode } from "react";
 import { Icon } from "@/components/icon";
 import { PlatformViewShell } from "./platform-view-shell";
-import { ForexDesk } from "./forex/forex-desk";
 import styles from "./forex-platform-view.module.css";
 
 /**
@@ -9,7 +9,7 @@ import styles from "./forex-platform-view.module.css";
  * the sessions on the real clock, and an order ticket with take-profit and
  * stop-loss. Sample figures only.
  */
-export function ForexPlatformView() {
+export function ForexPlatformView({ children }: { children: ReactNode }) {
   return (
     <PlatformViewShell
       name="Forex"
@@ -31,7 +31,7 @@ export function ForexPlatformView() {
         </>
       }
     >
-      <ForexDesk />
+      {children}
     </PlatformViewShell>
   );
 }

@@ -1,5 +1,5 @@
+import type { ReactNode } from "react";
 import { PlatformViewShell } from "./platform-view-shell";
-import { WorldstoreDeal } from "./worldstore/worldstore-deal";
 import styles from "./worldstore-platform-view.module.css";
 
 /**
@@ -7,7 +7,7 @@ import styles from "./worldstore-platform-view.module.css";
  * line from worldstreetgold.com, then a deal you can run from offer to
  * escrow to the seller being paid (worldstore/).
  */
-export function WorldstorePlatformView() {
+export function WorldstorePlatformView({ children }: { children: ReactNode }) {
   return (
     <PlatformViewShell
       name="WorldStore"
@@ -38,7 +38,7 @@ export function WorldstorePlatformView() {
         </>
       }
     >
-      <WorldstoreDeal />
+      {children}
     </PlatformViewShell>
   );
 }

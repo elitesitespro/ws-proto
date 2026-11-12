@@ -1,0 +1,32 @@
+/* WorldSpace's still: the helmet with the room in orbit round it, as its
+   demo has it, and the room's name beside it */
+.room {
+  flex-direction: row;
+  align-items: center;
+  gap: 16px;
+  background:
+    radial-gradient(60% 90% at 26% 50%, color-mix(in srgb, var(--hue) 22%, transparent), transparent),
+    color-mix(in srgb, currentColor 6%, transparent);
+}
+.orbit {
+  position: relative;
+  flex: 1 1 0;
+  align-self: stretch;
+  min-width: 112px;
+}
+.helmet {
+  object-fit: contain;
+  padding: 4px 16px;
+}
+/* The orbit's path: a tilted ring behind the helmet */
+.path {
+  position: absolute;
+  inset: 30% -2% 14%;
+  border: 1px solid color-mix(in srgb, var(--hue) 55%, transparent);
+  border-radius: 50%;
+  transform: rotate(-10deg);
+}
+.rider {
+  position: absolute;
+  transform: translate(-50%, -50%);
+}
